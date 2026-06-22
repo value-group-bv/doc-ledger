@@ -28,7 +28,15 @@ services:
       - "${HTTP_PORT:-8080}:80"
     depends_on:
       - php
+    networks:
+      - default
+      - npm_proxy
     restart: unless-stopped
 
 volumes:
   docledger_var:
+
+networks:
+  npm_proxy:
+    external: true
+    name: "${NPM_NETWORK:-nginxproxymanager_default}"
