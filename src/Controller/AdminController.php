@@ -175,25 +175,27 @@ class AdminController extends AbstractController
     // ── Sub categories ────────────────────────────────────────────────────────
 
     #[Route('/subcat/new', name: 'subcat_new', methods: ['POST'])]
-    public function subcatNew(Request $request, DocTypeRepository $docTypes, DocSubsidiaryRepository $subsidiaries): Response
+    public function subcatNew(Request $request, DocTypeRepository $docTypes, DocMainCategoryRepository $mainCats, DocSubsidiaryRepository $subsidiaries): Response
     {
         $docTypeId = (int) $request->request->get('docTypeId', 0);
+        $mainCategoryId = (int) $request->request->get('mainCategoryId', 0);
         $subsidiaryId = (int) $request->request->get('subsidiaryId', 0);
         $code = (int) $request->request->get('code', 0);
         $description = trim((string) $request->request->get('description', ''));
         $docType = $docTypes->find($docTypeId);
+        $mainCategory = $mainCategoryId ? $mainCats->find($mainCategoryId) : null;
         $subsidiary = $subsidiaryId ? $subsidiaries->find($subsidiaryId) : null;
 
         if ($docType && $code && $description) {
             $entity = new DocSubCategory();
-            $entity->setCode($code)->setDescription($description)->setDocType($docType)->setSubsidiary($subsidiary);
+            $entity->setCode($code)->setDescription($description)->setDocType($docType)->setMainCategory($mainCategory)->setSubsidiary($subsidiary);
             $this->em->persist($entity);
             try {
                 $this->em->flush();
                 $this->addFlash('success', "Sub category {$code} added.");
             } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException) {
                 $this->em->clear();
-                $this->addFlash('error', "Sub category {$code} already exists for this document type and subsidiary.");
+                $this->addFlash('error', "Sub category {$code} already exists for this document type, main category and subsidiary.");
             }
         }
 
@@ -207,24 +209,26 @@ class AdminController extends AbstractController
     }
 
     #[Route('/subcat/{id}/update', name: 'subcat_update', methods: ['POST'])]
-    public function subcatUpdate(int $id, Request $request, DocTypeRepository $docTypes, DocSubsidiaryRepository $subsidiaries): Response
+    public function subcatUpdate(int $id, Request $request, DocTypeRepository $docTypes, DocMainCategoryRepository $mainCats, DocSubsidiaryRepository $subsidiaries): Response
     {
         $entity = $this->em->find(DocSubCategory::class, $id);
         $code = (int) $request->request->get('code', 0);
         $description = trim((string) $request->request->get('description', ''));
         $docTypeId = (int) $request->request->get('docTypeId', 0);
+        $mainCategoryId = (int) $request->request->get('mainCategoryId', 0);
         $subsidiaryId = (int) $request->request->get('subsidiaryId', 0);
         $docType = $docTypes->find($docTypeId);
+        $mainCategory = $mainCategoryId ? $mainCats->find($mainCategoryId) : null;
         $subsidiary = $subsidiaryId ? $subsidiaries->find($subsidiaryId) : null;
 
         if ($entity && $code && $description && $docType) {
-            $entity->setCode($code)->setDescription($description)->setDocType($docType)->setSubsidiary($subsidiary);
+            $entity->setCode($code)->setDescription($description)->setDocType($docType)->setMainCategory($mainCategory)->setSubsidiary($subsidiary);
             try {
                 $this->em->flush();
                 $this->addFlash('success', "Sub category {$entity->getFormattedCode()} updated.");
             } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException) {
                 $this->em->clear();
-                $this->addFlash('error', "Sub category {$code} already exists for this document type and subsidiary.");
+                $this->addFlash('error', "Sub category {$code} already exists for this document type, main category and subsidiary.");
             }
         }
 

@@ -1,5 +1,6 @@
 Document numbering ledger for Value Group.
 
 ## TODO
-1. Keyword search
-2. Add sub category uniqueness per main category
+[x] Keyword search
+[x] Add sub category uniqueness per main category
+[] Build to Docker

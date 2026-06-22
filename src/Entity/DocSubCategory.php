@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DocSubCategoryRepository::class)]
 #[ORM\Table(name: 'doc_sub_category')]
-#[ORM\UniqueConstraint(fields: ['code', 'docType', 'subsidiary'])]
+#[ORM\UniqueConstraint(fields: ['code', 'docType', 'mainCategory', 'subsidiary'])]
 class DocSubCategory
 {
     #[ORM\Id]
@@ -27,6 +27,11 @@ class DocSubCategory
     #[ORM\ManyToOne(targetEntity: DocType::class, inversedBy: 'subCategories')]
     #[ORM\JoinColumn(nullable: false)]
     private DocType $docType;
+
+    /** Null means this sub category applies to all main categories */
+    #[ORM\ManyToOne(targetEntity: DocMainCategory::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?DocMainCategory $mainCategory = null;
 
     /** Null means this sub category applies to all subsidiaries */
     #[ORM\ManyToOne(targetEntity: DocSubsidiary::class)]
@@ -53,6 +58,9 @@ class DocSubCategory
     public function setDescription(string $description): static { $this->description = $description; return $this; }
     public function getDocType(): DocType { return $this->docType; }
     public function setDocType(DocType $docType): static { $this->docType = $docType; return $this; }
+
+    public function getMainCategory(): ?DocMainCategory { return $this->mainCategory; }
+    public function setMainCategory(?DocMainCategory $mainCategory): static { $this->mainCategory = $mainCategory; return $this; }
 
     public function getSubsidiary(): ?DocSubsidiary { return $this->subsidiary; }
     public function setSubsidiary(?DocSubsidiary $subsidiary): static { $this->subsidiary = $subsidiary; return $this; }

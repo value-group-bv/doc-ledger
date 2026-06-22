@@ -86,11 +86,11 @@ class DocumentWizard
         return $this->docTypes->findBy([], ['sortOrder' => 'ASC']);
     }
 
-    /** @return DocSubCategory[] — filtered by selected docType and subsidiary */
+    /** @return DocSubCategory[] — filtered by selected docType, mainCategory and subsidiary */
     public function getSubCategories(): array
     {
-        if (!$this->docTypeId || !$this->subsidiaryId) return [];
-        return $this->subCategories->findForWizard($this->docTypeId, $this->subsidiaryId);
+        if (!$this->docTypeId || !$this->mainCategoryId || !$this->subsidiaryId) return [];
+        return $this->subCategories->findForWizard($this->docTypeId, $this->mainCategoryId, $this->subsidiaryId);
     }
 
     /** @return DocPredefinedNumber[] — filtered by selected subCategory */

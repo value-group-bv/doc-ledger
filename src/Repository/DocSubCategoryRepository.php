@@ -14,13 +14,15 @@ class DocSubCategoryRepository extends ServiceEntityRepository
         parent::__construct($registry, DocSubCategory::class);
     }
 
-    /** Returns sub categories for a doc type, scoped to the given subsidiary plus any shared (subsidiary = null) ones. */
-    public function findForWizard(int $docTypeId, int $subsidiaryId): array
+    /** Returns sub categories for a doc type + main category, scoped to the given subsidiary plus shared (null) ones. */
+    public function findForWizard(int $docTypeId, int $mainCategoryId, int $subsidiaryId): array
     {
         return $this->createQueryBuilder('sc')
             ->where('sc.docType = :docTypeId')
+            ->andWhere('sc.mainCategory = :mainCategoryId OR sc.mainCategory IS NULL')
             ->andWhere('sc.subsidiary = :subsidiaryId OR sc.subsidiary IS NULL')
             ->setParameter('docTypeId', $docTypeId)
+            ->setParameter('mainCategoryId', $mainCategoryId)
             ->setParameter('subsidiaryId', $subsidiaryId)
             ->orderBy('sc.code', 'ASC')
             ->getQuery()
