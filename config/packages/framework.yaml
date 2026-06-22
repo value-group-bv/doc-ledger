@@ -8,7 +8,7 @@ framework:
 when@prod:
     framework:
         # Trust any private-network upstream (NPM reverse proxy) to forward HTTPS scheme.
-        trusted_proxies: '127.0.0.1,PRIVATE_SUBNET'
+        trusted_proxies: '127.0.0.1,PRIVATE_SUBNETS'
         trusted_headers:
             - 'x-forwarded-for'
             - 'x-forwarded-host'

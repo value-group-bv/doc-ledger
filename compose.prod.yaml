@@ -11,7 +11,7 @@ services:
       DATABASE_URL: "sqlite:////var/www/html/var/data.db"
       MAILER_DSN: "null://null"
       MESSENGER_TRANSPORT_DSN: "sync://"
-      TRUSTED_PROXIES: "127.0.0.1,PRIVATE_SUBNET"
+      TRUSTED_PROXIES: "127.0.0.1,PRIVATE_SUBNETS"
       AZURE_CLIENT_ID: "${AZURE_CLIENT_ID}"
       AZURE_CLIENT_SECRET: "${AZURE_CLIENT_SECRET}"
       AZURE_TENANT_ID: "${AZURE_TENANT_ID}"
