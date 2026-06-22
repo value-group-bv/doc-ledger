@@ -13,7 +13,7 @@ knpu_oauth2_client:
                 scope: [openid, profile, email]
                 urlLogin: 'https://login.microsoftonline.com/'
                 pathAuthorize: '/oauth2/authorize'
-                pathToken: '/oauth2/token'
+                pathToken: '/oauth2/v2.0/token'
                 urlAPI: 'https://graph.windows.net/'
                 API_VERSION: '1.6'
                 authWithResource: false
