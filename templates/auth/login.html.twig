@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% set page_title = 'Sign in' %}
+{% set page_auth = true %}
+
+{% block body %}
+
+<div class="flex justify-center items-center min-h-screen">
+    <twig:Card class="shadow-xl/30 px-3 rounded-2xl w-[366px]">
+        {% include 'auth/_card_header.html.twig' %}
+        <twig:Card:Content>
+
+            {% for message in app.flashes('error') %}
+            <div class="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg border border-destructive/25 bg-destructive/5 text-destructive text-sm">
+                <twig:ux:icon name="material-symbols:error-outline" class="size-4 shrink-0" />
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+
+            <a href="{{ path('oidc_azure_start') }}"
+                class="flex justify-center items-center bg-white hover:bg-neutral-50 border border-border rounded-lg w-full h-10 font-medium text-gray-600 text-sm no-underline transition-colors"
+                style="gap: 0.75rem;">
+                <twig:ux:icon name="logos:microsoft-icon" class="size-4 shrink-0" />
+                Continue with Microsoft 365
+            </a>
+
+        </twig:Card:Content>
+        <twig:Card:Footer class="flex-row justify-center gap-4">
+            <a href="https://valuegroupnl.com/"
+                class="text-muted-foreground text-sm hover:underline underline-offset-3">Back to main site</a>
+        </twig:Card:Footer>
+    </twig:Card>
+</div>
+
+{% endblock %}

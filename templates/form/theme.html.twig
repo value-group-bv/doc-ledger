@@ -1,0 +1,72 @@
+{# Project-wide form theme. Registered globally via twig.yaml. #}
+
+{%- block form_label -%}
+    {%- if label is not same as(false) -%}
+        {%- if not compound -%}
+            {%- set label_attr = label_attr|merge({'for': id}) -%}
+        {%- endif -%}
+        {%- if label is empty -%}
+            {%- set label = name|humanize -%}
+        {%- endif -%}
+        {%- set label_attr = label_attr|merge({
+            class: ('flex items-center gap-2 text-sm leading-none font-medium select-none ' ~ (label_attr.class ?? ''))|trim
+        }) -%}
+        <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            {{- translation_domain is same as(false) ? label : label|trans({}, translation_domain) -}}
+        </label>
+    {%- endif -%}
+{%- endblock %}
+
+{%- block form_widget_simple -%}
+    {%- set base_class = 'flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50' -%}
+    {%- if errors|length -%}
+        {%- set base_class = base_class ~ ' border-destructive focus-visible:ring-destructive' -%}
+    {%- endif -%}
+    {%- set attr = attr|merge({class: (base_class ~ ' ' ~ (attr.class ?? ''))|trim}) -%}
+    <input type="{{ type|default('text') }}" {{ block('widget_attributes') }}{% if value is not empty %} value="{{ value }}"{% endif %}/>
+{%- endblock %}
+
+{%- block choice_widget_collapsed -%}
+    {%- if required and placeholder is none and not placeholder_in_choices and not multiple and (attr.size is not defined or attr.size <= 1) -%}
+        {%- set required = false -%}
+    {%- endif -%}
+    {%- set base_class = 'flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50' -%}
+    {%- if errors|length -%}
+        {%- set base_class = base_class ~ ' border-destructive focus-visible:ring-destructive' -%}
+    {%- endif -%}
+    {%- set attr = attr|merge({class: (base_class ~ ' ' ~ (attr.class ?? ''))|trim}) -%}
+    <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
+        {%- if placeholder is not none -%}
+            <option value=""{% if required and value is empty %} selected="selected"{% endif %}>{{ placeholder != '' ? (translation_domain is same as(false) ? placeholder : placeholder|trans({}, translation_domain)) }}</option>
+        {%- endif -%}
+        {%- if preferred_choices|length > 0 -%}
+            {%- set options = preferred_choices -%}
+            {%- set render_preferred_choices = true -%}
+            {{- block('choice_widget_options') -}}
+            {%- if choices|length > 0 and separator is not none -%}
+                <option disabled="disabled">{{ separator }}</option>
+            {%- endif -%}
+        {%- endif -%}
+        {%- set options = choices -%}
+        {%- set render_preferred_choices = false -%}
+        {{- block('choice_widget_options') -}}
+    </select>
+{%- endblock choice_widget_collapsed -%}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+        <p class="text-destructive text-xs">
+            {%- for error in errors -%}{{ error.message }}{%- endfor -%}
+        </p>
+    {%- endif -%}
+{%- endblock %}
+
+{%- block form_row -%}
+    <div class="gap-2 grid">
+        {{- form_label(form) -}}
+        {{- form_widget(form) -}}
+        {{- form_errors(form) -}}
+    </div>
+{%- endblock %}
+
+{%- block hidden_row -%}{{ form_widget(form) }}{%- endblock %}

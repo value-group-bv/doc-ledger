@@ -1,0 +1,19 @@
+knpu_oauth2_client:
+    clients:
+        azure:
+            type: generic
+            provider_class: App\Security\MultiTenantAzureProvider
+            client_id: '%env(AZURE_CLIENT_ID)%'
+            client_secret: '%env(AZURE_CLIENT_SECRET)%'
+            redirect_route: oidc_azure_callback
+            redirect_params: {}
+            provider_options:
+                tenant: '%env(AZURE_TENANT_ID)%'
+                defaultEndPointVersion: '2.0'
+                scope: [openid, profile, email]
+                urlLogin: 'https://login.microsoftonline.com/'
+                pathAuthorize: '/oauth2/authorize'
+                pathToken: '/oauth2/token'
+                urlAPI: 'https://graph.windows.net/'
+                API_VERSION: '1.6'
+                authWithResource: false

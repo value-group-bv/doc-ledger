@@ -1,24 +1,78 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html class='h-full' lang="en">
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Value Group Document Ledger">
+    <meta name="theme-color" content="#0f5b7f">
+    <meta name="robots" content="noindex">
 
-        {% set frankenphpHotReload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
-        {% if frankenphpHotReload %}
-        <meta name="frankenphp-hot-reload:url" content="{{ frankenphpHotReload }}">
-        <script src="https://cdn.jsdelivr.net/npm/idiomorph"></script>
-        <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
-        {% endif %}
-    </head>
-    <body>
+    <title>{{ page_title is defined ? page_title|title ~ ' |' }} Document Ledger</title>
+
+    <link rel="icon" type="image/x-icon" href="{{ asset('/favicon.ico') }}">
+    <link rel="canonical" href="{{ app.request.uri }}">
+
+    {% block javascripts %}
+    {% block importmap %}{{ importmap('app') }}{% endblock %}
+
+    <script>(function () {
+            {% if page_auth is defined %}
+            document.documentElement.classList.remove('dark');
+            {% else %}
+            const saved = localStorage.getItem('theme');
+            if (saved === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else if (saved === 'light') {
+                document.documentElement.classList.remove('dark');
+            } else {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.classList.toggle('dark', prefersDark);
+            }
+            {% endif %}
+        })();
+    </script>
+    {% endblock %}
+
+    {% block stylesheets %}
+    {% if (page_auth is defined) %}
+    <link rel="stylesheet" href="{{ asset('styles/auth.css') }}">
+    {% endif %}
+    <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto+Slab:wght@100..900&display=swap"
+        rel="stylesheet">
+    {% endblock %}
+
+    {% set frankenphpHotReload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
+    {% if frankenphpHotReload %}
+    <meta name="frankenphp-hot-reload:url" content="{{ frankenphpHotReload }}">
+    <script src="https://cdn.jsdelivr.net/npm/idiomorph"></script>
+    <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
+    {% endif %}
+</head>
+
+<body id="body" class='flex flex-col min-h-screen'>
+
+    {% block header %}
+    {% if page_auth is not defined %}
+    {{ include('_header.html.twig') }}
+    {% endif %}
+    {% endblock %}
+
+    <main id='content' class='flex-1 mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-7xl'>
         {% block body %}{% endblock %}
-    </body>
+    </main>
+
+    {% block footer %}
+    {% if page_auth is not defined %}
+    {{ include('_footer.html.twig') }}
+    {% endif %}
+    {% endblock %}
+
+</body>
+
 </html>
