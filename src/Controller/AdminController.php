@@ -288,7 +288,7 @@ class AdminController extends AbstractController
     // ── Users ─────────────────────────────────────────────────────────────────
 
     #[Route('/user/{id}/toggle-admin', name: 'user_toggle_admin', methods: ['POST'])]
-    public function userToggleAdmin(int $id, UserRepository $users): Response
+    public function userToggleAdmin(string $id, UserRepository $users): Response
     {
         $user = $users->find($id);
         if ($user && $user !== $this->getUser()) {
