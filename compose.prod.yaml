@@ -1,6 +1,8 @@
 services:
 
   php:
+    env_file:
+      - .env.local
     build:
       context: .
       dockerfile: Dockerfile
@@ -38,4 +40,3 @@ volumes:
 networks:
   npm_network:
     external: true
-    name: "${NPM_NETWORK:-nginxproxymanager_default}"
