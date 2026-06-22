@@ -25,7 +25,6 @@
         "symfony/framework-bundle": "8.0.*",
         "symfony/http-client": "8.0.*",
         "symfony/intl": "8.0.*",
-        "symfony/mailer": "8.0.*",
         "symfony/mime": "8.0.*",
         "symfony/monolog-bundle": "^3.0|^4.0.2",
         "symfony/notifier": "8.0.*",
