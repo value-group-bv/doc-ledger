@@ -8,5 +8,5 @@ Document numbering ledger for Value Group.
 
 ## TO FIX
 
-- [ ] Dark mode selector
+- [x] Dark mode selector
 - [ ] Mobile friendlyness

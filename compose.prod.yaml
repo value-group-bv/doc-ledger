@@ -1,8 +1,7 @@
 services:
 
   php:
-    env_file:
-      - .env.local
+    env_file: .env.local
     build:
       context: .
       dockerfile: Dockerfile
