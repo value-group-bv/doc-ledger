@@ -3,12 +3,14 @@ FROM php:8.4-cli-alpine AS builder
 
 RUN apk add --no-cache \
     git unzip curl gcompat \
-    sqlite-dev libzip-dev libxml2-dev oniguruma-dev icu-dev
+    sqlite-dev libzip-dev libxml2-dev oniguruma-dev icu-dev \
+    libpng-dev libjpeg-turbo-dev freetype-dev
 
-RUN docker-php-ext-install \
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install \
     pdo pdo_sqlite \
     zip mbstring xml xmlwriter xmlreader simplexml \
-    intl
+    intl gd
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -33,12 +35,14 @@ RUN APP_ENV=prod php bin/console asset-map:compile --no-debug
 FROM php:8.4-fpm-alpine AS runtime
 
 RUN apk add --no-cache \
-    sqlite-dev libzip-dev libxml2-dev oniguruma-dev icu-dev su-exec
+    sqlite-dev libzip-dev libxml2-dev oniguruma-dev icu-dev su-exec \
+    libpng-dev libjpeg-turbo-dev freetype-dev
 
-RUN docker-php-ext-install \
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install \
     pdo pdo_sqlite opcache \
     zip mbstring xml xmlwriter xmlreader simplexml \
-    intl
+    intl gd
 
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/app.ini
 
