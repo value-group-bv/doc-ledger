@@ -29,13 +29,13 @@ services:
       - php
     networks:
       - default
-      - npm_proxy
+      - npm_network
     restart: unless-stopped
 
 volumes:
   docledger_var:
 
 networks:
-  npm_proxy:
+  npm_network:
     external: true
     name: "${NPM_NETWORK:-nginxproxymanager_default}"
