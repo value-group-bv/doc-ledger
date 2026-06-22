@@ -5,6 +5,16 @@ framework:
     # Note that the session will be started ONLY if you read or write from it.
     session: true
 
+    # Trust the reverse proxy (NPM / nginx) so HTTPS is detected correctly.
+    # Set TRUSTED_PROXIES=127.0.0.1,PRIVATE_SUBNET in production.
+    trusted_proxies: '%env(default::TRUSTED_PROXIES)%'
+    trusted_headers:
+        - 'x-forwarded-for'
+        - 'x-forwarded-host'
+        - 'x-forwarded-proto'
+        - 'x-forwarded-port'
+        - 'x-forwarded-prefix'
+
     #esi: true
     #fragments: true
 
