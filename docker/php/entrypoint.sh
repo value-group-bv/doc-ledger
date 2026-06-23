@@ -13,7 +13,7 @@ su-exec www-data php bin/console doctrine:migrations:migrate \
     --allow-no-migration \
     --no-debug
 
-# Warm up the Symfony cache
-su-exec www-data php bin/console cache:warmup --no-debug
+# Clear stale cache from the mounted volume and rebuild it
+su-exec www-data php bin/console cache:clear --no-debug
 
 exec "$@"
