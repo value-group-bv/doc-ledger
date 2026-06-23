@@ -97,6 +97,6 @@ class AzureAuthenticator extends OAuth2Authenticator implements AuthenticationEn
 
     public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
-        return new RedirectResponse($this->router->generate('oidc_azure_start'));
+        return new RedirectResponse($this->router->generate('app_login'));
     }
 }
