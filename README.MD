@@ -9,7 +9,7 @@ A Symfony-based document numbering ledger application for Value Group. It helps 
 - [x] Keyword search
 - [x] Add sub category uniqueness per main category
 - [x] Build to Docker
-- [ ] Fixed alphabetic codes for products (EGC, CAR, etc..)
+- [x] Fixed alphabetic codes for products (EGC, CAR, etc..)
 
 ### TO FIX
 

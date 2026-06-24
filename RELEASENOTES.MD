@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 0.6.1 (24 June 2026)
+
+- FIX: Docker Build bug would fail because of missing .env variables during build process.
+
 ## Version 0.6.0 (24 June 2026)
 
 - Added Comments / Search tags field on each ledger entry. This text is included in the _Search_ function on the main ledger page.

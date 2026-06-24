@@ -28,6 +28,9 @@ COPY . .
 ARG DEFAULT_URI=https://ledger.valuegroup.vg
 ENV DEFAULT_URI=$DEFAULT_URI
 
+# Minimal build-time .env — no secrets, just enough for Symfony to boot during asset compilation
+RUN printf "APP_ENV=prod\nDEFAULT_URI=%s\n" "$DEFAULT_URI" > .env
+
 # Install bundle assets and vendor JS, then build Tailwind and compile asset map
 RUN APP_ENV=prod php bin/console assets:install public --no-debug
 RUN APP_ENV=prod php bin/console importmap:install --no-debug
