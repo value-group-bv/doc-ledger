@@ -1,0 +1,6 @@
+{% extends 'bundles/TwigBundle/Exception/error.html.twig' %}
+
+{% set page_title = 'Access Denied' %}
+{% set error_code = '4' ~ ux_icon('fa:empire', {class: 'size-18'}) ~ '3' %}
+{% set heading = 'Access denied' %}
+{% set message = 'This page is not on your clearance level.<br>Move along.' %}

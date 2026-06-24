@@ -4,7 +4,7 @@ A Symfony-based document numbering ledger application for Value Group. It helps 
 
 ## Status
 
-### TO ADD
+### Roadmap
 
 - [x] Keyword search
 - [x] Add sub category uniqueness per main category
@@ -16,12 +16,3 @@ A Symfony-based document numbering ledger application for Value Group. It helps 
 - [x] Dark mode selector
 - [ ] Mobile userfriendlyness
 - [x] BUG: 'All subsidiaries' in admin page for subcategories doesn't work
-
-## Releases
-
-### Version 0.5.0
-
-- Instantiated version numbering.
-- Renamed navbar to 'Number Ledger' rather than 'Document Ledger'.
-- You are now first prompted with the login page rather than redirected automatically to Microsoft OIDC.
-- FIX: Favicon not displayed properly.

@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% set page_auth = true %}
+
+{% block body %}
+
+<!-- Bleep bloop Star Wars > Star Trek -->
+<div class="flex justify-center items-center min-h-screen">
+    <twig:Card class="shadow-xl/30 px-3 rounded-2xl w-[366px]">
+        {% include 'auth/_card_header.html.twig' %}
+        <twig:Card:Content class="text-center">
+            <div class="mb-3">
+                <p class="mb-2 font-bold text-muted-foreground text-sm text-center">ERROR</p>
+                <p class="inline-flex items-center font-extrabold text-primary/40 text-8xl">{{ error_code|raw }}</p>
+            </div>
+            <p class="mb-2 font-heading font-extrabold text-foreground text-3xl">{{ heading }}</p>
+            <p class="mb-3 text-muted-foreground text-sm">{{ message|raw }}</p>
+            <a href="/"
+                class="flex justify-center items-center bg-primary hover:bg-primary/90 rounded-md w-full h-10 font-medium text-white text-sm no-underline transition-colors">
+                <twig:ux:icon name="fa:resistance" class="mr-2 text-lg" />Back to Base
+            </a>
+        </twig:Card:Content>
+        <twig:Card:Footer class="flex-row justify-center gap-4">
+            <a href="https://valuegroupnl.com/"
+                class="text-muted-foreground text-sm hover:underline underline-offset-3">Back to main site</a>
+            <twig:Separator orientation="vertical" class="self-center h-4" />
+            <a href="https://valuegroupnl.com/contact" class="text-muted-foreground text-sm hover:underline underline-offset-3">Help</a>
+        </twig:Card:Footer>
+    </twig:Card>
+</div>
+
+{% endblock %}

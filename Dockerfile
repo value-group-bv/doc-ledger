@@ -25,6 +25,9 @@ RUN APP_ENV=prod composer install \
 
 COPY . .
 
+ARG DEFAULT_URI=https://ledger.valuegroup.vg
+ENV DEFAULT_URI=$DEFAULT_URI
+
 # Install bundle assets and vendor JS, then build Tailwind and compile asset map
 RUN APP_ENV=prod php bin/console assets:install public --no-debug
 RUN APP_ENV=prod php bin/console importmap:install --no-debug

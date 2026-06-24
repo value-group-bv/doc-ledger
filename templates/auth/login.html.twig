@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% set page_title = 'Sign in' %}
+
 {% set page_auth = true %}
 
 {% block body %}
@@ -11,7 +11,7 @@
         <twig:Card:Content>
 
             {% for message in app.flashes('error') %}
-            <div class="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg border border-destructive/25 bg-destructive/5 text-destructive text-sm">
+            <div class="flex items-center gap-2 bg-destructive/5 mb-4 px-3 py-2 border border-destructive/25 rounded-lg text-destructive text-sm">
                 <twig:ux:icon name="material-symbols:error-outline" class="size-4 shrink-0" />
                 <span>{{ message }}</span>
             </div>
