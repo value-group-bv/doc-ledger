@@ -5,24 +5,24 @@
 <div {{ attributes }}>
 
     {# ── Filter bar ─────────────────────────────────────────────────────────── #}
-    <div class="flex flex-wrap gap-3 items-end mb-4">
+    <div class="flex flex-wrap items-end gap-3 mb-4">
 
         {# Search #}
         <div class="flex-1 min-w-[200px]">
-            <label class="text-xs text-muted-foreground mb-1 block">Search</label>
+            <label class="block mb-1 text-muted-foreground text-xs">Search</label>
             <input type="text"
                 data-model="search"
                 data-action="input->live#update:debounce(300ms)"
                 value="{{ search }}"
-                placeholder="Title or reference code…"
-                class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                placeholder="Search by document number, title, or keywords"
+                class="flex bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-full h-9 placeholder:text-muted-foreground text-sm" />
         </div>
 
         {# Subsidiary filter #}
         <div class="w-36">
-            <label class="text-xs text-muted-foreground mb-1 block">Subsidiary</label>
+            <label class="block mb-1 text-muted-foreground text-xs">Subsidiary</label>
             <select data-model="subsidiaryFilter" data-action="change->live#action" data-live-action-param="applyFilter"
-                class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                class="flex bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-full h-9 text-sm">
                 <option value="0">All</option>
                 {% for s in this.subsidiaries %}
                 <option value="{{ s.id }}" {% if subsidiaryFilter == s.id %}selected{% endif %}>{{ s.code }}</option>
@@ -32,9 +32,9 @@
 
         {# Doc type filter #}
         <div class="w-36">
-            <label class="text-xs text-muted-foreground mb-1 block">Doc type</label>
+            <label class="block mb-1 text-muted-foreground text-xs">Document type</label>
             <select data-model="docTypeFilter" data-action="change->live#action" data-live-action-param="applyFilter"
-                class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                class="flex bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-full h-9 text-sm">
                 <option value="0">All</option>
                 {% for dt in this.docTypes %}
                 <option value="{{ dt.id }}" {% if docTypeFilter == dt.id %}selected{% endif %}>{{ dt.code }}</option>
@@ -44,12 +44,12 @@
 
         {# Main category filter #}
         <div class="w-44">
-            <label class="text-xs text-muted-foreground mb-1 block">Main category</label>
+            <label class="block mb-1 text-muted-foreground text-xs">Main category</label>
             <select data-model="mainCategoryFilter" data-action="change->live#action" data-live-action-param="applyFilter"
-                class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                class="flex bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-full h-9 text-sm">
                 <option value="0">All</option>
                 {% for mc in this.mainCategories %}
-                <option value="{{ mc.id }}" {% if mainCategoryFilter == mc.id %}selected{% endif %}>{{ mc.code }} — {{ mc.description }}</option>
+                <option value="{{ mc.id }}" {% if mainCategoryFilter == mc.id %}selected{% endif %}>{{ mc.code }} - {{ mc.description }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -57,7 +57,7 @@
         {# Reset #}
         {% if search or subsidiaryFilter or docTypeFilter or mainCategoryFilter %}
         <button type="button" data-action="live#action" data-live-action-param="resetFilters"
-            class="h-9 px-3 text-sm rounded-md border border-border hover:bg-muted text-muted-foreground transition-colors">
+            class="hover:bg-muted px-3 border border-border rounded-md h-9 text-muted-foreground text-sm transition-colors">
             Clear filters
         </button>
         {% endif %}
@@ -65,7 +65,7 @@
         {# Spacer + new entry button #}
         <div class="ml-auto">
             <a href="{{ path('ledger_new') }}"
-                class="inline-flex items-center gap-1.5 h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
+                class="inline-flex items-center gap-1.5 bg-primary hover:bg-primary/90 px-4 rounded-md h-9 font-medium text-primary-foreground text-sm transition-colors">
                 <twig:ux:icon name="material-symbols:add" class="size-4" />
                 New entry
             </a>
@@ -73,19 +73,19 @@
     </div>
 
     {# ── Result count ────────────────────────────────────────────────────────── #}
-    <p class="text-xs text-muted-foreground mb-3">
+    <p class="mb-3 text-muted-foreground text-xs">
         {{ totalCount }} {{ totalCount == 1 ? 'entry' : 'entries' }}
         {% if search or subsidiaryFilter or docTypeFilter or mainCategoryFilter %} matching filters{% endif %}
     </p>
 
     {# ── Table ───────────────────────────────────────────────────────────────── #}
-    <div class="rounded-lg border border-border overflow-hidden">
+    <div class="border border-border rounded-lg overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-muted/50 border-b border-border">
+                <thead class="bg-muted/50 border-border border-b">
                     <tr>
                         {% macro sort_th(label, field, currentField, currentDir) %}
-                        <th class="text-left px-4 py-3 font-medium text-muted-foreground whitespace-nowrap">
+                        <th class="px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
                             <button type="button"
                                 data-action="live#action"
                                 data-live-action-param="sort"
@@ -95,7 +95,7 @@
                                 {% if currentField == field %}
                                 <twig:ux:icon name="{{ currentDir == 'ASC' ? 'material-symbols:arrow-upward' : 'material-symbols:arrow-downward' }}" class="size-3.5" />
                                 {% else %}
-                                <twig:ux:icon name="material-symbols:unfold-more" class="size-3.5 opacity-30" />
+                                <twig:ux:icon name="material-symbols:unfold-more" class="opacity-30 size-3.5" />
                                 {% endif %}
                             </button>
                         </th>
@@ -108,19 +108,19 @@
                         {{ _self.sort_th('Main category', 'mc.code', sortField, sortDir) }}
                         {{ _self.sort_th('Sub category', 'sc.code', sortField, sortDir) }}
                         {{ _self.sort_th('No.', 'e.docNumber', sortField, sortDir) }}
-                        <th class="px-4 py-3 text-right font-medium text-muted-foreground">Actions</th>
+                        <th class="px-4 py-3 font-medium text-muted-foreground text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-border">
                     {% for entry in entries %}
                     <tr class="hover:bg-muted/30 transition-colors">
                         <td class="px-4 py-3">
-                            <code class="font-mono text-xs border rounded px-2 py-0.5 whitespace-nowrap"
+                            <code class="px-2 py-0.5 border rounded font-[450] font-mono text-[13px] whitespace-nowrap"
                                 style="{{ subsidiary_doc_number_style(entry.subsidiary.code) }}">
                                 {{ entry.documentNumberBase }}
                             </code>
                         </td>
-                        <td class="px-4 py-3 font-medium text-foreground max-w-xs truncate">
+                        <td class="px-4 py-3 max-w-xs font-medium text-foreground truncate">
                             {{ entry.title }}
                         </td>
                         <td class="px-4 py-3 text-muted-foreground text-xs">
@@ -130,25 +130,25 @@
                             <twig:Badge style="{{ doc_type_badge_style(entry.docType.code) }}">{{ entry.docType.code }}</twig:Badge>
                         </td>
                         <td class="px-4 py-3 text-muted-foreground text-xs">
-                            {{ entry.mainCategory.code }} — {{ entry.mainCategory.description }}
+                            {{ entry.mainCategory.code }} - {{ entry.mainCategory.description }}
                         </td>
                         <td class="px-4 py-3 text-muted-foreground text-xs">
-                            {{ entry.subCategory.formattedCode }} — {{ entry.subCategory.description }}
+                            {{ entry.subCategory.formattedCode }} - {{ entry.subCategory.description }}
                         </td>
-                        <td class="px-4 py-3 font-mono text-xs text-muted-foreground">
+                        <td class="px-4 py-3 font-mono text-muted-foreground text-xs">
                             {{ '%03d'|format(entry.docNumber) }}
                         </td>
                         <td class="px-4 py-3 text-right">
                             <div class="flex justify-end gap-1">
                                 <a href="{{ path('ledger_edit', {id: entry.id}) }}"
-                                    class="inline-flex items-center justify-center size-7 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                                    class="inline-flex justify-center items-center hover:bg-muted rounded size-7 text-muted-foreground hover:text-foreground transition-colors"
                                     title="Edit">
                                     <twig:ux:icon name="material-symbols:edit-outline" class="size-4" />
                                 </a>
                                 <button type="button"
                                     data-controller="confirm-delete"
                                     data-confirm-delete-url-value="{{ path('ledger_delete', {id: entry.id}) }}"
-                                    class="inline-flex items-center justify-center size-7 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                                    class="inline-flex justify-center items-center hover:bg-destructive/10 rounded size-7 text-muted-foreground hover:text-destructive transition-colors"
                                     title="Delete">
                                     <twig:ux:icon name="material-symbols:delete-outline" class="size-4" />
                                 </button>
@@ -157,7 +157,7 @@
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="8" class="px-4 py-12 text-center text-muted-foreground">
+                        <td colspan="8" class="px-4 py-12 text-muted-foreground text-center">
                             No entries found.
                             {% if search or subsidiaryFilter or docTypeFilter or mainCategoryFilter %}
                             <button type="button" data-action="live#action" data-live-action-param="resetFilters"
@@ -173,8 +173,8 @@
 
     {# ── Pagination ──────────────────────────────────────────────────────────── #}
     {% if totalPages > 1 %}
-    <div class="flex items-center justify-between mt-4">
-        <p class="text-xs text-muted-foreground">
+    <div class="flex justify-between items-center mt-4">
+        <p class="text-muted-foreground text-xs">
             Page {{ page }} of {{ totalPages }}
         </p>
         <div class="flex gap-1">
@@ -182,7 +182,7 @@
                 data-action="live#action" data-live-action-param="goToPage"
                 data-live-page-param="{{ max(page - 1, 1) }}"
                 {% if page <= 1 %}disabled{% endif %}
-                class="inline-flex items-center justify-center h-8 w-8 rounded border border-border hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                class="inline-flex justify-center items-center hover:bg-muted disabled:opacity-40 border border-border rounded w-8 h-8 transition-colors disabled:cursor-not-allowed">
                 <twig:ux:icon name="material-symbols:chevron-left" class="size-4" />
             </button>
 
@@ -196,7 +196,7 @@
                 {{ p }}
             </button>
             {% elseif p == page - 3 or p == page + 3 %}
-            <span class="inline-flex items-center justify-center h-8 w-8 text-muted-foreground">…</span>
+            <span class="inline-flex justify-center items-center w-8 h-8 text-muted-foreground">…</span>
             {% endif %}
             {% endfor %}
 
@@ -204,7 +204,7 @@
                 data-action="live#action" data-live-action-param="goToPage"
                 data-live-page-param="{{ min(page + 1, totalPages) }}"
                 {% if page >= totalPages %}disabled{% endif %}
-                class="inline-flex items-center justify-center h-8 w-8 rounded border border-border hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                class="inline-flex justify-center items-center hover:bg-muted disabled:opacity-40 border border-border rounded w-8 h-8 transition-colors disabled:cursor-not-allowed">
                 <twig:ux:icon name="material-symbols:chevron-right" class="size-4" />
             </button>
         </div>

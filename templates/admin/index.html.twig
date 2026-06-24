@@ -26,7 +26,7 @@
         <twig:Card>
             <twig:Card:Header>
                 <twig:Card:Title>Subsidiaries</twig:Card:Title>
-                <twig:Card:Description>Prefix codes (VC, VM, VS, VG)</twig:Card:Description>
+                <twig:Card:Description>Prefix codes for Value Group subsidiaries</twig:Card:Description>
             </twig:Card:Header>
             <twig:Card:Content>
                 <table class="mb-4 w-full text-sm">
@@ -53,9 +53,9 @@
                 </table>
                 <form method="post" action="{{ path('admin_subsidiary_new') }}" class="flex gap-2">
                     <input name="code" placeholder="Code" maxlength="2"
-                        class="flex bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-24 h-9 text-sm" />
+                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-24 h-9 text-sm transition-[color,box-shadow]" />
                     <input name="description" placeholder="Description"
-                        class="flex flex-1 bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-9 text-sm" />
+                        class="flex flex-1 bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-9 text-sm transition-[color,box-shadow]" />
                     <button type="submit" class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
                 </form>
             </twig:Card:Content>
@@ -64,8 +64,8 @@
         {# ── Main categories ──────────────────────────────────────────────────── #}
         <twig:Card>
             <twig:Card:Header>
-                <twig:Card:Title>Main categories</twig:Card:Title>
-                <twig:Card:Description>Single-digit codes (1 Engineering, 2 Procurement…)</twig:Card:Description>
+                <twig:Card:Title>Main Categories</twig:Card:Title>
+                <twig:Card:Description>Single-digit codes</twig:Card:Description>
             </twig:Card:Header>
             <twig:Card:Content>
                 <table class="mb-4 w-full text-sm">
@@ -82,9 +82,10 @@
                         <td class="py-2">
                             <form method="post" action="{{ path('admin_maincat_set_refcode', {id: mc.id}) }}">
                                 <select name="referenceCode" onchange="this.form.submit()"
-                                    class="bg-background px-2 border border-input rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-7 font-mono text-xs">
+                                    class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-7 font-mono text-xs transition-[color,box-shadow]">
                                     <option value="000" {% if mc.referenceCode == '000' %}selected{% endif %}>000</option>
                                     <option value="AAA" {% if mc.referenceCode == 'AAA' %}selected{% endif %}>AAA</option>
+                                    <option value="PRO" {% if mc.referenceCode == 'PRO' %}selected{% endif %}>PRO</option>
                                 </select>
                             </form>
                         </td>
@@ -102,14 +103,15 @@
                 </table>
                 <form method="post" action="{{ path('admin_maincat_new') }}" class="flex gap-2">
                     <input name="code" placeholder="Code" maxlength="1"
-                        class="flex bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-20 h-9 text-sm" />
+                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-20 h-9 text-sm transition-[color,box-shadow]" />
                     <select name="referenceCode"
-                        class="flex bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-9 font-mono text-sm">
+                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-9 font-mono text-sm transition-[color,box-shadow]">
                         <option value="000">000</option>
                         <option value="AAA">AAA</option>
+                        <option value="PRO">PRO</option>
                     </select>
                     <input name="description" placeholder="Description"
-                        class="flex flex-1 bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-9 text-sm" />
+                        class="flex flex-1 bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-9 text-sm transition-[color,box-shadow]" />
                     <button type="submit" class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
                 </form>
             </twig:Card:Content>
@@ -118,8 +120,8 @@
         {# ── Doc types ────────────────────────────────────────────────────────── #}
         <twig:Card>
             <twig:Card:Header>
-                <twig:Card:Title>Document types</twig:Card:Title>
-                <twig:Card:Description>DWG, APP, PLA, REP…</twig:Card:Description>
+                <twig:Card:Title>Document Types</twig:Card:Title>
+                <twig:Card:Description>Three-letter codes</twig:Card:Description>
             </twig:Card:Header>
             <twig:Card:Content>
                 <table class="mb-4 w-full text-sm">
@@ -131,7 +133,7 @@
                     <tbody class="divide-y divide-border">
                     {% for dt in docTypes %}
                     <tr>
-                        <td class="py-2 font-mono font-semibold"><twig:Badge style="{{ doc_type_badge_style(dt.code) }}">{{ dt.code }}</twig:Badge></td>
+                        <td class="py-2"><twig:Badge style="{{ doc_type_badge_style(dt.code) }}">{{ dt.code }}</twig:Badge></td>
                         <td class="py-2">{{ dt.description }}</td>
                         <td class="py-2 text-right">
                             <form method="post" action="{{ path('admin_doctype_delete', {id: dt.id}) }}"
@@ -146,9 +148,9 @@
                 </table>
                 <form method="post" action="{{ path('admin_doctype_new') }}" class="flex gap-2">
                     <input name="code" placeholder="Code" maxlength="3"
-                        class="flex bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-28 h-9 text-sm" />
+                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-28 h-9 text-sm transition-[color,box-shadow]" />
                     <input name="description" placeholder="Description"
-                        class="flex flex-1 bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-9 text-sm" />
+                        class="flex flex-1 bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-9 text-sm transition-[color,box-shadow]" />
                     <button type="submit" class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
                 </form>
             </twig:Card:Content>
@@ -157,8 +159,8 @@
         {# ── Sub categories ───────────────────────────────────────────────────── #}
         <twig:Card class="xl:col-span-2">
             <twig:Card:Header>
-                <twig:Card:Title>Sub categories</twig:Card:Title>
-                <twig:Card:Description>Linked to a document type; 3-digit codes (100 Structural, 300 Electrical…)</twig:Card:Description>
+                <twig:Card:Title>Sub Categories</twig:Card:Title>
+                <twig:Card:Description>Linked to a document type; three-digit codes</twig:Card:Description>
             </twig:Card:Header>
             <twig:Card:Content>
                 <div class="overflow-x-auto">
@@ -178,7 +180,7 @@
                         <form method="post" action="{{ path('admin_subcat_update', {id: sc.id}) }}" class="contents">
                         <td class="py-1">
                             <select name="subsidiaryId"
-                                class="bg-background px-2 border border-input rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-8 text-sm">
+                                class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-8 text-sm transition-[color,box-shadow]">
                                 <option value="0">All</option>
                                 {% for s in subsidiaries %}
                                 <option value="{{ s.id }}" {% if sc.subsidiary and s.id == sc.subsidiary.id %}selected{% endif %}>{{ s.code }}</option>
@@ -187,7 +189,7 @@
                         </td>
                         <td class="py-1">
                             <select name="mainCategoryId"
-                                class="bg-background px-2 border border-input rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-8 text-sm">
+                                class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-8 text-sm transition-[color,box-shadow]">
                                 <option value="0">All</option>
                                 {% for mc in mainCategories %}
                                 <option value="{{ mc.id }}" {% if sc.mainCategory and mc.id == sc.mainCategory.id %}selected{% endif %}>{{ mc.code }}</option>
@@ -196,7 +198,7 @@
                         </td>
                         <td class="py-1">
                             <select name="docTypeId"
-                                class="bg-background px-2 border border-input rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-8 text-sm">
+                                class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-8 text-sm transition-[color,box-shadow]">
                                 {% for dt in docTypes %}
                                 <option value="{{ dt.id }}" {% if dt.id == sc.docType.id %}selected{% endif %}>{{ dt.code }}</option>
                                 {% endfor %}
@@ -204,11 +206,11 @@
                         </td>
                         <td class="py-1">
                             <input name="code" type="number" min="0" max="999" value="{{ sc.code }}"
-                                class="bg-background px-2 border border-input rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-24 h-8 font-mono text-sm" />
+                                class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-24 h-8 font-mono text-sm transition-[color,box-shadow]" />
                         </td>
                         <td class="py-1">
                             <input name="description" value="{{ sc.description }}"
-                                class="bg-background px-2 border border-input rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-full h-8 text-sm" />
+                                class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-8 text-sm transition-[color,box-shadow]" />
                         </td>
                         <td class="py-1 text-right whitespace-nowrap">
                             <button type="submit" class="mr-3 text-primary text-xs hover:underline">Save</button>
@@ -218,10 +220,10 @@
                     </tr>
                     {% else %}
                     <tr>
-                        <td class="py-2 text-muted-foreground text-xs">{{ sc.subsidiary ? sc.subsidiary.code : 'All' }}</td>
-                        <td class="py-2 text-muted-foreground text-xs">{{ sc.mainCategory ? sc.mainCategory.code : 'All' }}</td>
+                        <td class="py-2 font-mono text-muted-foreground">{{ sc.subsidiary ? sc.subsidiary.code : 'All' }}</td>
+                        <td class="py-2 font-mono text-muted-foreground">{{ sc.mainCategory ? sc.mainCategory.code : 'All' }}</td>
                         <td class="py-2"><twig:Badge style="{{ doc_type_badge_style(sc.docType.code) }}">{{ sc.docType.code }}</twig:Badge></td>
-                        <td class="py-2 font-mono">{{ sc.formattedCode }}</td>
+                        <td class="py-2 font-mono font-semibold">{{ sc.formattedCode }}</td>
                         <td class="py-2">{{ sc.description }}</td>
                         <td class="py-2 text-right whitespace-nowrap">
                             <a href="{{ path('admin_subcat_edit', {id: sc.id}) }}" class="mr-3 text-xs hover:underline">Edit</a>
@@ -239,30 +241,30 @@
                 </div>
                 <form method="post" action="{{ path('admin_subcat_new') }}" class="flex flex-wrap gap-2">
                     <select name="subsidiaryId"
-                        class="flex bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-9 text-sm">
+                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-9 text-sm transition-[color,box-shadow]">
                         <option value="0">All subsidiaries</option>
                         {% for s in subsidiaries %}
                         <option value="{{ s.id }}">{{ s.code }}</option>
                         {% endfor %}
                     </select>
                     <select name="mainCategoryId"
-                        class="flex bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-9 text-sm">
+                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-9 text-sm transition-[color,box-shadow]">
                         <option value="0">All main cats.</option>
                         {% for mc in mainCategories %}
-                        <option value="{{ mc.id }}">{{ mc.code }} — {{ mc.description }}</option>
+                        <option value="{{ mc.id }}">{{ mc.code }} - {{ mc.description }}</option>
                         {% endfor %}
                     </select>
                     <select name="docTypeId"
-                        class="flex bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-9 text-sm">
+                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-9 text-sm transition-[color,box-shadow]">
                         <option value="">Doc type…</option>
                         {% for dt in docTypes %}
                         <option value="{{ dt.id }}">{{ dt.code }}</option>
                         {% endfor %}
                     </select>
                     <input name="code" type="number" min="0" max="999" placeholder="Code (0–999)"
-                        class="flex bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-36 h-9 text-sm" />
+                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-36 h-9 text-sm transition-[color,box-shadow]" />
                     <input name="description" placeholder="Description"
-                        class="flex flex-1 bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-w-48 h-9 text-sm" />
+                        class="flex flex-1 bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 min-w-48 h-9 text-sm transition-[color,box-shadow]" />
                     <button type="submit" class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
                 </form>
             </twig:Card:Content>
@@ -271,7 +273,7 @@
         {# ── Predefined numbers ───────────────────────────────────────────────── #}
         <twig:Card class="xl:col-span-2">
             <twig:Card:Header>
-                <twig:Card:Title>Predefined document numbers</twig:Card:Title>
+                <twig:Card:Title>Predefined Document Numbers</twig:Card:Title>
                 <twig:Card:Description>Fixed codes reserved for specific document types within a sub category</twig:Card:Description>
             </twig:Card:Header>
             <twig:Card:Content>
@@ -288,7 +290,7 @@
                     {% for pn in predefinedNumbers %}
                     <tr>
                         <td class="py-2"><twig:Badge style="{{ doc_type_badge_style(pn.subCategory.docType.code) }}">{{ pn.subCategory.docType.code }}</twig:Badge></td>
-                        <td class="py-2 font-mono text-xs">{{ pn.subCategory.formattedCode }}</td>
+                        <td class="py-2 font-mono text-muted-foreground">{{ pn.subCategory.formattedCode }}</td>
                         <td class="py-2 font-mono font-semibold">{{ pn.formattedCode }}</td>
                         <td class="py-2">{{ pn.description }}</td>
                         <td class="py-2 text-right">
@@ -305,16 +307,16 @@
                 </div>
                 <form method="post" action="{{ path('admin_predefined_new') }}" class="flex flex-wrap gap-2">
                     <select name="subCategoryId"
-                        class="flex bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-9 text-sm">
+                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-9 text-sm transition-[color,box-shadow]">
                         <option value="">Sub category…</option>
                         {% for sc in subCategories %}
-                        <option value="{{ sc.id }}">{{ sc.docType.code }} — {{ sc.formattedCode }} {{ sc.description }}</option>
+                        <option value="{{ sc.id }}">{{ sc.docType.code }} - {{ sc.formattedCode }} {{ sc.description }}</option>
                         {% endfor %}
                     </select>
                     <input name="code" type="number" min="0" max="999" placeholder="Code (0–999)"
-                        class="flex bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-36 h-9 text-sm" />
+                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-36 h-9 text-sm transition-[color,box-shadow]" />
                     <input name="description" placeholder="Description"
-                        class="flex flex-1 bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-w-48 h-9 text-sm" />
+                        class="flex flex-1 bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 min-w-48 h-9 text-sm transition-[color,box-shadow]" />
                     <button type="submit" class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
                 </form>
             </twig:Card:Content>

@@ -1,6 +1,6 @@
 # Document numbering ledger for Value Group
 
-A Symfony-based document numbering ledger application for Value Group. It helps manage main categories, subcategories, document codes, and related metadata with a web UI. The app utilises Docker deployment.
+A Symfony-based document numbering ledger application for Value Group. It helps define, track and look-up document numbers, including main categories, subcategories, document codes, and related metadata with a web UI. The app utilises Docker deployment.
 
 ## Status
 

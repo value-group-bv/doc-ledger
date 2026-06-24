@@ -53,6 +53,9 @@ class DocumentWizard
     #[LiveProp(writable: true)]
     public string $title = '';
 
+    #[LiveProp(writable: true)]
+    public string $comments = '';
+
     /** Saved document number string shown after submit */
     #[LiveProp(writable: true)]
     public string $savedDocNumber = '';
@@ -175,6 +178,7 @@ class DocumentWizard
         $entry->setDocNumber($this->resolvedDocNumber());
         $entry->setRevision('00');
         $entry->setTitle($this->title);
+        $entry->setComments($this->comments ?: null);
         $entry->setCreatedBy($this->security->getUser());
 
         $this->em->persist($entry);
@@ -191,6 +195,7 @@ class DocumentWizard
         $this->predefinedNumberId = 0;
         $this->manualDocNumber = '';
         $this->title = '';
+        $this->comments = '';
 
         $this->emit('entryCreated');
     }

@@ -32,8 +32,10 @@ class DocumentEntryRepository extends ServiceEntityRepository
             ->addSelect('s', 'mc', 'dt', 'sc', 'u');
 
         if ($search) {
-            $qb->andWhere('e.title LIKE :search OR e.referenceCode LIKE :search')
-               ->setParameter('search', "%$search%");
+            $qb->andWhere(
+                'e.title LIKE :search OR e.referenceCode LIKE :search OR e.comments LIKE :search OR ' .
+                "CONCAT(s.code, mc.code, '-', e.referenceCode, '-', dt.code, '-', ZEROPAD3(sc.code), '-', ZEROPAD3(e.docNumber)) LIKE :search"
+            )->setParameter('search', "%$search%");
         }
 
         if ($subsidiaryId) {
@@ -53,7 +55,19 @@ class DocumentEntryRepository extends ServiceEntityRepository
             $sortField = 'e.referenceCode';
         }
 
-        $qb->orderBy($sortField, $sortDir === 'ASC' ? 'ASC' : 'DESC');
+        $dir = $sortDir === 'ASC' ? 'ASC' : 'DESC';
+
+        if ($sortField === 'e.referenceCode') {
+            // Sort by all components that make up the document number
+            $qb->orderBy('s.code', $dir)
+               ->addOrderBy('mc.code', $dir)
+               ->addOrderBy('e.referenceCode', $dir)
+               ->addOrderBy('dt.code', $dir)
+               ->addOrderBy('sc.code', $dir)
+               ->addOrderBy('e.docNumber', $dir);
+        } else {
+            $qb->orderBy($sortField, $dir);
+        }
 
         return $qb;
     }

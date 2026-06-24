@@ -118,7 +118,7 @@
     --font-sans: 'Nunito Sans', sans-serif;
     --font-heading: 'Nunito', serif;
     --font-serif: 'Roboto Slab', serif;
-    --font-mono: 'Cascadia Code', monospace;
+    --font-mono: 'Roboto Mono', monospace;
 }
 
 @layer base {

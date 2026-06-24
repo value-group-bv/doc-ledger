@@ -12,7 +12,7 @@
                     <a href="{{ path('ledger_index') }}"
                         class="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
                         <img src="{{ asset('logo/vg-logo-square-256-white.png') }}" alt="VG" class="size-10">
-                        <span class="font-heading text-white/70 text-xl">Number Ledger</span>
+                        <span class="font-heading font-bold text-white text-2xl">Value Ledger</span>
                     </a>
                 </div>
 
@@ -89,13 +89,16 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="group-aria-expanded:hidden block size-6">
                             <path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="hidden group-aria-expanded:block size-6">
+                            <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- Mobile Menu -->
-        <div id="mobile-menu" data-header-target="menu" class="hidden md:hidden bg-primary/20 border-border border-t">
+        <div id="mobile-menu" data-header-target="menu" class="hidden md:hidden nav-gradient border-border border-t">
             <div class="space-y-1 px-4 pt-2 pb-3">
                 {% for menu in menus %}
                 {% if menu.route != 'admin_index' or is_granted('ROLE_ADMIN') %}

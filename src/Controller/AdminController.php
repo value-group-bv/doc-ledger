@@ -90,7 +90,7 @@ class AdminController extends AbstractController
         $code = trim((string) $request->request->get('code', ''));
         $description = trim((string) $request->request->get('description', ''));
 
-        $referenceCode = \in_array($request->request->get('referenceCode'), ['000', 'AAA'], true)
+        $referenceCode = \in_array($request->request->get('referenceCode'), ['000', 'AAA', 'PRO'], true)
             ? $request->request->get('referenceCode')
             : '000';
 
@@ -116,7 +116,7 @@ class AdminController extends AbstractController
         $entity = $this->em->find(DocMainCategory::class, $id);
         $value = $request->request->get('referenceCode');
 
-        if ($entity && \in_array($value, ['000', 'AAA'], true)) {
+        if ($entity && \in_array($value, ['000', 'AAA', 'PRO'], true)) {
             $entity->setReferenceCode($value);
             $this->em->flush();
         }

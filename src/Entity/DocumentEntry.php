@@ -54,6 +54,9 @@ class DocumentEntry
     #[ORM\Column(length: 255)]
     private string $title;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $comments = null;
+
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
     private ?User $createdBy = null;
@@ -101,6 +104,9 @@ class DocumentEntry
 
     public function getTitle(): string { return $this->title; }
     public function setTitle(string $title): static { $this->title = $title; return $this; }
+
+    public function getComments(): ?string { return $this->comments; }
+    public function setComments(?string $comments): static { $this->comments = $comments; return $this; }
 
     public function getCreatedBy(): ?User { return $this->createdBy; }
     public function setCreatedBy(?User $createdBy): static { $this->createdBy = $createdBy; return $this; }
