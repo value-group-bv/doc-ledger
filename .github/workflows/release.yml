@@ -21,10 +21,14 @@ jobs:
       - name: Extract release notes for this version
         id: notes
         run: |
-          VERSION=${GITHUB_REF_NAME#v}
-          VERSION=${VERSION:-${{ github.event.inputs.tag }}}
-          VERSION=${VERSION#v}
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.tag }}"
+          else
+            TAG="${GITHUB_REF_NAME}"
+          fi
+          VERSION=${TAG#v}
           NOTES=$(awk "/^## Version $VERSION/,/^## Version /{if(/^## Version $VERSION/)next; if(/^## Version /)exit; print}" RELEASENOTES.MD)
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
           echo "body<<EOF" >> $GITHUB_OUTPUT
           echo "$NOTES" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -32,4 +36,5 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.notes.outputs.tag }}
           body: ${{ steps.notes.outputs.body }}
