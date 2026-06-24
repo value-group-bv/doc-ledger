@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 0.6.2 (24 June 2026)
+
+- FIX: Docker build failed because APP_VERSION environment variable was not available during asset compilation.
+
 ## Version 0.6.1 (24 June 2026)
 
 - FIX: Docker Build bug would fail because of missing .env variables during build process.
