@@ -27,7 +27,7 @@ jobs:
             TAG="${GITHUB_REF_NAME}"
           fi
           VERSION=${TAG#v}
-          NOTES=$(awk "/^## Version $VERSION/,/^## Version /{if(/^## Version $VERSION/)next; if(/^## Version /)exit; print}" RELEASENOTES.MD)
+          NOTES=$(awk "/^## Version $VERSION/{found=1; next} found && /^## Version /{exit} found{print}" RELEASENOTES.MD)
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
           echo "body<<EOF" >> $GITHUB_OUTPUT
           echo "$NOTES" >> $GITHUB_OUTPUT

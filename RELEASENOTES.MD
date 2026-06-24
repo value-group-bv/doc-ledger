@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 0.6.4 (24 June 2026)
+
+- FIX: GitHub release body was always empty due to awk range pattern matching start and end on the same header line.
+
 ## Version 0.6.3 (24 June 2026)
 
 - CHANGE: App version is now read from the committed `VERSION` file at Docker build time. The `APP_VERSION` variable no longer needs to be set in the server's `.env` file.
