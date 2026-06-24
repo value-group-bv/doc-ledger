@@ -26,12 +26,12 @@ RUN APP_ENV=prod composer install \
 COPY . .
 
 ARG DEFAULT_URI=https://ledger.valuegroup.vg
-ARG APP_VERSION=0.0.0
 ENV DEFAULT_URI=$DEFAULT_URI
-ENV APP_VERSION=$APP_VERSION
 
-# Minimal build-time .env — no secrets, just enough for Symfony to boot during asset compilation
-RUN printf "APP_ENV=prod\nDEFAULT_URI=%s\nAPP_VERSION=%s\n" "$DEFAULT_URI" "$APP_VERSION" > .env
+# Version comes from the committed VERSION file — no manual env var needed on the server
+RUN APP_VERSION=$(tr -d '[:space:]' < VERSION) && \
+    printf "APP_ENV=prod\nDEFAULT_URI=%s\nAPP_VERSION=%s\n" "$DEFAULT_URI" "$APP_VERSION" > .env && \
+    printf "[www]\nenv[APP_VERSION] = %s\n" "$APP_VERSION" > docker/php/zz-appenv.conf
 
 # Install bundle assets and vendor JS, then build Tailwind and compile asset map
 RUN APP_ENV=prod php bin/console assets:install public --no-debug
@@ -53,6 +53,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     intl gd
 
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/app.ini
+COPY --from=builder /app/docker/php/zz-appenv.conf /usr/local/etc/php-fpm.d/zz-appenv.conf
 
 WORKDIR /var/www/html
 
