@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 0.7.1 (29 June 2026)
+
+- FIX: `User` role badge not showing up on Admin page.
+
 ## Version 0.7.0 (26 June 2026)
 
 - Switched the Docker build process to Github Actions rather than on-server.

@@ -352,13 +352,14 @@
                     <tr>
                         <td class="py-2">{{ user.email }}</td>
                         <td class="py-2">
-                            {% for role in user.roles %}
-                            {% if role != 'ROLE_USER' %}
-                            <twig:Badge variant="{{ role == 'ROLE_ADMIN' or role == 'ROLE_SUPERADMIN' ? 'default' : 'secondary' }}">{{ role|replace({'ROLE_': ''}) }}</twig:Badge>
-                            {% endif %}
-                            {% else %}
+                            {% set extraRoles = user.roles|filter(r => r != 'ROLE_USER') %}
+                            {% if extraRoles is empty %}
                             <twig:Badge variant="outline">User</twig:Badge>
+                            {% else %}
+                            {% for role in extraRoles %}
+                            <twig:Badge variant="{{ role == 'ROLE_ADMIN' or role == 'ROLE_SUPERADMIN' ? 'default' : 'secondary' }}">{{ role|replace({'ROLE_': ''}) }}</twig:Badge>
                             {% endfor %}
+                            {% endif %}
                         </td>
                         <td class="py-2 text-muted-foreground text-xs">{{ user.createdAt|date('d M Y') }}</td>
                         <td class="py-2 text-right">
