@@ -54,17 +54,25 @@ class AdminController extends AbstractController
         $code = trim((string) $request->request->get('code', ''));
         $description = trim((string) $request->request->get('description', ''));
 
-        if ($code && $description) {
-            $entity = new DocSubsidiary();
-            $entity->setCode(strtoupper($code))->setDescription($description);
-            $this->em->persist($entity);
-            try {
-                $this->em->flush();
-                $this->addFlash('success', "Subsidiary '{$code}' added.");
-            } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException) {
-                $this->em->clear();
-                $this->addFlash('error', "Subsidiary code '{$code}' already exists.");
-            }
+        if (!$code || !$description) {
+            $this->addFlash('error', 'Code and description are required.');
+            return $this->redirectToRoute('admin_index');
+        }
+
+        if (!preg_match('/^[A-Za-z]{2}$/', $code)) {
+            $this->addFlash('error', 'Subsidiary code must be exactly 2 letters (no numbers or special characters).');
+            return $this->redirectToRoute('admin_index');
+        }
+
+        $entity = new DocSubsidiary();
+        $entity->setCode(strtoupper($code))->setDescription($description);
+        $this->em->persist($entity);
+        try {
+            $this->em->flush();
+            $this->addFlash('success', "Subsidiary '{$code}' added.");
+        } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException) {
+            $this->em->clear();
+            $this->addFlash('error', "Subsidiary code '{$code}' already exists.");
         }
 
         return $this->redirectToRoute('admin_index');
@@ -74,11 +82,18 @@ class AdminController extends AbstractController
     public function subsidiaryDelete(int $id): Response
     {
         $entity = $this->em->find(DocSubsidiary::class, $id);
-        if ($entity) {
-            $this->em->remove($entity);
-            $this->em->flush();
-            $this->addFlash('success', 'Subsidiary deleted.');
+        if (!$entity) {
+            return $this->redirectToRoute('admin_index');
         }
+
+        if ($entity->getDocumentEntries()->count() > 0) {
+            $this->addFlash('error', "Cannot delete subsidiary '{$entity->getCode()}' — it has {$entity->getDocumentEntries()->count()} linked document(s). Delete or reassign documents first.");
+            return $this->redirectToRoute('admin_index');
+        }
+
+        $this->em->remove($entity);
+        $this->em->flush();
+        $this->addFlash('success', "Subsidiary '{$entity->getCode()}' deleted.");
         return $this->redirectToRoute('admin_index');
     }
 

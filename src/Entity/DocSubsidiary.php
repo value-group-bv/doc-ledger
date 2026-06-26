@@ -6,6 +6,7 @@ use App\Repository\DocSubsidiaryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: DocSubsidiaryRepository::class)]
 #[ORM\Table(name: 'doc_subsidiary')]
@@ -16,7 +17,11 @@ class DocSubsidiary
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 4, unique: true)]
+    #[ORM\Column(length: 2, unique: true)]
+    #[Assert\Regex(
+        pattern: '/^[A-Za-z]{2}$/',
+        message: 'Subsidiary code must be exactly 2 letters (no numbers or special characters)'
+    )]
     private string $code;
 
     #[ORM\Column(length: 100)]

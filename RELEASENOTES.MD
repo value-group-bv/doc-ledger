@@ -3,6 +3,8 @@
 ## Version 0.7.1 (29 June 2026)
 
 - FIX: `User` role badge not showing up on Admin page.
+- FIX: Footer URL update to version log on GitHub.
+- FIX: Validation mistake in subsidiary codes resulted in user being able to make subsidiary codes with digits in them.
 
 ## Version 0.7.0 (26 June 2026)
 
