@@ -30,7 +30,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Resolve image tag
+      - name: Resolve image tag and repo
         id: meta
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -39,6 +39,7 @@ jobs:
             TAG="${GITHUB_REF_NAME}"
           fi
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "repo=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
       - name: Build and push PHP-FPM image
         uses: docker/build-push-action@v6
@@ -47,8 +48,8 @@ jobs:
           target: runtime
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/app:${{ steps.meta.outputs.tag }}
-            ghcr.io/${{ github.repository }}/app:latest
+            ghcr.io/${{ steps.meta.outputs.repo }}/app:${{ steps.meta.outputs.tag }}
+            ghcr.io/${{ steps.meta.outputs.repo }}/app:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -59,7 +60,7 @@ jobs:
           target: web
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/web:${{ steps.meta.outputs.tag }}
-            ghcr.io/${{ github.repository }}/web:latest
+            ghcr.io/${{ steps.meta.outputs.repo }}/web:${{ steps.meta.outputs.tag }}
+            ghcr.io/${{ steps.meta.outputs.repo }}/web:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
