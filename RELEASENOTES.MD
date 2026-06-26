@@ -1,6 +1,14 @@
 # Release Notes
 
-## Version 0.7.1 (29 June 2026)
+## Version 0.7.2 (26 June 2026)
+
+- FIX: Creating a sub category applicable to ALL subsidiaries, BUT only one specific main category would fail silently.
+- FIX: spelling error on admin page User role.
+- FIX: Auto-propose doc number started at 001 rather than 000.
+- FIX: Auto-propose doc number would not always format correctly in the preview to three-digits.
+
+
+## Version 0.7.1 (26 June 2026)
 
 - FIX: `User` role badge not showing up on Admin page.
 - FIX: Footer URL update to version log on GitHub.

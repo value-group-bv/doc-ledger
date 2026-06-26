@@ -195,22 +195,32 @@ class AdminController extends AbstractController
         $docTypeId = (int) $request->request->get('docTypeId', 0);
         $mainCategoryId = (int) $request->request->get('mainCategoryId', 0);
         $subsidiaryId = (int) $request->request->get('subsidiaryId', 0);
-        $code = (int) $request->request->get('code', 0);
+        $code = (int) $request->request->get('code', -1);
         $description = trim((string) $request->request->get('description', ''));
         $docType = $docTypes->find($docTypeId);
         $mainCategory = $mainCategoryId ? $mainCats->find($mainCategoryId) : null;
         $subsidiary = $subsidiaryId ? $subsidiaries->find($subsidiaryId) : null;
 
-        if ($docType && $code && $description) {
+        if (!$docType) {
+            $this->addFlash('error', 'Document type is required.');
+        } elseif ($code < 0 || $code > 999) {
+            $this->addFlash('error', 'Code is required and must be between 0 and 999.');
+        } elseif (!$description) {
+            $this->addFlash('error', 'Description is required.');
+        } else {
             $entity = new DocSubCategory();
             $entity->setCode($code)->setDescription($description)->setDocType($docType)->setMainCategory($mainCategory)->setSubsidiary($subsidiary);
             $this->em->persist($entity);
             try {
                 $this->em->flush();
                 $this->addFlash('success', "Sub category {$code} added.");
-            } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException) {
+            } catch (\Exception $e) {
                 $this->em->clear();
-                $this->addFlash('error', "Sub category {$code} already exists for this document type, main category and subsidiary.");
+                if ($e instanceof \Doctrine\DBAL\Exception\UniqueConstraintViolationException) {
+                    $this->addFlash('error', "Sub category {$code} already exists for this document type, main category and subsidiary.");
+                } else {
+                    $this->addFlash('error', "Error creating sub category: " . $e->getMessage());
+                }
             }
         }
 
@@ -227,7 +237,7 @@ class AdminController extends AbstractController
     public function subcatUpdate(int $id, Request $request, DocTypeRepository $docTypes, DocMainCategoryRepository $mainCats, DocSubsidiaryRepository $subsidiaries): Response
     {
         $entity = $this->em->find(DocSubCategory::class, $id);
-        $code = (int) $request->request->get('code', 0);
+        $code = (int) $request->request->get('code', -1);
         $description = trim((string) $request->request->get('description', ''));
         $docTypeId = (int) $request->request->get('docTypeId', 0);
         $mainCategoryId = (int) $request->request->get('mainCategoryId', 0);
@@ -236,14 +246,26 @@ class AdminController extends AbstractController
         $mainCategory = $mainCategoryId ? $mainCats->find($mainCategoryId) : null;
         $subsidiary = $subsidiaryId ? $subsidiaries->find($subsidiaryId) : null;
 
-        if ($entity && $code && $description && $docType) {
+        if (!$entity) {
+            $this->addFlash('error', 'Sub category not found.');
+        } elseif ($code < 0 || $code > 999) {
+            $this->addFlash('error', 'Code is required and must be between 0 and 999.');
+        } elseif (!$description) {
+            $this->addFlash('error', 'Description is required.');
+        } elseif (!$docType) {
+            $this->addFlash('error', 'Document type is required.');
+        } else {
             $entity->setCode($code)->setDescription($description)->setDocType($docType)->setMainCategory($mainCategory)->setSubsidiary($subsidiary);
             try {
                 $this->em->flush();
                 $this->addFlash('success', "Sub category {$entity->getFormattedCode()} updated.");
-            } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException) {
+            } catch (\Exception $e) {
                 $this->em->clear();
-                $this->addFlash('error', "Sub category {$code} already exists for this document type, main category and subsidiary.");
+                if ($e instanceof \Doctrine\DBAL\Exception\UniqueConstraintViolationException) {
+                    $this->addFlash('error', "Sub category {$code} already exists for this document type, main category and subsidiary.");
+                } else {
+                    $this->addFlash('error', "Error updating sub category: " . $e->getMessage());
+                }
             }
         }
 

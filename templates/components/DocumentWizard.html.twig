@@ -90,7 +90,7 @@
                     <input type="radio" data-model="docNumberMode" value="1"
                         data-action="change->live#action"
                         {% if docNumberMode == 1 %}checked{% endif %} />
-                    Manual (000–999)
+                    Manual (000 - 999)
                 </label>
             </div>
 
@@ -99,19 +99,19 @@
             {% if predefined is not empty %}
             <select data-model="predefinedNumberId" data-action="change->live#action"
                 class="flex bg-background px-3 py-2 border border-input rounded-md shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-10 text-sm">
-                <option value="0">Auto next available ({{ this.suggestedDocNumber|format_number({'fraction_digit': 0}) ~ '' }})</option>
+                <option value="0">Auto next available ({{ "%03d"|format(this.suggestedDocNumber) }})</option>
                 {% for pn in predefined %}
                 <option value="{{ pn.id }}" {% if predefinedNumberId == pn.id %}selected{% endif %}>{{ pn.formattedCode }} - {{ pn.description }}</option>
                 {% endfor %}
             </select>
             {% else %}
-            <p class="text-muted-foreground text-sm">No pre-defined numbers for this sub category. Next available: <strong>{{ this.suggestedDocNumber }}</strong></p>
+            <p class="text-muted-foreground text-sm">No pre-defined numbers for this sub category. Next available: <strong>{{ "%03d"|format(this.suggestedDocNumber) }}</strong></p>
             {% endif %}
             {% else %}
             <input type="number" data-model="manualDocNumber"
                 data-action="input->live#update:debounce(300ms)"
                 value="{{ manualDocNumber }}"
-                min="0" max="999" placeholder="{{ this.suggestedDocNumber }} (next available)"
+                min="0" max="999" placeholder="{{ "%03d"|format(this.suggestedDocNumber) }} (next available)"
                 class="flex bg-background px-3 py-2 border border-input rounded-md shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-10 font-mono text-sm" />
             {% endif %}
         </div>

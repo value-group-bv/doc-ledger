@@ -264,16 +264,16 @@
                         <option value="{{ mc.id }}">{{ mc.code }} - {{ mc.description }}</option>
                         {% endfor %}
                     </select>
-                    <select name="docTypeId"
+                    <select name="docTypeId" required
                         class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-9 text-sm transition-[color,box-shadow]">
                         <option value="">Doc type…</option>
                         {% for dt in docTypes %}
                         <option value="{{ dt.id }}">{{ dt.code }}</option>
                         {% endfor %}
                     </select>
-                    <input name="code" type="number" min="0" max="999" placeholder="Code (0–999)"
+                    <input name="code" type="number" min="0" max="999" placeholder="Code (0–999)" required
                         class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-36 h-9 text-sm transition-[color,box-shadow]" />
-                    <input name="description" placeholder="Description"
+                    <input name="description" placeholder="Description" required
                         class="flex flex-1 bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 min-w-48 h-9 text-sm transition-[color,box-shadow]" />
                     <button type="submit" class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
                 </form>
@@ -354,7 +354,7 @@
                         <td class="py-2">
                             {% set extraRoles = user.roles|filter(r => r != 'ROLE_USER') %}
                             {% if extraRoles is empty %}
-                            <twig:Badge variant="outline">User</twig:Badge>
+                            <twig:Badge variant="outline">USER</twig:Badge>
                             {% else %}
                             {% for role in extraRoles %}
                             <twig:Badge variant="{{ role == 'ROLE_ADMIN' or role == 'ROLE_SUPERADMIN' ? 'default' : 'secondary' }}">{{ role|replace({'ROLE_': ''}) }}</twig:Badge>

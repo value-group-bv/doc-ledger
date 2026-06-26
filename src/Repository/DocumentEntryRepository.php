@@ -72,8 +72,8 @@ class DocumentEntryRepository extends ServiceEntityRepository
         return $qb;
     }
 
-    /** Returns the highest docNumber used for a given docType + subCategory combination */
-    public function findMaxDocNumber(int $docTypeId, int $subCategoryId): int
+    /** Returns the highest docNumber used for a given docType + subCategory combination, or null if none exist */
+    public function findMaxDocNumber(int $docTypeId, int $subCategoryId): ?int
     {
         $result = $this->createQueryBuilder('e')
             ->select('MAX(e.docNumber)')
@@ -84,6 +84,6 @@ class DocumentEntryRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
 
-        return (int) $result;
+        return $result !== null ? (int) $result : null;
     }
 }
