@@ -15,14 +15,14 @@
                 data-action="input->live#update:debounce(300ms)"
                 value="{{ search }}"
                 placeholder="Search by document number, title, or keywords"
-                class="flex bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-full h-9 placeholder:text-muted-foreground text-sm" />
+                class="flex bg-background shadow-xs px-3 py-2 border border-input rounded-md outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-9 placeholder:text-muted-foreground text-sm transition-[color,box-shadow]" />
         </div>
 
         {# Subsidiary filter #}
         <div class="w-36">
             <label class="block mb-1 text-muted-foreground text-xs">Subsidiary</label>
             <select data-model="subsidiaryFilter" data-action="change->live#action" data-live-action-param="applyFilter"
-                class="flex bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-full h-9 text-sm">
+                class="flex bg-background shadow-xs px-3 py-2 border border-input rounded-md outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/50 w-full h-9 text-sm transition-[color,box-shadow]">
                 <option value="0">All</option>
                 {% for s in this.subsidiaries %}
                 <option value="{{ s.id }}" {% if subsidiaryFilter == s.id %}selected{% endif %}>{{ s.code }}</option>
@@ -34,7 +34,7 @@
         <div class="w-36">
             <label class="block mb-1 text-muted-foreground text-xs">Document type</label>
             <select data-model="docTypeFilter" data-action="change->live#action" data-live-action-param="applyFilter"
-                class="flex bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-full h-9 text-sm">
+                class="flex bg-background shadow-xs px-3 py-2 border border-input rounded-md outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/50 w-full h-9 text-sm transition-[color,box-shadow]">
                 <option value="0">All</option>
                 {% for dt in this.docTypes %}
                 <option value="{{ dt.id }}" {% if docTypeFilter == dt.id %}selected{% endif %}>{{ dt.code }}</option>
@@ -46,7 +46,7 @@
         <div class="w-44">
             <label class="block mb-1 text-muted-foreground text-xs">Main category</label>
             <select data-model="mainCategoryFilter" data-action="change->live#action" data-live-action-param="applyFilter"
-                class="flex bg-background px-3 py-2 border border-input rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring w-full h-9 text-sm">
+                class="flex bg-background shadow-xs px-3 py-2 border border-input rounded-md outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/50 w-full h-9 text-sm transition-[color,box-shadow]">
                 <option value="0">All</option>
                 {% for mc in this.mainCategories %}
                 <option value="{{ mc.id }}" {% if mainCategoryFilter == mc.id %}selected{% endif %}>{{ mc.code }} - {{ mc.description }}</option>
@@ -108,7 +108,7 @@
                         {{ _self.sort_th('Main category', 'mc.code', sortField, sortDir) }}
                         {{ _self.sort_th('Sub category', 'sc.code', sortField, sortDir) }}
                         {{ _self.sort_th('No.', 'e.docNumber', sortField, sortDir) }}
-                        <th class="px-4 py-3 font-medium text-muted-foreground text-right">Actions</th>
+                        <th class="px-4 py-3 font-medium text-muted-foreground text-right">Edit</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-border">
@@ -145,13 +145,6 @@
                                     title="Edit">
                                     <twig:ux:icon name="material-symbols:edit-outline" class="size-4" />
                                 </a>
-                                <button type="button"
-                                    data-controller="confirm-delete"
-                                    data-confirm-delete-url-value="{{ path('ledger_delete', {id: entry.id}) }}"
-                                    class="inline-flex justify-center items-center hover:bg-destructive/10 rounded size-7 text-muted-foreground hover:text-destructive transition-colors"
-                                    title="Delete">
-                                    <twig:ux:icon name="material-symbols:delete-outline" class="size-4" />
-                                </button>
                             </div>
                         </td>
                     </tr>

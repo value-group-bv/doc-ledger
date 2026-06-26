@@ -1,5 +1,17 @@
 # Release Notes
 
+## Version 0.7.0 (26 June 2026)
+
+- Switched the Docker build process to Github Actions rather than on-server.
+- Changed login page background.
+- Removed the `Delete entry` button from the overview ledger page.
+- Changed the URL scheme so that the ledger is on the base domain (`ledger.valuegroup.vg`) rather than a subpage (`ledger.valuegroup.vg/ledger`).
+- Updated CSS styling on the search bar on the main page to be more in-line with the rest.
+- Removed the 'name' tag on admin user page.
+- Added Superadmin role.
+- Simplified the Docker Compose file.
+- FIX: Some out-of-bounds admin page buttons on mobile. It's not yet perfect though, continues to be a WIP.
+
 ## Version 0.6.4 (24 June 2026)
 
 - FIX: GitHub release body was always empty due to awk range pattern matching start and end on the same header line.

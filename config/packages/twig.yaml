@@ -3,7 +3,7 @@ twig:
     form_themes:
         - 'form/theme.html.twig'
     globals:
-        app_version: '%env(APP_VERSION)%'
+        app_version: '%env(default:app.version.default:APP_VERSION)%'
 
 when@test:
     twig:

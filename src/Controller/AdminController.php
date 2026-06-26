@@ -291,7 +291,7 @@ class AdminController extends AbstractController
     public function userToggleAdmin(string $id, UserRepository $users): Response
     {
         $user = $users->find($id);
-        if ($user && $user !== $this->getUser()) {
+        if ($user && $user !== $this->getUser() && !\in_array('ROLE_SUPERADMIN', $user->getRoles(), true)) {
             $roles = $user->getRoles();
             if (\in_array('ROLE_ADMIN', $roles, true)) {
                 $user->setRoles(array_filter($roles, fn($r) => $r !== 'ROLE_ADMIN' && $r !== 'ROLE_USER'));

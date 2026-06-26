@@ -13,7 +13,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Uid\Uuid;
 
 #[IsGranted('ROLE_USER')]
-#[Route('/ledger', name: 'ledger_')]
 class LedgerController extends AbstractController
 {
     public function __construct(
@@ -21,19 +20,19 @@ class LedgerController extends AbstractController
         private readonly DocumentEntryRepository $entries,
     ) {}
 
-    #[Route('/', name: 'index')]
+    #[Route('/', name: 'ledger_index')]
     public function index(): Response
     {
         return $this->render('ledger/index.html.twig');
     }
 
-    #[Route('/new', name: 'new')]
+    #[Route('/ledger/new', name: 'ledger_new')]
     public function new(): Response
     {
         return $this->render('ledger/new.html.twig');
     }
 
-    #[Route('/{id}/edit', name: 'edit')]
+    #[Route('/ledger/{id}/edit', name: 'ledger_edit')]
     public function edit(Uuid $id, Request $request): Response
     {
         $entry = $this->entries->find($id);
@@ -57,7 +56,7 @@ class LedgerController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'delete', methods: ['POST'])]
+    #[Route('/ledger/{id}/delete', name: 'ledger_delete', methods: ['POST'])]
     public function delete(Uuid $id, Request $request): Response
     {
         $entry = $this->entries->find($id);

@@ -4,8 +4,12 @@
 {% set page_header = true %}
 
 {% block body %}
-<div class="py-8">
-    <h1 class="mb-8 font-heading font-bold text-foreground text-3xl">Admin</h1>
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="font-heading font-bold text-foreground text-3xl">Admin</h1>
+            <p class="mt-1 text-muted-foreground">Manage system settings and users</p>
+        </div>
+    </div>
 
     {% for message in app.flashes('success') %}
     <twig:Alert class="bg-emerald-50 mb-4 border-emerald-200">
@@ -29,6 +33,7 @@
                 <twig:Card:Description>Prefix codes for Value Group subsidiaries</twig:Card:Description>
             </twig:Card:Header>
             <twig:Card:Content>
+                <div class="overflow-x-auto">
                 <table class="mb-4 w-full text-sm">
                     <thead><tr class="border-border border-b text-muted-foreground text-xs">
                         <th class="pb-2 text-left">Code</th>
@@ -51,7 +56,8 @@
                     {% endfor %}
                     </tbody>
                 </table>
-                <form method="post" action="{{ path('admin_subsidiary_new') }}" class="flex gap-2">
+                </div>
+                <form method="post" action="{{ path('admin_subsidiary_new') }}" class="flex flex-wrap gap-2">
                     <input name="code" placeholder="Code" maxlength="2"
                         class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-24 h-9 text-sm transition-[color,box-shadow]" />
                     <input name="description" placeholder="Description"
@@ -68,6 +74,7 @@
                 <twig:Card:Description>Single-digit codes</twig:Card:Description>
             </twig:Card:Header>
             <twig:Card:Content>
+                <div class="overflow-x-auto">
                 <table class="mb-4 w-full text-sm">
                     <thead><tr class="border-border border-b text-muted-foreground text-xs">
                         <th class="pb-2 text-left">Code</th>
@@ -101,7 +108,8 @@
                     {% endfor %}
                     </tbody>
                 </table>
-                <form method="post" action="{{ path('admin_maincat_new') }}" class="flex gap-2">
+                </div>
+                <form method="post" action="{{ path('admin_maincat_new') }}" class="flex flex-wrap gap-2">
                     <input name="code" placeholder="Code" maxlength="1"
                         class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-20 h-9 text-sm transition-[color,box-shadow]" />
                     <select name="referenceCode"
@@ -124,6 +132,7 @@
                 <twig:Card:Description>Three-letter codes</twig:Card:Description>
             </twig:Card:Header>
             <twig:Card:Content>
+                <div class="overflow-x-auto">
                 <table class="mb-4 w-full text-sm">
                     <thead><tr class="border-border border-b text-muted-foreground text-xs">
                         <th class="pb-2 text-left">Code</th>
@@ -146,7 +155,8 @@
                     {% endfor %}
                     </tbody>
                 </table>
-                <form method="post" action="{{ path('admin_doctype_new') }}" class="flex gap-2">
+                </div>
+                <form method="post" action="{{ path('admin_doctype_new') }}" class="flex flex-wrap gap-2">
                     <input name="code" placeholder="Code" maxlength="3"
                         class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-28 h-9 text-sm transition-[color,box-shadow]" />
                     <input name="description" placeholder="Description"
@@ -329,10 +339,10 @@
                 <twig:Card:Description>All users who have logged in via Microsoft 365</twig:Card:Description>
             </twig:Card:Header>
             <twig:Card:Content>
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead><tr class="border-border border-b text-muted-foreground text-xs">
                         <th class="pb-2 text-left">Email</th>
-                        <th class="pb-2 text-left">Name</th>
                         <th class="pb-2 text-left">Roles</th>
                         <th class="pb-2 text-left">Joined</th>
                         <th></th>
@@ -341,11 +351,10 @@
                     {% for user in users %}
                     <tr>
                         <td class="py-2">{{ user.email }}</td>
-                        <td class="py-2 text-muted-foreground">{{ user.displayName ?? '—' }}</td>
                         <td class="py-2">
                             {% for role in user.roles %}
                             {% if role != 'ROLE_USER' %}
-                            <twig:Badge variant="{{ role == 'ROLE_ADMIN' ? 'default' : 'secondary' }}">{{ role|replace({'ROLE_': ''}) }}</twig:Badge>
+                            <twig:Badge variant="{{ role == 'ROLE_ADMIN' or role == 'ROLE_SUPERADMIN' ? 'default' : 'secondary' }}">{{ role|replace({'ROLE_': ''}) }}</twig:Badge>
                             {% endif %}
                             {% else %}
                             <twig:Badge variant="outline">User</twig:Badge>
@@ -353,7 +362,9 @@
                         </td>
                         <td class="py-2 text-muted-foreground text-xs">{{ user.createdAt|date('d M Y') }}</td>
                         <td class="py-2 text-right">
-                            {% if user != app.user %}
+                            {% if 'ROLE_SUPERADMIN' in user.roles %}
+                            <span class="text-muted-foreground text-xs">Protected</span>
+                            {% elseif user != app.user %}
                             <form method="post" action="{{ path('admin_user_toggle_admin', {id: user.id}) }}">
                                 <button type="submit"
                                     class="text-xs {% if 'ROLE_ADMIN' in user.roles %}text-destructive{% else %}text-primary{% endif %} hover:underline">
@@ -368,6 +379,7 @@
                     {% endfor %}
                     </tbody>
                 </table>
+                </div>
             </twig:Card:Content>
         </twig:Card>
 
