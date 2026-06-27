@@ -5,10 +5,10 @@
 <div {{ attributes }}>
 
     {# ── Filter bar ─────────────────────────────────────────────────────────── #}
-    <div class="flex flex-wrap items-end gap-3 mb-4">
+    <div class="block sm:flex sm:flex-wrap sm:items-end sm:gap-3 mb-4">
 
-        {# Search #}
-        <div class="flex-1 min-w-[200px]">
+        {# Search - full width on mobile #}
+        <div class="w-full sm:flex-1 sm:min-w-[200px] mb-3 sm:mb-0">
             <label class="block mb-1 text-muted-foreground text-xs">Search</label>
             <input type="text"
                 data-model="search"
@@ -19,7 +19,7 @@
         </div>
 
         {# Subsidiary filter #}
-        <div class="w-36">
+        <div class="hidden sm:block w-full sm:w-36 mb-3 sm:mb-0">
             <label class="block mb-1 text-muted-foreground text-xs">Subsidiary</label>
             <select data-model="subsidiaryFilter" data-action="change->live#action" data-live-action-param="applyFilter"
                 class="flex bg-background shadow-xs px-3 py-2 border border-input rounded-md outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/50 w-full h-9 text-sm transition-[color,box-shadow]">
@@ -31,7 +31,7 @@
         </div>
 
         {# Doc type filter #}
-        <div class="w-36">
+        <div class="hidden sm:block w-full sm:w-36 mb-3 sm:mb-0">
             <label class="block mb-1 text-muted-foreground text-xs">Document type</label>
             <select data-model="docTypeFilter" data-action="change->live#action" data-live-action-param="applyFilter"
                 class="flex bg-background shadow-xs px-3 py-2 border border-input rounded-md outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/50 w-full h-9 text-sm transition-[color,box-shadow]">
@@ -43,7 +43,7 @@
         </div>
 
         {# Main category filter #}
-        <div class="w-44">
+        <div class="hidden sm:block w-full sm:w-44 mb-3 sm:mb-0">
             <label class="block mb-1 text-muted-foreground text-xs">Main category</label>
             <select data-model="mainCategoryFilter" data-action="change->live#action" data-live-action-param="applyFilter"
                 class="flex bg-background shadow-xs px-3 py-2 border border-input rounded-md outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/50 w-full h-9 text-sm transition-[color,box-shadow]">
@@ -57,17 +57,17 @@
         {# Reset #}
         {% if search or subsidiaryFilter or docTypeFilter or mainCategoryFilter %}
         <button type="button" data-action="live#action" data-live-action-param="resetFilters"
-            class="hover:bg-muted px-3 border border-border rounded-md h-9 text-muted-foreground text-sm transition-colors">
+            class="hidden sm:block hover:bg-muted px-3 border border-border rounded-md h-9 text-muted-foreground text-sm transition-colors w-full sm:w-auto mb-3 sm:mb-0">
             Clear filters
         </button>
         {% endif %}
 
         {# Spacer + new entry button #}
-        <div class="ml-auto">
+        <div class="sm:ml-auto">
             <a href="{{ path('ledger_new') }}"
-                class="inline-flex items-center gap-1.5 bg-primary hover:bg-primary/90 px-4 rounded-md h-9 font-medium text-primary-foreground text-sm transition-colors">
-                <twig:ux:icon name="material-symbols:add" class="size-4" />
-                New entry
+                class="inline-flex items-center justify-center sm:justify-start gap-1.5 bg-primary hover:bg-primary/90 px-3 sm:px-4 rounded-md h-8 sm:h-9 font-medium text-primary-foreground text-xs sm:text-sm transition-colors w-full sm:w-auto">
+                <twig:ux:icon name="material-symbols:add" class="size-3.5 sm:size-4" />
+                <span>New entry</span>
             </a>
         </div>
     </div>
@@ -103,39 +103,108 @@
 
                         {{ _self.sort_th('Document number', 'e.referenceCode', sortField, sortDir) }}
                         {{ _self.sort_th('Title', 'e.title', sortField, sortDir) }}
-                        {{ _self.sort_th('Subsidiary', 's.code', sortField, sortDir) }}
-                        {{ _self.sort_th('Type', 'dt.code', sortField, sortDir) }}
-                        {{ _self.sort_th('Main category', 'mc.code', sortField, sortDir) }}
-                        {{ _self.sort_th('Sub category', 'sc.code', sortField, sortDir) }}
-                        {{ _self.sort_th('No.', 'e.docNumber', sortField, sortDir) }}
+                        <th class="hidden sm:table-cell px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
+                            <button type="button"
+                                data-action="live#action"
+                                data-live-action-param="sort"
+                                data-live-field-param="s.code"
+                                class="flex items-center gap-1 hover:text-foreground transition-colors">
+                                Subsidiary
+                                {% if sortField == 's.code' %}
+                                <twig:ux:icon name="{{ sortDir == 'ASC' ? 'material-symbols:arrow-upward' : 'material-symbols:arrow-downward' }}" class="size-3.5" />
+                                {% else %}
+                                <twig:ux:icon name="material-symbols:unfold-more" class="opacity-30 size-3.5" />
+                                {% endif %}
+                            </button>
+                        </th>
+                        <th class="hidden sm:table-cell px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
+                            <button type="button"
+                                data-action="live#action"
+                                data-live-action-param="sort"
+                                data-live-field-param="dt.code"
+                                class="flex items-center gap-1 hover:text-foreground transition-colors">
+                                Type
+                                {% if sortField == 'dt.code' %}
+                                <twig:ux:icon name="{{ sortDir == 'ASC' ? 'material-symbols:arrow-upward' : 'material-symbols:arrow-downward' }}" class="size-3.5" />
+                                {% else %}
+                                <twig:ux:icon name="material-symbols:unfold-more" class="opacity-30 size-3.5" />
+                                {% endif %}
+                            </button>
+                        </th>
+                        <th class="hidden sm:table-cell px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
+                            <button type="button"
+                                data-action="live#action"
+                                data-live-action-param="sort"
+                                data-live-field-param="mc.code"
+                                class="flex items-center gap-1 hover:text-foreground transition-colors">
+                                Main category
+                                {% if sortField == 'mc.code' %}
+                                <twig:ux:icon name="{{ sortDir == 'ASC' ? 'material-symbols:arrow-upward' : 'material-symbols:arrow-downward' }}" class="size-3.5" />
+                                {% else %}
+                                <twig:ux:icon name="material-symbols:unfold-more" class="opacity-30 size-3.5" />
+                                {% endif %}
+                            </button>
+                        </th>
+                        <th class="hidden sm:table-cell px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
+                            <button type="button"
+                                data-action="live#action"
+                                data-live-action-param="sort"
+                                data-live-field-param="sc.code"
+                                class="flex items-center gap-1 hover:text-foreground transition-colors">
+                                Sub category
+                                {% if sortField == 'sc.code' %}
+                                <twig:ux:icon name="{{ sortDir == 'ASC' ? 'material-symbols:arrow-upward' : 'material-symbols:arrow-downward' }}" class="size-3.5" />
+                                {% else %}
+                                <twig:ux:icon name="material-symbols:unfold-more" class="opacity-30 size-3.5" />
+                                {% endif %}
+                            </button>
+                        </th>
+                        <th class="hidden sm:table-cell px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
+                            <button type="button"
+                                data-action="live#action"
+                                data-live-action-param="sort"
+                                data-live-field-param="e.docNumber"
+                                class="flex items-center gap-1 hover:text-foreground transition-colors">
+                                No.
+                                {% if sortField == 'e.docNumber' %}
+                                <twig:ux:icon name="{{ sortDir == 'ASC' ? 'material-symbols:arrow-upward' : 'material-symbols:arrow-downward' }}" class="size-3.5" />
+                                {% else %}
+                                <twig:ux:icon name="material-symbols:unfold-more" class="opacity-30 size-3.5" />
+                                {% endif %}
+                            </button>
+                        </th>
                         <th class="px-4 py-3 font-medium text-muted-foreground text-right">Edit</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-border">
                     {% for entry in entries %}
                     <tr class="hover:bg-muted/30 transition-colors">
-                        <td class="px-4 py-3">
-                            <code class="px-2 py-0.5 border rounded font-[450] font-mono text-[13px] whitespace-nowrap"
-                                style="{{ subsidiary_doc_number_style(entry.subsidiary.code) }}">
+                        <td class="px-4 py-3" data-controller="copy-doc-number">
+                            <button type="button"
+                                data-copy-doc-number-target="button"
+                                data-copy-doc-number="{{ entry.getDocumentNumber() }}"
+                                class="px-2 py-0.5 border rounded font-[450] font-mono text-[13px] whitespace-nowrap cursor-pointer hover:opacity-80 transition-opacity"
+                                style="{{ subsidiary_doc_number_style(entry.subsidiary.code) }}"
+                                title="Click to copy full document number">
                                 {{ entry.documentNumberBase }}
-                            </code>
+                            </button>
                         </td>
                         <td class="px-4 py-3 max-w-xs font-medium text-foreground truncate">
                             {{ entry.title }}
                         </td>
-                        <td class="px-4 py-3 text-muted-foreground text-xs">
+                        <td class="px-4 py-3 text-muted-foreground text-xs sm:table-cell" style="display: none;">
                             {{ entry.subsidiary.code }}
                         </td>
-                        <td class="px-4 py-3">
+                        <td class="px-4 py-3 sm:table-cell" style="display: none;">
                             <twig:Badge style="{{ doc_type_badge_style(entry.docType.code) }}">{{ entry.docType.code }}</twig:Badge>
                         </td>
-                        <td class="px-4 py-3 text-muted-foreground text-xs">
+                        <td class="px-4 py-3 text-muted-foreground text-xs sm:table-cell" style="display: none;">
                             {{ entry.mainCategory.code }} - {{ entry.mainCategory.description }}
                         </td>
-                        <td class="px-4 py-3 text-muted-foreground text-xs">
+                        <td class="px-4 py-3 text-muted-foreground text-xs sm:table-cell" style="display: none;">
                             {{ entry.subCategory.formattedCode }} - {{ entry.subCategory.description }}
                         </td>
-                        <td class="px-4 py-3 font-mono text-muted-foreground text-xs">
+                        <td class="px-4 py-3 font-mono text-muted-foreground text-xs sm:table-cell" style="display: none;">
                             {{ '%03d'|format(entry.docNumber) }}
                         </td>
                         <td class="px-4 py-3 text-right">

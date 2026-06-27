@@ -51,7 +51,7 @@ class DocumentEntry
     #[ORM\Column(length: 10, options: ['default' => '00'])]
     private string $revision = '00';
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 48)]
     private string $title;
 
     #[ORM\Column(type: 'text', nullable: true)]

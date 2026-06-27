@@ -4,6 +4,13 @@
 {% set page_header = true %}
 
 {% block body %}
+    <style>
+        @media (min-width: 640px) {
+            td[style*="display: none"] {
+                display: table-cell !important;
+            }
+        }
+    </style>
     <div class="flex justify-between items-center mb-6">
         <div>
             <h1 class="font-heading font-bold text-foreground text-3xl">Ledger</h1>

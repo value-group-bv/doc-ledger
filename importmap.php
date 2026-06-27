@@ -28,4 +28,12 @@ return [
     '@symfony/ux-live-component' => [
         'path' => './vendor/symfony/ux-live-component/assets/dist/live_controller.js',
     ],
+    'shadcn/dist/tailwind.css' => [
+        'version' => '4.12.0',
+        'type' => 'css',
+    ],
+    'tw-animate-css/dist/tw-animate.css' => [
+        'version' => '1.4.0',
+        'type' => 'css',
+    ],
 ];

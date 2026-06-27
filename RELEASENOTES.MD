@@ -1,5 +1,15 @@
 # Release Notes
 
+## Version 0.8.0 (XX June 2026)
+
+- When you now click on an document number it is copied to your clipboard (including `-00` suffix).
+- Improved layout of the searchbar and filters on mobile screens. By hiding the filter buttons.
+- Improved ledger table layout on mobile screens by hiding certain columns.
+- Document titles can now be up to 48 characters long.
+- Updated dependencies.
+- FIX: CSS styling on mobile website login page had small issue with the blue hue.
+
+
 ## Version 0.7.2 (26 June 2026)
 
 - FIX: Creating a sub category applicable to ALL subsidiaries, BUT only one specific main category would fail silently.
