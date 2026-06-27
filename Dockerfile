@@ -2,7 +2,7 @@
 FROM php:8.4-cli-alpine AS builder
 
 RUN apk add --no-cache \
-    git unzip curl gcompat \
+    git unzip curl gcompat nodejs npm \
     sqlite-dev libzip-dev libxml2-dev oniguruma-dev icu-dev \
     libpng-dev libjpeg-turbo-dev freetype-dev
 
@@ -35,7 +35,7 @@ RUN APP_VERSION=$(tr -d '[:space:]' < VERSION) && \
 
 # Install bundle assets and vendor JS, then build Tailwind and compile asset map
 RUN APP_ENV=prod php bin/console assets:install public --no-debug
-RUN APP_ENV=prod php bin/console importmap:install --no-debug
+RUN APP_ENV=prod php -d default_socket_timeout=300 bin/console importmap:install --no-debug
 RUN APP_ENV=prod php bin/console tailwind:build --minify --no-debug
 RUN APP_ENV=prod php bin/console asset-map:compile --no-debug
 

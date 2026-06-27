@@ -42,7 +42,7 @@ class LedgerTable
     public string $sortField = 'e.referenceCode';
 
     #[LiveProp(writable: true)]
-    public string $sortDir = 'DESC';
+    public string $sortDir = 'ASC';
 
     public function __construct(
         private readonly DocumentEntryRepository $entries,
