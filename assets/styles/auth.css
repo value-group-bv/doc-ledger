@@ -18,6 +18,10 @@
         background-size: cover;
         background-color: #0f5b7f;
         height: 100dvh;
+        min-height: 100%;
+        position: fixed;
+        width: 100%;
+        overflow: hidden;
     }
 
     .card-title {
