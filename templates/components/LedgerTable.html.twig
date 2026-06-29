@@ -14,7 +14,7 @@
                 data-model="search"
                 data-action="input->live#update:debounce(300ms)"
                 value="{{ search }}"
-                placeholder="Search by document number, title, or keywords"
+                placeholder="Search by document ID, title, or keywords"
                 class="flex bg-background shadow-xs px-3 py-2 border border-input rounded-md outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-9 placeholder:text-muted-foreground text-sm transition-[color,box-shadow]" />
         </div>
 
@@ -101,7 +101,7 @@
                         </th>
                         {% endmacro %}
 
-                        {{ _self.sort_th('Document number', 'e.referenceCode', sortField, sortDir) }}
+                        {{ _self.sort_th('Document ID', 'e.referenceCode', sortField, sortDir) }}
                         {{ _self.sort_th('Title', 'e.title', sortField, sortDir) }}
                         <th class="hidden sm:table-cell px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
                             <button type="button"
@@ -182,11 +182,11 @@
                         <td class="px-4 py-3" data-controller="copy-doc-number">
                             <button type="button"
                                 data-copy-doc-number-target="button"
-                                data-copy-doc-number="{{ entry.getDocumentNumber() }}"
+                                data-copy-doc-number="{{ entry.getDocumentId() }}"
                                 class="px-2 py-0.5 border rounded font-[450] font-mono text-[13px] whitespace-nowrap cursor-pointer hover:opacity-80 transition-opacity"
                                 style="{{ subsidiary_doc_number_style(entry.subsidiary.code) }}"
-                                title="Click to copy full document number">
-                                {{ entry.documentNumberBase }}
+                                title="Click to copy document ID">
+                                {{ entry.documentIdBase }}
                             </button>
                         </td>
                         <td class="px-4 py-3 max-w-xs font-medium text-foreground truncate">

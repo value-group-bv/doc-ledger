@@ -1,6 +1,12 @@
 # Release Notes
 
-## Version 0.8.0 (XX June 2026)
+## Version 0.8.1 (29 June 2026)
+
+- Changed the term 'Document number' for the big code to 'Document ID'.
+- Small styling updates on the Edit and New Ledger pages.
+- Updated dependencies.
+
+## Version 0.8.0 (27 June 2026)
 
 - When you now click on an document number it is copied to your clipboard (including `-00` suffix).
 - Improved layout of the searchbar and filters on mobile screens. By hiding the filter buttons.
@@ -9,14 +15,12 @@
 - Updated dependencies.
 - FIX: CSS styling on mobile website login page had small issue with the blue hue.
 
-
 ## Version 0.7.2 (26 June 2026)
 
 - FIX: Creating a sub category applicable to ALL subsidiaries, BUT only one specific main category would fail silently.
 - FIX: spelling error on admin page User role.
 - FIX: Auto-propose doc number started at 001 rather than 000.
 - FIX: Auto-propose doc number would not always format correctly in the preview to three-digits.
-
 
 ## Version 0.7.1 (26 June 2026)
 

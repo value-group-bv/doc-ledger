@@ -114,8 +114,8 @@ class DocumentEntry
     public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
     public function getUpdatedAt(): \DateTimeImmutable { return $this->updatedAt; }
 
-    /** Generates the full document number string, e.g. VM2-001-DWG-300-002-00 */
-    public function getDocumentNumber(): string
+    /** Generates the full document ID string, e.g. VM2-001-DWG-300-002-00 */
+    public function getDocumentId(): string
     {
         return sprintf(
             '%s%s-%s-%s-%s-%s-%s',
@@ -129,8 +129,8 @@ class DocumentEntry
         );
     }
 
-    /** Document number without revision suffix, e.g. VM2-001-DWG-300-002 */
-    public function getDocumentNumberBase(): string
+    /** Document ID without revision suffix, e.g. VM2-001-DWG-300-002 */
+    public function getDocumentIdBase(): string
     {
         return sprintf(
             '%s%s-%s-%s-%s-%s',

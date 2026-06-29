@@ -56,9 +56,9 @@ class DocumentWizard
     #[LiveProp(writable: true)]
     public string $comments = '';
 
-    /** Saved document number string shown after submit */
+    /** Saved document ID string shown after submit */
     #[LiveProp(writable: true)]
-    public string $savedDocNumber = '';
+    public string $savedDocumentId = '';
 
     public function __construct(
         private readonly DocSubsidiaryRepository $subsidiaries,
@@ -110,7 +110,7 @@ class DocumentWizard
         return ($max ?? -1) + 1;
     }
 
-    public function getPreviewDocNumber(): string
+    public function getPreviewDocumentId(): string
     {
         if (!$this->subsidiaryId || !$this->mainCategoryId || !$this->docTypeId || !$this->subCategoryId) {
             return '—';
@@ -152,7 +152,7 @@ class DocumentWizard
     #[LiveAction]
     public function resetConfirmation(): void
     {
-        $this->savedDocNumber = '';
+        $this->savedDocumentId = '';
     }
 
     #[LiveAction]
@@ -185,7 +185,7 @@ class DocumentWizard
         $this->em->persist($entry);
         $this->em->flush();
 
-        $this->savedDocNumber = $entry->getDocumentNumber();
+        $this->savedDocumentId = $entry->getDocumentId();
 
         // Reset form
         $this->subsidiaryId = 0;

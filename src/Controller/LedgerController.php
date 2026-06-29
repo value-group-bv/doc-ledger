@@ -46,7 +46,7 @@ class LedgerController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entry->setReferenceCode($entry->getMainCategory()->getReferenceCode());
             $this->em->flush();
-            $this->addFlash('success', "Entry updated: {$entry->getDocumentNumber()}");
+            $this->addFlash('success', "Entry updated: {$entry->getDocumentId()}");
             return $this->redirectToRoute('ledger_index');
         }
 

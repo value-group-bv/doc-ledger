@@ -1,12 +1,12 @@
 <div {{ attributes }}>
 
-{% if savedDocNumber %}
+{% if savedDocumentId %}
 {# ── Success state ──────────────────────────────────────────────────────────── #}
 <twig:Alert class="bg-emerald-50 mb-6 border-emerald-200">
     <twig:ux:icon name="material-symbols:check-circle-outline" class="size-4 text-emerald-600" />
     <twig:Alert:Title class="text-emerald-800">Entry registered</twig:Alert:Title>
     <twig:Alert:Description class="text-emerald-700">
-        Document number <code class="font-mono font-semibold">{{ savedDocNumber }}</code> has been saved to the ledger.
+        Document ID <code class="font-mono font-semibold">{{ savedDocumentId }}</code> has been saved to the ledger.
     </twig:Alert:Description>
 </twig:Alert>
 
@@ -146,14 +146,14 @@
             {% endif %}
             class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 mt-2 px-6 rounded-md h-10 font-medium text-primary-foreground text-sm transition-colors disabled:cursor-not-allowed">
             <twig:ux:icon name="material-symbols:save-outline" class="size-4" />
-            Register document number
+            Register document ID
         </button>
 
     </div>
 
     {# Right: live preview #}
     <div>
-        {% set previewDocNumber = this.previewDocNumber %}
+        {% set previewDocumentId = this.previewDocumentId %}
         <twig:Card class="top-6 sticky">
             <twig:Card:Header>
                 <twig:Card:Title>Live preview</twig:Card:Title>
@@ -161,8 +161,8 @@
             </twig:Card:Header>
             <twig:Card:Content>
                 <div class="bg-muted p-4 rounded-lg text-center">
-                    <code class="font-mono text-sm font-semibold break-all {% if previewDocNumber != '—' %}text-primary{% else %}text-muted-foreground{% endif %}">
-                        {{ previewDocNumber }}
+                    <code class="font-mono text-sm font-semibold break-all {% if previewDocumentId != '—' %}text-primary{% else %}text-muted-foreground{% endif %}">
+                        {{ previewDocumentId }}
                     </code>
                 </div>
                 {% if title %}
