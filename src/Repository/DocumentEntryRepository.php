@@ -72,6 +72,31 @@ class DocumentEntryRepository extends ServiceEntityRepository
         return $qb;
     }
 
+    /** Returns true if a document entry with the same ID components already exists (optionally excluding a given entry by UUID) */
+    public function isDuplicate(int $subsidiaryId, int $mainCategoryId, int $docTypeId, int $subCategoryId, int $docNumber, string $revision, ?string $excludeId = null): bool
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->where('e.subsidiary = :subsidiaryId')
+            ->andWhere('e.mainCategory = :mainCategoryId')
+            ->andWhere('e.docType = :docTypeId')
+            ->andWhere('e.subCategory = :subCategoryId')
+            ->andWhere('e.docNumber = :docNumber')
+            ->andWhere('e.revision = :revision')
+            ->setParameter('subsidiaryId', $subsidiaryId)
+            ->setParameter('mainCategoryId', $mainCategoryId)
+            ->setParameter('docTypeId', $docTypeId)
+            ->setParameter('subCategoryId', $subCategoryId)
+            ->setParameter('docNumber', $docNumber)
+            ->setParameter('revision', $revision);
+
+        if ($excludeId !== null) {
+            $qb->andWhere('e.id != :excludeId')->setParameter('excludeId', $excludeId);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult() > 0;
+    }
+
     /** Returns the highest docNumber used for a given docType + subCategory combination, or null if none exist */
     public function findMaxDocNumber(int $docTypeId, int $subCategoryId): ?int
     {

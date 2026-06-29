@@ -60,6 +60,9 @@ class DocumentWizard
     #[LiveProp(writable: true)]
     public string $savedDocumentId = '';
 
+    #[LiveProp(writable: true)]
+    public string $duplicateError = '';
+
     public function __construct(
         private readonly DocSubsidiaryRepository $subsidiaries,
         private readonly DocMainCategoryRepository $mainCategories,
@@ -153,11 +156,14 @@ class DocumentWizard
     public function resetConfirmation(): void
     {
         $this->savedDocumentId = '';
+        $this->duplicateError = '';
     }
 
     #[LiveAction]
     public function save(): void
     {
+        $this->duplicateError = '';
+
         if (!$this->subsidiaryId || !$this->mainCategoryId || !$this->docTypeId
             || !$this->subCategoryId || !$this->title) {
             return;
@@ -170,13 +176,19 @@ class DocumentWizard
 
         if (!$subsidiary || !$mainCategory || !$docType || !$subCategory) return;
 
+        $docNumber = $this->resolvedDocNumber();
+        if ($this->entries->isDuplicate($this->subsidiaryId, $this->mainCategoryId, $this->docTypeId, $this->subCategoryId, $docNumber, '00')) {
+            $this->duplicateError = 'This document ID already exists in the ledger.';
+            return;
+        }
+
         $entry = new DocumentEntry();
         $entry->setSubsidiary($subsidiary);
         $entry->setMainCategory($mainCategory);
         $entry->setReferenceCode($mainCategory->getReferenceCode());
         $entry->setDocType($docType);
         $entry->setSubCategory($subCategory);
-        $entry->setDocNumber($this->resolvedDocNumber());
+        $entry->setDocNumber($docNumber);
         $entry->setRevision('00');
         $entry->setTitle($this->title);
         $entry->setComments($this->comments ?: null);

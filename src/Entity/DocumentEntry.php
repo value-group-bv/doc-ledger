@@ -4,11 +4,14 @@ namespace App\Entity;
 
 use App\Repository\DocumentEntryRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: DocumentEntryRepository::class)]
 #[ORM\Table(name: 'document_entry')]
+#[ORM\UniqueConstraint(name: 'document_entry_unique_id', columns: ['subsidiary_id', 'main_category_id', 'doc_type_id', 'sub_category_id', 'doc_number', 'revision'])]
 #[ORM\HasLifecycleCallbacks]
+#[UniqueEntity(fields: ['subsidiary', 'mainCategory', 'docType', 'subCategory', 'docNumber', 'revision'], message: 'This document ID already exists in the ledger.')]
 class DocumentEntry
 {
     #[ORM\Id]

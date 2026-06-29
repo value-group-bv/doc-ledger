@@ -8,21 +8,21 @@
     <div class="block sm:flex sm:flex-wrap sm:items-end sm:gap-3 mb-4">
 
         {# Search - full width on mobile #}
-        <div class="w-full sm:flex-1 sm:min-w-[200px] mb-3 sm:mb-0">
+        <div class="sm:flex-1 mb-3 sm:mb-0 w-full sm:min-w-[200px]">
             <label class="block mb-1 text-muted-foreground text-xs">Search</label>
             <input type="text"
                 data-model="search"
                 data-action="input->live#update:debounce(300ms)"
                 value="{{ search }}"
                 placeholder="Search by document ID, title, or keywords"
-                class="flex bg-background shadow-xs px-3 py-2 border border-input rounded-md outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-9 placeholder:text-muted-foreground text-sm transition-[color,box-shadow]" />
+                class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-9 placeholder:text-muted-foreground text-sm transition-[color,box-shadow]" />
         </div>
 
         {# Subsidiary filter #}
-        <div class="hidden sm:block w-full sm:w-36 mb-3 sm:mb-0">
+        <div class="hidden sm:block mb-3 sm:mb-0 w-full sm:w-36">
             <label class="block mb-1 text-muted-foreground text-xs">Subsidiary</label>
             <select data-model="subsidiaryFilter" data-action="change->live#action" data-live-action-param="applyFilter"
-                class="flex bg-background shadow-xs px-3 py-2 border border-input rounded-md outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/50 w-full h-9 text-sm transition-[color,box-shadow]">
+                class="flex bg-background shadow-xs px-3 py-2 border border-input focus:border-ring rounded-md outline-none focus:ring-[3px] focus:ring-ring/50 w-full h-9 text-sm transition-[color,box-shadow]">
                 <option value="0">All</option>
                 {% for s in this.subsidiaries %}
                 <option value="{{ s.id }}" {% if subsidiaryFilter == s.id %}selected{% endif %}>{{ s.code }}</option>
@@ -31,10 +31,10 @@
         </div>
 
         {# Doc type filter #}
-        <div class="hidden sm:block w-full sm:w-36 mb-3 sm:mb-0">
+        <div class="hidden sm:block mb-3 sm:mb-0 w-full sm:w-36">
             <label class="block mb-1 text-muted-foreground text-xs">Document type</label>
             <select data-model="docTypeFilter" data-action="change->live#action" data-live-action-param="applyFilter"
-                class="flex bg-background shadow-xs px-3 py-2 border border-input rounded-md outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/50 w-full h-9 text-sm transition-[color,box-shadow]">
+                class="flex bg-background shadow-xs px-3 py-2 border border-input focus:border-ring rounded-md outline-none focus:ring-[3px] focus:ring-ring/50 w-full h-9 text-sm transition-[color,box-shadow]">
                 <option value="0">All</option>
                 {% for dt in this.docTypes %}
                 <option value="{{ dt.id }}" {% if docTypeFilter == dt.id %}selected{% endif %}>{{ dt.code }}</option>
@@ -43,10 +43,10 @@
         </div>
 
         {# Main category filter #}
-        <div class="hidden sm:block w-full sm:w-44 mb-3 sm:mb-0">
+        <div class="hidden sm:block mb-3 sm:mb-0 w-full sm:w-44">
             <label class="block mb-1 text-muted-foreground text-xs">Main category</label>
             <select data-model="mainCategoryFilter" data-action="change->live#action" data-live-action-param="applyFilter"
-                class="flex bg-background shadow-xs px-3 py-2 border border-input rounded-md outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/50 w-full h-9 text-sm transition-[color,box-shadow]">
+                class="flex bg-background shadow-xs px-3 py-2 border border-input focus:border-ring rounded-md outline-none focus:ring-[3px] focus:ring-ring/50 w-full h-9 text-sm transition-[color,box-shadow]">
                 <option value="0">All</option>
                 {% for mc in this.mainCategories %}
                 <option value="{{ mc.id }}" {% if mainCategoryFilter == mc.id %}selected{% endif %}>{{ mc.code }} - {{ mc.description }}</option>
@@ -57,7 +57,7 @@
         {# Reset #}
         {% if search or subsidiaryFilter or docTypeFilter or mainCategoryFilter %}
         <button type="button" data-action="live#action" data-live-action-param="resetFilters"
-            class="hidden sm:block hover:bg-muted px-3 border border-border rounded-md h-9 text-muted-foreground text-sm transition-colors w-full sm:w-auto mb-3 sm:mb-0">
+            class="hidden sm:block hover:bg-muted mb-3 sm:mb-0 px-3 border border-border rounded-md w-full sm:w-auto h-9 text-muted-foreground text-sm transition-colors">
             Clear filters
         </button>
         {% endif %}
@@ -65,24 +65,30 @@
         {# Spacer + new entry button #}
         <div class="sm:ml-auto">
             <a href="{{ path('ledger_new') }}"
-                class="inline-flex items-center justify-center sm:justify-start gap-1.5 bg-primary hover:bg-primary/90 px-3 sm:px-4 rounded-md h-8 sm:h-9 font-medium text-primary-foreground text-xs sm:text-sm transition-colors w-full sm:w-auto">
+                class="inline-flex justify-center sm:justify-start items-center gap-1.5 bg-primary hover:bg-primary/90 px-3 sm:px-4 rounded-md w-full sm:w-auto h-8 sm:h-9 font-medium text-primary-foreground text-xs sm:text-sm transition-colors">
                 <twig:ux:icon name="material-symbols:add" class="size-3.5 sm:size-4" />
                 <span>New entry</span>
             </a>
         </div>
     </div>
 
-    {# ── Result count ────────────────────────────────────────────────────────── #}
-    <p class="mb-3 text-muted-foreground text-xs">
-        {{ totalCount }} {{ totalCount == 1 ? 'entry' : 'entries' }}
-        {% if search or subsidiaryFilter or docTypeFilter or mainCategoryFilter %} matching filters{% endif %}
-    </p>
+    {# ── Result count + export ───────────────────────────────────────────────── #}
+    <div class="flex items-center mb-3">
+        <p class="text-muted-foreground text-xs">
+            {{ totalCount }} {{ totalCount == 1 ? 'entry' : 'entries' }}
+            {% if search or subsidiaryFilter or docTypeFilter or mainCategoryFilter %} matching filters{% endif %}
+        </p>
+        <a href="{{ path('ledger_export') }}"
+            class="not-sm:hidden inline-flex items-center gap-1 ml-auto text-muted-foreground hover:text-foreground text-xs transition-colors">
+            <twig:ux:icon name="material-symbols:download" class="size-3" />
+            Export to XLSX
+        </a>
+    </div>
 
     {# ── Table ───────────────────────────────────────────────────────────────── #}
-    <div class="border border-border rounded-lg overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead class="bg-muted/50 border-border border-b">
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+                <thead class="bg-primary/10 border-border border-b">
                     <tr>
                         {% macro sort_th(label, field, currentField, currentDir) %}
                         <th class="px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
@@ -183,7 +189,7 @@
                             <button type="button"
                                 data-copy-doc-number-target="button"
                                 data-copy-doc-number="{{ entry.getDocumentId() }}"
-                                class="px-2 py-0.5 border rounded font-[450] font-mono text-[13px] whitespace-nowrap cursor-pointer hover:opacity-80 transition-opacity"
+                                class="hover:opacity-80 px-2 py-0.5 border rounded font-[450] font-mono text-[13px] whitespace-nowrap transition-opacity cursor-pointer"
                                 style="{{ subsidiary_doc_number_style(entry.subsidiary.code) }}"
                                 title="Click to copy document ID">
                                 {{ entry.documentIdBase }}
@@ -192,19 +198,19 @@
                         <td class="px-4 py-3 max-w-xs font-medium text-foreground truncate">
                             {{ entry.title }}
                         </td>
-                        <td class="px-4 py-3 text-muted-foreground text-xs sm:table-cell" style="display: none;">
+                        <td class="sm:table-cell px-4 py-3 text-muted-foreground text-xs" style="display: none;">
                             {{ entry.subsidiary.code }}
                         </td>
-                        <td class="px-4 py-3 sm:table-cell" style="display: none;">
+                        <td class="sm:table-cell px-4 py-3" style="display: none;">
                             <twig:Badge style="{{ doc_type_badge_style(entry.docType.code) }}">{{ entry.docType.code }}</twig:Badge>
                         </td>
-                        <td class="px-4 py-3 text-muted-foreground text-xs sm:table-cell" style="display: none;">
+                        <td class="sm:table-cell px-4 py-3 text-muted-foreground text-xs" style="display: none;">
                             {{ entry.mainCategory.code }} - {{ entry.mainCategory.description }}
                         </td>
-                        <td class="px-4 py-3 text-muted-foreground text-xs sm:table-cell" style="display: none;">
+                        <td class="sm:table-cell px-4 py-3 text-muted-foreground text-xs" style="display: none;">
                             {{ entry.subCategory.formattedCode }} - {{ entry.subCategory.description }}
                         </td>
-                        <td class="px-4 py-3 font-mono text-muted-foreground text-xs sm:table-cell" style="display: none;">
+                        <td class="sm:table-cell px-4 py-3 font-mono text-muted-foreground text-xs" style="display: none;">
                             {{ '%03d'|format(entry.docNumber) }}
                         </td>
                         <td class="px-4 py-3 text-right">
@@ -229,8 +235,7 @@
                     </tr>
                     {% endfor %}
                 </tbody>
-            </table>
-        </div>
+        </table>
     </div>
 
     {# ── Pagination ──────────────────────────────────────────────────────────── #}

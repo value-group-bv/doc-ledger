@@ -1,5 +1,13 @@
 # Release Notes
 
+## Version 0.9.0 (29 June 2026)
+
+- Added an export function to download all current entries in XLSX.
+- It's no longer possible to create duplicate document IDs.
+- Updated the ledger table styling to use content-card style like the rest of the site.
+- Did the same for the /new and /edit pages.
+- Enhanced readability in dark mode of the destructive red colour.
+
 ## Version 0.8.1 (29 June 2026)
 
 - Changed the term 'Document number' for the big code to 'Document ID'.

@@ -22,46 +22,52 @@
     </twig:Alert>
     {% endfor %}
 
-    {{ form_start(form, {attr: {class: 'space-y-5'}}) }}
+    <twig:Card>
+        <twig:Card:Content class="p-6">
 
-    <div class="gap-4 grid grid-cols-2">
-        {{ form_row(form.subsidiary) }}
-        {{ form_row(form.mainCategory) }}
-    </div>
-    <div class="gap-4 grid grid-cols-2">
-        {{ form_row(form.docType) }}
-        {{ form_row(form.subCategory) }}
-    </div>
-    {{ form_row(form.docNumber) }}
-    {{ form_row(form.title) }}
-    {{ form_row(form.comments) }}
+        {{ form_start(form, {attr: {class: 'space-y-5'}}) }}
 
-    <div class="flex gap-3 pt-2">
-        <button type="submit"
-            class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 px-6 rounded-md h-10 font-medium text-primary-foreground text-sm transition-colors">
-            <twig:ux:icon name="material-symbols:save-outline" class="size-4" />
-            Save changes
-        </button>
-        <a href="{{ path('ledger_index') }}"
-            class="inline-flex items-center hover:bg-muted px-4 border border-border rounded-md h-10 text-sm transition-colors">
-            Cancel
-        </a>
-    </div>
+        <div class="gap-4 grid grid-cols-2">
+            {{ form_row(form.subsidiary) }}
+            {{ form_row(form.mainCategory) }}
+        </div>
+        <div class="gap-4 grid grid-cols-2">
+            {{ form_row(form.docType) }}
+            {{ form_row(form.subCategory) }}
+        </div>
+        {{ form_row(form.docNumber) }}
+        {{ form_row(form.title) }}
+        {{ form_row(form.comments) }}
 
-    {{ form_end(form) }}
-
-    {# Delete section #}
-    <div class="mt-10 pt-6 border-border border-t">
-        <h2 class="mb-3 font-medium text-destructive text-sm">Danger zone</h2>
-        <form action="{{ path('ledger_delete', {id: entry.id}) }}" method="post"
-            onsubmit="return confirm('Delete {{ entry.documentId }}? This cannot be undone.')">
-            <input type="hidden" name="_token" value="{{ csrf_token('delete_entry_' ~ entry.id) }}">
+        <div class="flex gap-3 pt-2">
             <button type="submit"
-                class="inline-flex items-center gap-2 bg-destructive/10 hover:bg-destructive/20 px-4 rounded-md h-9 font-medium text-destructive text-sm transition-colors">
-                <twig:ux:icon name="material-symbols:delete-outline" class="size-4" />
-                Delete entry
+                class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 px-6 rounded-md h-10 font-medium text-primary-foreground text-sm transition-colors">
+                <twig:ux:icon name="material-symbols:save-outline" class="size-4" />
+                Save changes
             </button>
-        </form>
-    </div>
+            <a href="{{ path('ledger_index') }}"
+                class="inline-flex items-center hover:bg-muted px-4 border border-border rounded-md h-10 text-sm transition-colors">
+                Cancel
+            </a>
+        </div>
+
+        {{ form_end(form) }}
+
+        {# Delete section #}
+        <div class="mt-10 pt-6 border-border border-t">
+            <h2 class="mb-3 font-medium text-destructive text-sm">Danger zone</h2>
+            <form action="{{ path('ledger_delete', {id: entry.id}) }}" method="post"
+                onsubmit="return confirm('Delete {{ entry.documentId }}? This cannot be undone.')">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete_entry_' ~ entry.id) }}">
+                <button type="submit"
+                    class="inline-flex items-center gap-2 border border-destructive text-destructive hover:bg-destructive/10 px-4 rounded-md h-9 font-medium text-sm transition-colors">
+                    <twig:ux:icon name="material-symbols:delete-outline" class="size-4" />
+                    Delete entry
+                </button>
+            </form>
+        </div>
+
+        </twig:Card:Content>
+    </twig:Card>
 </div>
 {% endblock %}
