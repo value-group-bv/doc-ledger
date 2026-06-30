@@ -12,7 +12,7 @@
     </div>
 </div>
 
-<div class="gap-8 grid grid-cols-1 lg:grid-cols-2">
+<div class="gap-8 grid grid-cols-1 xl:grid-cols-2">
 
     {# ── Intro ─────────────────────────────────────────────────────── #}
     <twig:Card>
@@ -29,7 +29,7 @@
                 in this guide.</p>
 
             <p>A typical document identifier follows the structure:</p><code
-                class="block bg-muted px-3 py-2 rounded font-mono font-bold text-neutral-700">VG0-AAB-REP-000-001-0A Title</code>
+                class="block bg-muted px-3 py-2 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">VG0-AAB-REP-000-001-0A Title</code>
 
             <p>Where each section conveys specific information, such as the responsible subsidiary, category, project or
                 product reference, document type, discipline, unique document number, and revision status.
@@ -62,6 +62,8 @@
                 <span class="bg-violet-100 px-3 py-1.5 rounded font-mono font-bold text-violet-700 text-sm">001</span>
                 <span class="px-0.5 font-bold text-muted-foreground">-</span>
                 <span class="bg-pink-100 px-3 py-1.5 rounded font-mono font-bold text-pink-700 text-sm">0A</span>
+                <span class="px-0.5 font-bold text-muted-foreground"> </span>
+                <span class="bg-gray-100 px-3 py-1.5 rounded font-mono font-bold text-gray-800 text-sm">Title</span>
             </div>
 
             <twig:Separator />
@@ -92,8 +94,8 @@
                     <dt
                         class="bg-blue-100 px-1.5 py-0.5 rounded w-10 font-mono font-bold text-blue-700 text-xs text-center shrink-0">
                         REP</dt>
-                    <dd><strong>Document type</strong> - Short abbreviation for the nature of the document (e.g. REP =
-                        Report).</dd>
+                    <dd><strong>Document type</strong> - Short abbreviation for the type of document (e.g. REP =
+                        report).</dd>
                 </div>
                 <div class="flex items-baseline gap-3">
                     <dt
@@ -116,6 +118,13 @@
                     <dd><strong>Revision</strong> - Interim drafts use a letter suffix (0A, 0B, 1A…); formally issued
                         documents use a numeric suffix (00, 01…).</dd>
                 </div>
+                <div class="flex items-baseline gap-3">
+                    <dt
+                        class="bg-gray-100 px-1.5 py-0.5 rounded w-10 font-mono font-bold text-gray-800 text-xs text-center shrink-0">
+                        Abc</dt>
+                    <dd><strong>Title</strong> - Textual description of the document. Maximum of 48 characters in length
+                        (including spaces).</dd>
+                </div>
             </dl>
 
         </twig:Card:Content>
@@ -131,7 +140,7 @@
             <div class="gap-6 grid grid-cols-1 sm:grid-cols-2">
 
                 <div class="space-y-2.5">
-                    <p class="font-semibold text-emerald-700">Do's</p>
+                    <p class="font-semibold text-emerald-700">Do</p>
                     <ul class="space-y-2.5">
                         <li class="flex gap-2">
                             <span class="font-bold text-emerald-600 shrink-0">✓</span>
@@ -144,8 +153,7 @@
                         </li>
                         <li class="flex gap-2">
                             <span class="font-bold text-emerald-600 shrink-0">✓</span>
-                            Write a clear, descriptive title. It is stored alongside the document number and aids
-                            discoverability.
+                            Write a concise but clear descriptive title. It aids discoverability and understanding.
                         </li>
                         <li class="flex gap-2">
                             <span class="font-bold text-emerald-600 shrink-0">✓</span>
@@ -159,7 +167,7 @@
                 </div>
 
                 <div class="space-y-2.5">
-                    <p class="font-semibold text-destructive">Don'ts</p>
+                    <p class="font-semibold text-destructive">Don't</p>
                     <ul class="space-y-2.5">
                         <li class="flex gap-2">
                             <span class="font-bold text-destructive shrink-0">✗</span>
@@ -182,6 +190,10 @@
                             <span class="font-bold text-destructive shrink-0">✗</span>
                             Don't use a final revision format (00) for documents still under internal review.
                         </li>
+                        <li class="flex gap-2">
+                            <span class="font-bold text-destructive shrink-0">✗</span>
+                            Don't use a dash between the document ID and the title.
+                        </li>
                     </ul>
                 </div>
 
@@ -189,18 +201,47 @@
         </twig:Card:Content>
     </twig:Card>
 
-
-
-    {# ── Intro ─────────────────────────────────────────────────────── #}
+    {# ── Ledger ─────────────────────────────────────────────────────── #}
     <twig:Card>
         <twig:Card:Header>
-            <twig:Card:Title>Intro</twig:Card:Title>
+            <twig:Card:Title>Using the Ledger</twig:Card:Title>
             <!-- <twig:Card:Description>Subtitle</twig:Card:Description> -->
         </twig:Card:Header>
-        <twig:Card:Content class="space-y-4 text-sm">
+        <twig:Card:Content class="space-y-6 text-sm">
+            <div class="space-y-4">
+                <div>
+                    <h3 class="font-semibold text-foreground mb-2">How to Add Entries</h3>
+                    <p class="">Click the <strong>"New Entry"</strong> button to create a new document identifier. Fill in each required field: subsidiary code, main category, reference code, document type, sub category, and title. Preferably, also fill in search keywords to improve searchability for other users. The system will automatically generate the document ID. Once saved, the entry appears in the ledger and can be viewed by all users.</p>
+                </div>
 
+                <div>
+                    <h3 class="font-semibold text-foreground mb-2">How to Edit Entries</h3>
+                    <p class="">Locate the entry in the ledger and click the <twig:ux:icon name="material-symbols:edit-outline" class="inline"/> (Edit) button. You can update the title and other metadata. Always review changes before saving to ensure compliance with the naming conventions.</p>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold text-foreground mb-2">How to Search</h3>
+                    <p class="">Use the search bar at the top of the ledger page to filter entries by document ID components, title, or keywords. Search is case-insensitive and supports partial matches. You can also use filters.</p>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold text-foreground mb-2">User vs Admin Rights</h3>
+                    <p class=""><strong>Users</strong> can only view entries. <strong>Admins</strong> can create, edit, and delete entries.</p>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold text-foreground mb-2">Tips and tricks</h3>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>You can resort the table by clicking on the column headers.</li>
+                        <li>You can easily copy the document ID by clicking on it!</li>
+                        <li>You can export entries as a XLSX file for easy sharing and analysis.</li>
+                    </ul>
+                </div>
+            </div>
         </twig:Card:Content>
     </twig:Card>
+
+
 
 </div>
 
