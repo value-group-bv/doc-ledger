@@ -45,6 +45,7 @@ class DocSubsidiary
     public function setDescription(string $description): static { $this->description = $description; return $this; }
     public function getSortOrder(): int { return $this->sortOrder; }
     public function setSortOrder(int $sortOrder): static { $this->sortOrder = $sortOrder; return $this; }
+    public function getDocumentEntries(): Collection { return $this->documentEntries; }
 
     public function __toString(): string { return "{$this->code} — {$this->description}"; }
 }

@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 0.10.0 (xx xx 2026)
+
+- Started on an `Info` page where explainations on how to use the numbering scheme will be given.
+
 ## Version 0.9.0 (29 June 2026)
 
 - Added an export function to download all current entries in XLSX.
