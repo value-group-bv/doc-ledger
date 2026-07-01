@@ -159,6 +159,8 @@ class AdminController extends AbstractController
         $code = trim((string) $request->request->get('code', ''));
         $description = trim((string) $request->request->get('description', ''));
 
+        $code = preg_replace('/[^A-Za-z]/', '', $code);
+
         if ($code && $description) {
             $entity = new DocType();
             $entity->setCode(strtoupper($code))->setDescription($description);

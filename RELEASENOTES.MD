@@ -2,7 +2,9 @@
 
 ## Version 0.10.0 (xx xx 2026)
 
-- Started on an `Info` page where explainations on how to use the numbering scheme will be given.
+- Started on an `Info` page where the numbering scheme conventions are written.
+- Adding, editing and deleting ledger entries is now only available for admins.
+- Document types can now only contain letters, as it was supposed to.
 
 ## Version 0.9.0 (29 June 2026)
 

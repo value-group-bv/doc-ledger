@@ -29,12 +29,6 @@ class LedgerController extends AbstractController
         return $this->render('ledger/index.html.twig');
     }
 
-    #[Route('/ledger/new', name: 'ledger_new')]
-    public function new(): Response
-    {
-        return $this->render('ledger/new.html.twig');
-    }
-
     #[Route('/ledger/export', name: 'ledger_export')]
     public function export(): StreamedResponse
     {
@@ -91,6 +85,14 @@ class LedgerController extends AbstractController
         return $response;
     }
 
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/ledger/new', name: 'ledger_new')]
+    public function new(): Response
+    {
+        return $this->render('ledger/new.html.twig');
+    }
+
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/ledger/{id}/edit', name: 'ledger_edit')]
     public function edit(Uuid $id, Request $request): Response
     {
@@ -115,6 +117,7 @@ class LedgerController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/ledger/{id}/delete', name: 'ledger_delete', methods: ['POST'])]
     public function delete(Uuid $id, Request $request): Response
     {

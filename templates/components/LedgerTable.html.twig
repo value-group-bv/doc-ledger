@@ -10,10 +10,7 @@
         {# Search - full width on mobile #}
         <div class="sm:flex-1 mb-3 sm:mb-0 w-full sm:min-w-[200px]">
             <label class="block mb-1 text-muted-foreground text-xs">Search</label>
-            <input type="text"
-                data-model="search"
-                data-action="input->live#update:debounce(300ms)"
-                value="{{ search }}"
+            <input type="text" data-model="search" data-action="input->live#update:debounce(300ms)" value="{{ search }}"
                 placeholder="Search by document ID, title, or keywords"
                 class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-9 placeholder:text-muted-foreground text-sm transition-[color,box-shadow]" />
         </div>
@@ -25,7 +22,7 @@
                 class="flex bg-background shadow-xs px-3 py-2 border border-input focus:border-ring rounded-md outline-none focus:ring-[3px] focus:ring-ring/50 w-full h-9 text-sm transition-[color,box-shadow]">
                 <option value="0">All</option>
                 {% for s in this.subsidiaries %}
-                <option value="{{ s.id }}" {% if subsidiaryFilter == s.id %}selected{% endif %}>{{ s.code }}</option>
+                <option value="{{ s.id }}" {% if subsidiaryFilter==s.id %}selected{% endif %}>{{ s.code }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -37,7 +34,7 @@
                 class="flex bg-background shadow-xs px-3 py-2 border border-input focus:border-ring rounded-md outline-none focus:ring-[3px] focus:ring-ring/50 w-full h-9 text-sm transition-[color,box-shadow]">
                 <option value="0">All</option>
                 {% for dt in this.docTypes %}
-                <option value="{{ dt.id }}" {% if docTypeFilter == dt.id %}selected{% endif %}>{{ dt.code }}</option>
+                <option value="{{ dt.id }}" {% if docTypeFilter==dt.id %}selected{% endif %}>{{ dt.code }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -45,11 +42,13 @@
         {# Main category filter #}
         <div class="hidden sm:block mb-3 sm:mb-0 w-full sm:w-44">
             <label class="block mb-1 text-muted-foreground text-xs">Main category</label>
-            <select data-model="mainCategoryFilter" data-action="change->live#action" data-live-action-param="applyFilter"
+            <select data-model="mainCategoryFilter" data-action="change->live#action"
+                data-live-action-param="applyFilter"
                 class="flex bg-background shadow-xs px-3 py-2 border border-input focus:border-ring rounded-md outline-none focus:ring-[3px] focus:ring-ring/50 w-full h-9 text-sm transition-[color,box-shadow]">
                 <option value="0">All</option>
                 {% for mc in this.mainCategories %}
-                <option value="{{ mc.id }}" {% if mainCategoryFilter == mc.id %}selected{% endif %}>{{ mc.code }} - {{ mc.description }}</option>
+                <option value="{{ mc.id }}" {% if mainCategoryFilter==mc.id %}selected{% endif %}>{{ mc.code }} - {{
+                    mc.description }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -63,6 +62,7 @@
         {% endif %}
 
         {# Spacer + new entry button #}
+        {% if is_granted('ROLE_ADMIN') %}
         <div class="sm:ml-auto">
             <a href="{{ path('ledger_new') }}"
                 class="inline-flex justify-center sm:justify-start items-center gap-1.5 bg-primary hover:bg-primary/90 px-3 sm:px-4 rounded-md w-full sm:w-auto h-8 sm:h-9 font-medium text-primary-foreground text-xs sm:text-sm transition-colors">
@@ -70,6 +70,7 @@
                 <span>New entry</span>
             </a>
         </div>
+        {% endif %}
     </div>
 
     {# ── Result count + export ───────────────────────────────────────────────── #}
@@ -88,153 +89,162 @@
     {# ── Table ───────────────────────────────────────────────────────────────── #}
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
-                <thead class="bg-primary/10 border-border border-b">
-                    <tr>
-                        {% macro sort_th(label, field, currentField, currentDir) %}
-                        <th class="px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
-                            <button type="button"
-                                data-action="live#action"
-                                data-live-action-param="sort"
-                                data-live-field-param="{{ field }}"
-                                class="flex items-center gap-1 hover:text-foreground transition-colors">
-                                {{ label }}
-                                {% if currentField == field %}
-                                <twig:ux:icon name="{{ currentDir == 'ASC' ? 'material-symbols:arrow-upward' : 'material-symbols:arrow-downward' }}" class="size-3.5" />
-                                {% else %}
-                                <twig:ux:icon name="material-symbols:unfold-more" class="opacity-30 size-3.5" />
-                                {% endif %}
-                            </button>
-                        </th>
-                        {% endmacro %}
-
-                        {{ _self.sort_th('Document ID', 'e.referenceCode', sortField, sortDir) }}
-                        {{ _self.sort_th('Title', 'e.title', sortField, sortDir) }}
-                        <th class="hidden sm:table-cell px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
-                            <button type="button"
-                                data-action="live#action"
-                                data-live-action-param="sort"
-                                data-live-field-param="s.code"
-                                class="flex items-center gap-1 hover:text-foreground transition-colors">
-                                Subsidiary
-                                {% if sortField == 's.code' %}
-                                <twig:ux:icon name="{{ sortDir == 'ASC' ? 'material-symbols:arrow-upward' : 'material-symbols:arrow-downward' }}" class="size-3.5" />
-                                {% else %}
-                                <twig:ux:icon name="material-symbols:unfold-more" class="opacity-30 size-3.5" />
-                                {% endif %}
-                            </button>
-                        </th>
-                        <th class="hidden sm:table-cell px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
-                            <button type="button"
-                                data-action="live#action"
-                                data-live-action-param="sort"
-                                data-live-field-param="dt.code"
-                                class="flex items-center gap-1 hover:text-foreground transition-colors">
-                                Type
-                                {% if sortField == 'dt.code' %}
-                                <twig:ux:icon name="{{ sortDir == 'ASC' ? 'material-symbols:arrow-upward' : 'material-symbols:arrow-downward' }}" class="size-3.5" />
-                                {% else %}
-                                <twig:ux:icon name="material-symbols:unfold-more" class="opacity-30 size-3.5" />
-                                {% endif %}
-                            </button>
-                        </th>
-                        <th class="hidden sm:table-cell px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
-                            <button type="button"
-                                data-action="live#action"
-                                data-live-action-param="sort"
-                                data-live-field-param="mc.code"
-                                class="flex items-center gap-1 hover:text-foreground transition-colors">
-                                Main category
-                                {% if sortField == 'mc.code' %}
-                                <twig:ux:icon name="{{ sortDir == 'ASC' ? 'material-symbols:arrow-upward' : 'material-symbols:arrow-downward' }}" class="size-3.5" />
-                                {% else %}
-                                <twig:ux:icon name="material-symbols:unfold-more" class="opacity-30 size-3.5" />
-                                {% endif %}
-                            </button>
-                        </th>
-                        <th class="hidden sm:table-cell px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
-                            <button type="button"
-                                data-action="live#action"
-                                data-live-action-param="sort"
-                                data-live-field-param="sc.code"
-                                class="flex items-center gap-1 hover:text-foreground transition-colors">
-                                Sub category
-                                {% if sortField == 'sc.code' %}
-                                <twig:ux:icon name="{{ sortDir == 'ASC' ? 'material-symbols:arrow-upward' : 'material-symbols:arrow-downward' }}" class="size-3.5" />
-                                {% else %}
-                                <twig:ux:icon name="material-symbols:unfold-more" class="opacity-30 size-3.5" />
-                                {% endif %}
-                            </button>
-                        </th>
-                        <th class="hidden sm:table-cell px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
-                            <button type="button"
-                                data-action="live#action"
-                                data-live-action-param="sort"
-                                data-live-field-param="e.docNumber"
-                                class="flex items-center gap-1 hover:text-foreground transition-colors">
-                                No.
-                                {% if sortField == 'e.docNumber' %}
-                                <twig:ux:icon name="{{ sortDir == 'ASC' ? 'material-symbols:arrow-upward' : 'material-symbols:arrow-downward' }}" class="size-3.5" />
-                                {% else %}
-                                <twig:ux:icon name="material-symbols:unfold-more" class="opacity-30 size-3.5" />
-                                {% endif %}
-                            </button>
-                        </th>
-                        <th class="px-4 py-3 font-medium text-muted-foreground text-right">Edit</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-border">
-                    {% for entry in entries %}
-                    <tr class="hover:bg-muted/30 transition-colors">
-                        <td class="px-4 py-3" data-controller="copy-doc-number">
-                            <button type="button"
-                                data-copy-doc-number-target="button"
-                                data-copy-doc-number="{{ entry.getDocumentId() }}"
-                                class="hover:opacity-80 px-2 py-0.5 border rounded font-[450] font-mono text-[13px] whitespace-nowrap transition-opacity cursor-pointer"
-                                style="{{ subsidiary_doc_number_style(entry.subsidiary.code) }}"
-                                title="Click to copy document ID">
-                                {{ entry.documentIdBase }}
-                            </button>
-                        </td>
-                        <td class="px-4 py-3 max-w-xs font-medium text-foreground truncate">
-                            {{ entry.title }}
-                        </td>
-                        <td class="sm:table-cell px-4 py-3 text-muted-foreground text-xs" style="display: none;">
-                            {{ entry.subsidiary.code }}
-                        </td>
-                        <td class="sm:table-cell px-4 py-3" style="display: none;">
-                            <twig:Badge style="{{ doc_type_badge_style(entry.docType.code) }}">{{ entry.docType.code }}</twig:Badge>
-                        </td>
-                        <td class="sm:table-cell px-4 py-3 text-muted-foreground text-xs" style="display: none;">
-                            {{ entry.mainCategory.code }} - {{ entry.mainCategory.description }}
-                        </td>
-                        <td class="sm:table-cell px-4 py-3 text-muted-foreground text-xs" style="display: none;">
-                            {{ entry.subCategory.formattedCode }} - {{ entry.subCategory.description }}
-                        </td>
-                        <td class="sm:table-cell px-4 py-3 font-mono text-muted-foreground text-xs" style="display: none;">
-                            {{ '%03d'|format(entry.docNumber) }}
-                        </td>
-                        <td class="px-4 py-3 text-right">
-                            <div class="flex justify-end gap-1">
-                                <a href="{{ path('ledger_edit', {id: entry.id}) }}"
-                                    class="inline-flex justify-center items-center hover:bg-muted rounded size-7 text-muted-foreground hover:text-foreground transition-colors"
-                                    title="Edit">
-                                    <twig:ux:icon name="material-symbols:edit-outline" class="size-4" />
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="8" class="px-4 py-12 text-muted-foreground text-center">
-                            No entries found.
-                            {% if search or subsidiaryFilter or docTypeFilter or mainCategoryFilter %}
-                            <button type="button" data-action="live#action" data-live-action-param="resetFilters"
-                                class="ml-2 text-primary hover:underline">Clear filters</button>
+            <thead class="bg-primary/10 border-border border-b">
+                <tr>
+                    {% macro sort_th(label, field, currentField, currentDir) %}
+                    <th class="px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
+                        <button type="button" data-action="live#action" data-live-action-param="sort"
+                            data-live-field-param="{{ field }}"
+                            class="flex items-center gap-1 hover:text-foreground transition-colors">
+                            {{ label }}
+                            {% if currentField == field %}
+                            <twig:ux:icon
+                                name="{{ currentDir == 'ASC' ? 'material-symbols:arrow-upward' : 'material-symbols:arrow-downward' }}"
+                                class="size-3.5" />
+                            {% else %}
+                            <twig:ux:icon name="material-symbols:unfold-more" class="opacity-30 size-3.5" />
                             {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
+                        </button>
+                    </th>
+                    {% endmacro %}
+
+                    {{ _self.sort_th('Document ID', 'e.referenceCode', sortField, sortDir) }}
+                    {{ _self.sort_th('Title', 'e.title', sortField, sortDir) }}
+                    <th
+                        class="hidden sm:table-cell px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
+                        <button type="button" data-action="live#action" data-live-action-param="sort"
+                            data-live-field-param="s.code"
+                            class="flex items-center gap-1 hover:text-foreground transition-colors">
+                            Subsidiary
+                            {% if sortField == 's.code' %}
+                            <twig:ux:icon
+                                name="{{ sortDir == 'ASC' ? 'material-symbols:arrow-upward' : 'material-symbols:arrow-downward' }}"
+                                class="size-3.5" />
+                            {% else %}
+                            <twig:ux:icon name="material-symbols:unfold-more" class="opacity-30 size-3.5" />
+                            {% endif %}
+                        </button>
+                    </th>
+                    <th
+                        class="hidden sm:table-cell px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
+                        <button type="button" data-action="live#action" data-live-action-param="sort"
+                            data-live-field-param="dt.code"
+                            class="flex items-center gap-1 hover:text-foreground transition-colors">
+                            Type
+                            {% if sortField == 'dt.code' %}
+                            <twig:ux:icon
+                                name="{{ sortDir == 'ASC' ? 'material-symbols:arrow-upward' : 'material-symbols:arrow-downward' }}"
+                                class="size-3.5" />
+                            {% else %}
+                            <twig:ux:icon name="material-symbols:unfold-more" class="opacity-30 size-3.5" />
+                            {% endif %}
+                        </button>
+                    </th>
+                    <th
+                        class="hidden sm:table-cell px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
+                        <button type="button" data-action="live#action" data-live-action-param="sort"
+                            data-live-field-param="mc.code"
+                            class="flex items-center gap-1 hover:text-foreground transition-colors">
+                            Main category
+                            {% if sortField == 'mc.code' %}
+                            <twig:ux:icon
+                                name="{{ sortDir == 'ASC' ? 'material-symbols:arrow-upward' : 'material-symbols:arrow-downward' }}"
+                                class="size-3.5" />
+                            {% else %}
+                            <twig:ux:icon name="material-symbols:unfold-more" class="opacity-30 size-3.5" />
+                            {% endif %}
+                        </button>
+                    </th>
+                    <th
+                        class="hidden sm:table-cell px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
+                        <button type="button" data-action="live#action" data-live-action-param="sort"
+                            data-live-field-param="sc.code"
+                            class="flex items-center gap-1 hover:text-foreground transition-colors">
+                            Sub category
+                            {% if sortField == 'sc.code' %}
+                            <twig:ux:icon
+                                name="{{ sortDir == 'ASC' ? 'material-symbols:arrow-upward' : 'material-symbols:arrow-downward' }}"
+                                class="size-3.5" />
+                            {% else %}
+                            <twig:ux:icon name="material-symbols:unfold-more" class="opacity-30 size-3.5" />
+                            {% endif %}
+                        </button>
+                    </th>
+                    <th
+                        class="hidden sm:table-cell px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">
+                        <button type="button" data-action="live#action" data-live-action-param="sort"
+                            data-live-field-param="e.docNumber"
+                            class="flex items-center gap-1 hover:text-foreground transition-colors">
+                            No.
+                            {% if sortField == 'e.docNumber' %}
+                            <twig:ux:icon
+                                name="{{ sortDir == 'ASC' ? 'material-symbols:arrow-upward' : 'material-symbols:arrow-downward' }}"
+                                class="size-3.5" />
+                            {% else %}
+                            <twig:ux:icon name="material-symbols:unfold-more" class="opacity-30 size-3.5" />
+                            {% endif %}
+                        </button>
+                    </th>
+                    {% if is_granted('ROLE_ADMIN') %}
+                    <th class="px-4 py-3 font-medium text-muted-foreground text-right">Edit</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-border">
+                {% for entry in entries %}
+                <tr class="hover:bg-muted/30 transition-colors">
+                    <td class="px-4 py-3" data-controller="copy-doc-number">
+                        <button type="button" data-copy-doc-number-target="button"
+                            data-copy-doc-number="{{ entry.getDocumentId() }}"
+                            class="hover:opacity-80 px-2 py-0.5 border rounded font-[450] font-mono text-[13px] whitespace-nowrap transition-opacity cursor-pointer"
+                            style="{{ subsidiary_doc_number_style(entry.subsidiary.code) }}"
+                            title="Click to copy document ID">
+                            {{ entry.documentIdBase }}
+                        </button>
+                    </td>
+                    <td class="px-4 py-3 max-w-xs font-medium text-foreground truncate">
+                        {{ entry.title }}
+                    </td>
+                    <td class="sm:table-cell px-4 py-3 text-muted-foreground text-xs" style="display: none;">
+                        {{ entry.subsidiary.code }}
+                    </td>
+                    <td class="sm:table-cell px-4 py-3" style="display: none;">
+                        <twig:Badge style="{{ doc_type_badge_style(entry.docType.code) }}">{{ entry.docType.code }}
+                        </twig:Badge>
+                    </td>
+                    <td class="sm:table-cell px-4 py-3 text-muted-foreground text-xs" style="display: none;">
+                        {{ entry.mainCategory.code }} - {{ entry.mainCategory.description }}
+                    </td>
+                    <td class="sm:table-cell px-4 py-3 text-muted-foreground text-xs" style="display: none;">
+                        {{ entry.subCategory.formattedCode }} - {{ entry.subCategory.description }}
+                    </td>
+                    <td class="sm:table-cell px-4 py-3 font-mono text-muted-foreground text-xs" style="display: none;">
+                        {{ '%03d'|format(entry.docNumber) }}
+                    </td>
+                    {% if is_granted('ROLE_ADMIN') %}
+                    <td class="px-4 py-3 text-right">
+                        <div class="flex justify-end gap-1">
+                            <a href="{{ path('ledger_edit', {id: entry.id}) }}"
+                                class="inline-flex justify-center items-center hover:bg-muted rounded size-7 text-muted-foreground hover:text-foreground transition-colors"
+                                title="Edit">
+                                <twig:ux:icon name="material-symbols:edit-outline" class="size-4" />
+                            </a>
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" class="px-4 py-12 text-muted-foreground text-center">
+                        No entries found.
+                        {% if search or subsidiaryFilter or docTypeFilter or mainCategoryFilter %}
+                        <button type="button" data-action="live#action" data-live-action-param="resetFilters"
+                            class="ml-2 text-primary hover:underline">Clear filters</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
     </div>
 
@@ -245,35 +255,29 @@
             Page {{ page }} of {{ totalPages }}
         </p>
         <div class="flex gap-1">
-            <button type="button"
-                data-action="live#action" data-live-action-param="goToPage"
-                data-live-page-param="{{ max(page - 1, 1) }}"
-                {% if page <= 1 %}disabled{% endif %}
+            <button type="button" data-action="live#action" data-live-action-param="goToPage"
+                data-live-page-param="{{ max(page - 1, 1) }}" {% if page <=1 %}disabled{% endif %}
                 class="inline-flex justify-center items-center hover:bg-muted disabled:opacity-40 border border-border rounded w-8 h-8 transition-colors disabled:cursor-not-allowed">
                 <twig:ux:icon name="material-symbols:chevron-left" class="size-4" />
             </button>
 
             {% for p in 1..totalPages %}
-            {% if p == 1 or p == totalPages or (p >= page - 2 and p <= page + 2) %}
-            <button type="button"
-                data-action="live#action" data-live-action-param="goToPage"
-                data-live-page-param="{{ p }}"
+            {% if p == 1 or p == totalPages or (p >= page - 2 and p <= page + 2) %} <button type="button"
+                data-action="live#action" data-live-action-param="goToPage" data-live-page-param="{{ p }}"
                 class="inline-flex items-center justify-center h-8 min-w-8 px-2 rounded border text-sm transition-colors
                     {% if p == page %}bg-primary text-primary-foreground border-primary{% else %}border-border hover:bg-muted{% endif %}">
                 {{ p }}
-            </button>
-            {% elseif p == page - 3 or p == page + 3 %}
-            <span class="inline-flex justify-center items-center w-8 h-8 text-muted-foreground">…</span>
-            {% endif %}
-            {% endfor %}
+                </button>
+                {% elseif p == page - 3 or p == page + 3 %}
+                <span class="inline-flex justify-center items-center w-8 h-8 text-muted-foreground">…</span>
+                {% endif %}
+                {% endfor %}
 
-            <button type="button"
-                data-action="live#action" data-live-action-param="goToPage"
-                data-live-page-param="{{ min(page + 1, totalPages) }}"
-                {% if page >= totalPages %}disabled{% endif %}
-                class="inline-flex justify-center items-center hover:bg-muted disabled:opacity-40 border border-border rounded w-8 h-8 transition-colors disabled:cursor-not-allowed">
-                <twig:ux:icon name="material-symbols:chevron-right" class="size-4" />
-            </button>
+                <button type="button" data-action="live#action" data-live-action-param="goToPage"
+                    data-live-page-param="{{ min(page + 1, totalPages) }}" {% if page>= totalPages %}disabled{% endif %}
+                    class="inline-flex justify-center items-center hover:bg-muted disabled:opacity-40 border border-border rounded w-8 h-8 transition-colors disabled:cursor-not-allowed">
+                    <twig:ux:icon name="material-symbols:chevron-right" class="size-4" />
+                </button>
         </div>
     </div>
     {% endif %}

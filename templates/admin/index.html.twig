@@ -157,7 +157,8 @@
                 </table>
                 </div>
                 <form method="post" action="{{ path('admin_doctype_new') }}" class="flex flex-wrap gap-2">
-                    <input name="code" placeholder="Code" maxlength="3"
+                    <input name="code" placeholder="Code" maxlength="3" pattern="[A-Za-z]+"
+                        oninput="this.value=this.value.replace(/[^A-Za-z]/g,'')"
                         class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-28 h-9 text-sm transition-[color,box-shadow]" />
                     <input name="description" placeholder="Description"
                         class="flex flex-1 bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-9 text-sm transition-[color,box-shadow]" />

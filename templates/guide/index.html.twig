@@ -1,14 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% set page_title = 'Info' %}
+{% set page_title = 'Guide' %}
 {% set page_header = true %}
 
 {% block body %}
 
 <div class="flex justify-between items-center mb-6">
     <div>
-        <h1 class="font-heading font-bold text-foreground text-3xl">Info</h1>
-        <p class="mt-1 text-muted-foreground">Guideline for using the numbering system</p>
+        <h1 class="font-heading font-bold text-foreground text-3xl">Guide</h1>
+        <p class="mt-1 text-muted-foreground">Using the numbering system</p>
     </div>
 </div>
 
@@ -28,8 +28,8 @@
                 intended identifier is available. Usage of the naming system should follow the conventions described
                 in this guide.</p>
 
-            <p>A typical document identifier follows the structure:</p><code
-                class="block bg-muted px-3 py-2 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">VG0-AAB-REP-000-001-0A Title</code>
+            <p>A document identifier follows the structure:</p><code
+                class="block bg-muted px-3 py-2 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">VG0-AAB-REP-000-000-0A Title</code>
 
             <p>Where each section conveys specific information, such as the responsible subsidiary, category, project or
                 product reference, document type, discipline, unique document number, and revision status.
@@ -59,7 +59,7 @@
                 <span class="px-0.5 font-bold text-muted-foreground">-</span>
                 <span class="bg-emerald-100 px-3 py-1.5 rounded font-mono font-bold text-emerald-700 text-sm">000</span>
                 <span class="px-0.5 font-bold text-muted-foreground">-</span>
-                <span class="bg-violet-100 px-3 py-1.5 rounded font-mono font-bold text-violet-700 text-sm">001</span>
+                <span class="bg-violet-100 px-3 py-1.5 rounded font-mono font-bold text-violet-700 text-sm">000</span>
                 <span class="px-0.5 font-bold text-muted-foreground">-</span>
                 <span class="bg-pink-100 px-3 py-1.5 rounded font-mono font-bold text-pink-700 text-sm">0A</span>
                 <span class="px-0.5 font-bold text-muted-foreground"> </span>
@@ -80,22 +80,20 @@
                     <dt
                         class="bg-red-100 px-1.5 py-0.5 rounded w-10 font-mono font-bold text-red-700 text-xs text-center shrink-0">
                         0</dt>
-                    <dd><strong>Main category</strong> - Single digit indicating the project type: feasibility,
-                        installation, service etc.</dd>
+                    <dd><strong>Main category</strong> - Single digit indicating the project type.</dd>
                 </div>
                 <div class="flex items-baseline gap-3">
                     <dt
                         class="bg-orange-100 px-1.5 py-0.5 rounded w-10 font-mono font-bold text-orange-700 text-xs text-center shrink-0">
                         AAB</dt>
-                    <dd><strong>Reference code</strong> - Alphabetic (AAA) for studies; numeric (000) for signed
-                        projects; fixed abbreviations (LIQ) for product lines.</dd>
+                    <dd><strong>Reference code</strong> - Alphabetic for studies; numeric for signed
+                        projects; fixed abbreviations for product lines.</dd>
                 </div>
                 <div class="flex items-baseline gap-3">
                     <dt
                         class="bg-blue-100 px-1.5 py-0.5 rounded w-10 font-mono font-bold text-blue-700 text-xs text-center shrink-0">
                         REP</dt>
-                    <dd><strong>Document type</strong> - Short abbreviation for the type of document (e.g. REP =
-                        report).</dd>
+                    <dd><strong>Document type</strong> - Short abbreviation for the type of document.</dd>
                 </div>
                 <div class="flex items-baseline gap-3">
                     <dt
@@ -107,7 +105,7 @@
                 <div class="flex items-baseline gap-3">
                     <dt
                         class="bg-violet-100 px-1.5 py-0.5 rounded w-10 font-mono font-bold text-violet-700 text-xs text-center shrink-0">
-                        001</dt>
+                        000</dt>
                     <dd><strong>Document number</strong> - Three-digit number unique within the combination of the other
                         components.</dd>
                 </div>
@@ -115,26 +113,120 @@
                     <dt
                         class="bg-pink-100 px-1.5 py-0.5 rounded w-10 font-mono font-bold text-pink-700 text-xs text-center shrink-0">
                         0A</dt>
-                    <dd><strong>Revision</strong> - Interim drafts use a letter suffix (0A, 0B, 1A…); formally issued
-                        documents use a numeric suffix (00, 01…).</dd>
+                    <dd><strong>Revision</strong> - Interim drafts use an alphanumeric suffix; released
+                        versions use a numeric suffix.</dd>
                 </div>
                 <div class="flex items-baseline gap-3">
                     <dt
                         class="bg-gray-100 px-1.5 py-0.5 rounded w-10 font-mono font-bold text-gray-800 text-xs text-center shrink-0">
                         Abc</dt>
-                    <dd><strong>Title</strong> - Textual description of the document. Maximum of 48 characters in length
-                        (including spaces).</dd>
+                    <dd><strong>Title</strong> - Textual description of the document.</dd>
                 </div>
             </dl>
 
         </twig:Card:Content>
     </twig:Card>
 
+    {# ── Rules ─────────────────────────────────────────────────────── #}
+    <twig:Card class="xl:col-span-2">
+        <twig:Card:Header>
+            <twig:Card:Title>Conventions</twig:Card:Title>
+            <twig:Card:Description>Rules and constraints for each component of the document identifier.
+            </twig:Card:Description>
+        </twig:Card:Header>
+        <twig:Card:Content class="space-y-5 text-sm">
+
+            <div class="space-y-2">
+                <h3 class="font-semibold text-foreground">Document code &amp; title</h3>
+                <p>The 22-character code is always followed by a single space and then the title. Do
+                    <strong>not</strong> separate the code from the title using a hyphen or any other character.
+                </p>
+                <div
+                    class="flex gap-2 bg-amber-50 dark:bg-amber-950 px-3 py-2 border border-amber-200 dark:border-amber-800 rounded text-amber-800 dark:text-amber-200">
+                    <twig:ux:icon name="material-symbols:warning-outline" class="mt-0.5 size-4 shrink-0" />
+                    <div class="space-y-1.5">
+                        <p>The separator between code components must be the <strong>hyphen-minus</strong>. Do not use
+                            other dashes. These
+                            characters look similar but are <strong>not</strong> interchangeable:</p>
+                        <div class="space-y-0.5 font-mono text-xs">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 font-sans font-bold text-emerald-600">✓</span>
+                                <code class="bg-amber-100 dark:bg-amber-900 px-1 rounded">-</code>
+                                <span class="font-sans text-amber-700 dark:text-amber-300">hyphen-minus (U+002D)</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 font-sans font-bold text-red-500">✗</span>
+                                <code class="bg-amber-100 dark:bg-amber-900 px-1 rounded">–</code>
+                                <span class="font-sans text-amber-700 dark:text-amber-300">en dash (U+2013)</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 font-sans font-bold text-red-500">✗</span>
+                                <code class="bg-amber-100 dark:bg-amber-900 px-1 rounded">—</code>
+                                <span class="font-sans text-amber-700 dark:text-amber-300">em dash (U+2014)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <twig:Separator />
+
+            <div class="space-y-2">
+                <h3 class="font-semibold text-foreground">Reference codes</h3>
+                <p>Reference codes are unique globally across the whole Value Group and must not be reused across
+                    different projects or document types. The allowed format is determined by the main category.</p>
+                <ul class="space-y-1.5 pl-1">
+                    <li class="flex gap-2">
+                        <span class="text-muted-foreground shrink-0">→</span>
+                        <span><strong>Signed projects</strong>: numerical, equal to the serial number in three-digit
+                            format. Can only be assigned by the COO.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-muted-foreground shrink-0">→</span>
+                        <span><strong>Studies</strong>: three-letter sequential alphabetic code (AAA-ZZZ). Any user
+                            may assign one; check
+                            <a href="" class="text-primary underline underline-offset-2">SharePoint (TBD)</a> first for
+                            the next available code.</span> 
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-muted-foreground shrink-0">→</span>
+                        <span><strong>Product lines</strong>: fixed abbreviation maintained by the Product Owners.
+                            Publishing related documents requires consultation with a Product Owner.</span>
+                    </li>
+                </ul>
+
+                <div
+                    class="flex gap-2 bg-emerald-50 dark:bg-emerald-950 px-3 py-2 border border-emerald-200 dark:border-emerald-800 rounded text-emerald-800 dark:text-emerald-200">
+                    <span class="font-bold text-emerald-600 shrink-0">✓</span>The Ledger incorporates the correct
+                    reference code format per main category.
+                </div>
+
+            </div>
+
+            <twig:Separator />
+
+            <div class="space-y-2">
+                <h3 class="font-semibold text-foreground">Titles</h3>
+                <p>Titles should be concise but clear. Only alphanumeric characters (A-Z, a-z, 0-9) and spaces are
+                    allowed, with a maximum length of <strong>48 characters</strong> including spaces.
+
+                <div
+                    class="flex gap-2 bg-emerald-50 dark:bg-emerald-950 px-3 py-2 border border-emerald-200 dark:border-emerald-800 rounded text-emerald-800 dark:text-emerald-200">
+                    <span class="font-bold text-emerald-600 shrink-0">✓</span>The Ledger has built-in sanitisation and a
+                    character limit.
+                </div>
+                </p>
+            </div>
+
+        </twig:Card:Content>
+    </twig:Card>
+
+
     {# ── Do's and Don'ts ─────────────────────────────────────────────────────── #}
     <twig:Card>
         <twig:Card:Header>
             <twig:Card:Title>Do's and Don'ts</twig:Card:Title>
-            <twig:Card:Description>Conventions and common mistakes</twig:Card:Description>
+            <twig:Card:Description>Short recap</twig:Card:Description>
         </twig:Card:Header>
         <twig:Card:Content class="text-sm">
             <div class="gap-6 grid grid-cols-1 sm:grid-cols-2">
@@ -149,11 +241,11 @@
                         <li class="flex gap-2">
                             <span class="font-bold text-emerald-600 shrink-0">✓</span>
                             Start with an interim revision (0A) and promote to a final release (00) only when the
-                            document is formally issued.
+                            document is formally issued and approved.
                         </li>
                         <li class="flex gap-2">
                             <span class="font-bold text-emerald-600 shrink-0">✓</span>
-                            Write a concise but clear descriptive title. It aids discoverability and understanding.
+                            Write a concise but descriptive title. It aids discoverability and understanding.
                         </li>
                         <li class="flex gap-2">
                             <span class="font-bold text-emerald-600 shrink-0">✓</span>
@@ -161,7 +253,11 @@
                         </li>
                         <li class="flex gap-2">
                             <span class="font-bold text-emerald-600 shrink-0">✓</span>
-                            Register every document, internal and external, in the ledger before distributing it.
+                            Register every document identifier, internal and external, in the ledger before distributing it.
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="font-bold text-emerald-600 shrink-0">✓</span>
+                            Add keywords or tags ledger entries to improve searchability.
                         </li>
                     </ul>
                 </div>
@@ -171,7 +267,7 @@
                     <ul class="space-y-2.5">
                         <li class="flex gap-2">
                             <span class="font-bold text-destructive shrink-0">✗</span>
-                            Don't reuse an existing document number for a different document.
+                            Don't reuse an existing identifier for a different document.
                         </li>
                         <li class="flex gap-2">
                             <span class="font-bold text-destructive shrink-0">✗</span>
@@ -184,7 +280,7 @@
                         </li>
                         <li class="flex gap-2">
                             <span class="font-bold text-destructive shrink-0">✗</span>
-                            Don't assign document numbers manually outside of Value Ledger.
+                            Don't create document identifiers outside of Value Ledger. Even for one-offs.
                         </li>
                         <li class="flex gap-2">
                             <span class="font-bold text-destructive shrink-0">✗</span>
@@ -192,7 +288,7 @@
                         </li>
                         <li class="flex gap-2">
                             <span class="font-bold text-destructive shrink-0">✗</span>
-                            Don't use a dash between the document ID and the title.
+                            Don't use a hyphen between the document ID and the title.
                         </li>
                     </ul>
                 </div>
@@ -210,28 +306,39 @@
         <twig:Card:Content class="space-y-6 text-sm">
             <div class="space-y-4">
                 <div>
-                    <h3 class="font-semibold text-foreground mb-2">How to Add Entries</h3>
-                    <p class="">Click the <strong>"New Entry"</strong> button to create a new document identifier. Fill in each required field: subsidiary code, main category, reference code, document type, sub category, and title. Preferably, also fill in search keywords to improve searchability for other users. The system will automatically generate the document ID. Once saved, the entry appears in the ledger and can be viewed by all users.</p>
+                    <h3 class="mb-2 font-semibold text-foreground">How to Add Entries</h3>
+                    <p class="">Click the <strong>"New Entry"</strong> button to create a new document identifier. Fill
+                        in each required field: subsidiary code, main category, reference code, document type, sub
+                        category, and title. Also fill in search keywords to improve searchability for other
+                        users. The system will automatically format and store the document ID. Once saved, the entry appears in
+                        the ledger and can be viewed by all.</p>
                 </div>
 
                 <div>
-                    <h3 class="font-semibold text-foreground mb-2">How to Edit Entries</h3>
-                    <p class="">Locate the entry in the ledger and click the <twig:ux:icon name="material-symbols:edit-outline" class="inline"/> (Edit) button. You can update the title and other metadata. Always review changes before saving to ensure compliance with the naming conventions.</p>
+                    <h3 class="mb-2 font-semibold text-foreground">How to Edit Entries</h3>
+                    <p class="">Locate the entry in the ledger and click the
+                        <twig:ux:icon name="material-symbols:edit-outline" class="inline" /> (edit) button. You can
+                        update the title and other metadata. Always review changes before saving to ensure compliance
+                        with the naming conventions.
+                    </p>
                 </div>
 
                 <div>
-                    <h3 class="font-semibold text-foreground mb-2">How to Search</h3>
-                    <p class="">Use the search bar at the top of the ledger page to filter entries by document ID components, title, or keywords. Search is case-insensitive and supports partial matches. You can also use filters.</p>
+                    <h3 class="mb-2 font-semibold text-foreground">How to Search</h3>
+                    <p class="">Use the search bar at the top of the ledger page to filter entries by document ID
+                        components, title, or keywords. Search is case-insensitive and supports partial matches. You can
+                        also use filters.</p>
                 </div>
 
                 <div>
-                    <h3 class="font-semibold text-foreground mb-2">User vs Admin Rights</h3>
-                    <p class=""><strong>Users</strong> can only view entries. <strong>Admins</strong> can create, edit, and delete entries.</p>
+                    <h3 class="mb-2 font-semibold text-foreground">User vs Admin Rights</h3>
+                    <p class=""><strong>Users</strong> can only view entries. <strong>Admins</strong> can create, edit,
+                        and delete entries.</p>
                 </div>
 
                 <div>
-                    <h3 class="font-semibold text-foreground mb-2">Tips and tricks</h3>
-                    <ul class="list-disc list-inside space-y-1">
+                    <h3 class="mb-2 font-semibold text-foreground">Tips and tricks</h3>
+                    <ul class="space-y-1 list-disc list-inside">
                         <li>You can resort the table by clicking on the column headers.</li>
                         <li>You can easily copy the document ID by clicking on it!</li>
                         <li>You can export entries as a XLSX file for easy sharing and analysis.</li>

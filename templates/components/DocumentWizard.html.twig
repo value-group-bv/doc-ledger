@@ -123,9 +123,11 @@
             <label class="font-medium text-sm">Title <span class="font-normal text-muted-foreground text-xs">(human-readable)</span></label>
             <input type="text" data-model="title"
                 data-action="input->live#update:debounce(300ms)"
+                oninput="this.value=this.value.replace(/[^A-Za-z0-9 ]/g,'')"
                 value="{{ title }}"
                 maxlength="48"
-                placeholder="e.g. System P&ID"
+                pattern="[A-Za-z0-9 ]+"
+                placeholder="e.g. System PID"
                 class="flex bg-background px-3 py-2 border border-input rounded-md shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-10 text-sm" />
         </div>
 

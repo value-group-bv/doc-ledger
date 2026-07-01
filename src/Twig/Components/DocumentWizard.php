@@ -190,7 +190,7 @@ class DocumentWizard
         $entry->setSubCategory($subCategory);
         $entry->setDocNumber($docNumber);
         $entry->setRevision('00');
-        $entry->setTitle($this->title);
+        $entry->setTitle(preg_replace('/[^A-Za-z0-9 ]/', '', $this->title));
         $entry->setComments($this->comments ?: null);
         $entry->setCreatedBy($this->security->getUser());
 
