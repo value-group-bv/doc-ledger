@@ -138,9 +138,18 @@
 
             <div class="space-y-2">
                 <h3 class="font-semibold text-foreground">Document code &amp; title</h3>
-                <p>The 22-character code is always followed by a single space and then the title. Do
+                <p>The 22-character code is <strong>always</strong> followed by a single space and then the title. Do
                     <strong>not</strong> separate the code from the title using a hyphen or any other character.
                 </p>
+                <div class="flex items-center gap-1.5 text-xs">
+                    <code class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">VG0-AAB-REP-000-000-0A</code>
+                    <span class="inline-flex items-center gap-1 bg-red-100 dark:bg-red-950 px-1.5 py-1 border border-red-200 dark:border-red-800 rounded font-sans text-red-600 dark:text-red-400">
+                        <twig:ux:icon name="material-symbols:space-bar" class="size-3.5" />
+                        space
+                    </span>
+                    <code class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">Title</code>
+                </div>
+                
                 <div
                     class="flex gap-2 bg-amber-50 dark:bg-amber-950 px-3 py-2 border border-amber-200 dark:border-amber-800 rounded text-amber-800 dark:text-amber-200">
                     <twig:ux:icon name="material-symbols:warning-outline" class="mt-0.5 size-4 shrink-0" />
@@ -185,7 +194,7 @@
                         <span class="text-muted-foreground shrink-0">→</span>
                         <span><strong>Studies</strong>: three-letter sequential alphabetic code (AAA-ZZZ). Any user
                             may assign one; check
-                            <a href="" class="text-primary underline underline-offset-2">SharePoint (TBD)</a> first for
+                            <a href="" class="text-primary dark:text-cyan-500 underline underline-offset-2">SharePoint (TBD)</a> first for
                             the next available code.</span> 
                     </li>
                     <li class="flex gap-2">
