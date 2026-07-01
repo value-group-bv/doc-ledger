@@ -1,8 +1,13 @@
 # Release Notes
 
-## Version 0.10.0 (xx xx 2026)
+## Version 0.10.1 (01 July 2026)
 
-- Started on an `Info` page where the numbering scheme conventions are written.
+- Updated page title of ledger page.
+- FIX: Styling error on `Guide` page.
+
+## Version 0.10.0 (01 July 2026)
+
+- Started on an `Guide` page where the numbering scheme conventions are written.
 - Adding, editing and deleting ledger entries is now only available for admins.
 - Document types can now only contain letters, as it was supposed to.
 

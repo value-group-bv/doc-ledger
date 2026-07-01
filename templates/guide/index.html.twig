@@ -137,19 +137,8 @@
         <twig:Card:Content class="space-y-5 text-sm">
 
             <div class="space-y-2">
-                <h3 class="font-semibold text-foreground">Document code &amp; title</h3>
-                <p>The 22-character code is <strong>always</strong> followed by a single space and then the title. Do
-                    <strong>not</strong> separate the code from the title using a hyphen or any other character.
-                </p>
-                <div class="flex items-center gap-1.5 text-xs">
-                    <code class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">VG0-AAB-REP-000-000-0A</code>
-                    <span class="inline-flex items-center gap-1 bg-red-100 dark:bg-red-950 px-1.5 py-1 border border-red-200 dark:border-red-800 rounded font-sans text-red-600 dark:text-red-400">
-                        <twig:ux:icon name="material-symbols:space-bar" class="size-3.5" />
-                        space
-                    </span>
-                    <code class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">Title</code>
-                </div>
-                
+                <h3 class="font-semibold text-foreground">Document code</h3>
+                <p>The document code has a fixed total length of 22 characters, including hyphens, and is always fully written in capital letters.</p>
                 <div
                     class="flex gap-2 bg-amber-50 dark:bg-amber-950 px-3 py-2 border border-amber-200 dark:border-amber-800 rounded text-amber-800 dark:text-amber-200">
                     <twig:ux:icon name="material-symbols:warning-outline" class="mt-0.5 size-4 shrink-0" />
@@ -194,8 +183,9 @@
                         <span class="text-muted-foreground shrink-0">→</span>
                         <span><strong>Studies</strong>: three-letter sequential alphabetic code (AAA-ZZZ). Any user
                             may assign one; check
-                            <a href="" class="text-primary dark:text-cyan-500 underline underline-offset-2">SharePoint (TBD)</a> first for
-                            the next available code.</span> 
+                            <a href="" class="text-primary dark:text-cyan-500 underline underline-offset-2">SharePoint
+                                (TBD)</a> first for
+                            the next available code.</span>
                     </li>
                     <li class="flex gap-2">
                         <span class="text-muted-foreground shrink-0">→</span>
@@ -217,14 +207,32 @@
             <div class="space-y-2">
                 <h3 class="font-semibold text-foreground">Titles</h3>
                 <p>Titles should be concise but clear. Only alphanumeric characters (A-Z, a-z, 0-9) and spaces are
-                    allowed, with a maximum length of <strong>48 characters</strong> including spaces.
+                    allowed, with a maximum length of <strong>48 characters</strong> including spaces. </p>
+
+                <p>The 22-character document code is <strong>always</strong> followed by a single space and then the title. Do
+                    <strong>not</strong> separate the code from the title using a hyphen or any other character.
+                </p>
+
+                <div class="flex items-center gap-1.5 text-xs">
+                    <code
+                        class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">VG0-AAB-REP-000-000-0A</code>
+                    <span
+                        class="inline-flex items-center gap-1 bg-red-100 dark:bg-red-950 px-1.5 py-1 border border-red-200 dark:border-red-800 rounded font-sans text-red-600 dark:text-red-400">
+                        <twig:ux:icon name="material-symbols:space-bar" class="size-3.5" />
+                        space
+                    </span>
+                    <code
+                        class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">Title</code>
+                </div>
+
+                <p>The title utilises <code class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300 text-xs">Title Case</code>. This means that each word in the title should start with a capital letter, except for certain short words (like "and", "or", "the") unless they are the first or last word of the title.
+                </p>
 
                 <div
                     class="flex gap-2 bg-emerald-50 dark:bg-emerald-950 px-3 py-2 border border-emerald-200 dark:border-emerald-800 rounded text-emerald-800 dark:text-emerald-200">
                     <span class="font-bold text-emerald-600 shrink-0">✓</span>The Ledger has built-in sanitisation and a
                     character limit.
                 </div>
-                </p>
             </div>
 
         </twig:Card:Content>
@@ -262,7 +270,8 @@
                         </li>
                         <li class="flex gap-2">
                             <span class="font-bold text-emerald-600 shrink-0">✓</span>
-                            Register every document identifier, internal and external, in the ledger before distributing it.
+                            Register every document identifier, internal and external, in the ledger before distributing
+                            it.
                         </li>
                         <li class="flex gap-2">
                             <span class="font-bold text-emerald-600 shrink-0">✓</span>
@@ -319,7 +328,8 @@
                     <p class="">Click the <strong>"New Entry"</strong> button to create a new document identifier. Fill
                         in each required field: subsidiary code, main category, reference code, document type, sub
                         category, and title. Also fill in search keywords to improve searchability for other
-                        users. The system will automatically format and store the document ID. Once saved, the entry appears in
+                        users. The system will automatically format and store the document ID. Once saved, the entry
+                        appears in
                         the ledger and can be viewed by all.</p>
                 </div>
 
