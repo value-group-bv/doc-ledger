@@ -93,7 +93,7 @@
                     <dt
                         class="bg-blue-100 px-1.5 py-0.5 rounded w-10 font-mono font-bold text-blue-700 text-xs text-center shrink-0">
                         REP</dt>
-                    <dd><strong>Document type</strong> - Short abbreviation for the type of document.</dd>
+                    <dd><strong>Document type</strong> - Short three-letter abbreviation for the type of document.</dd>
                 </div>
                 <div class="flex items-baseline gap-3">
                     <dt
@@ -127,7 +127,7 @@
         </twig:Card:Content>
     </twig:Card>
 
-    {# ── Rules ─────────────────────────────────────────────────────── #}
+    {# ── Conventions ─────────────────────────────────────────────────────── #}
     <twig:Card class="xl:col-span-2">
         <twig:Card:Header>
             <twig:Card:Title>Conventions</twig:Card:Title>
@@ -172,7 +172,7 @@
             <div class="space-y-2">
                 <h3 class="font-semibold text-foreground">Reference codes</h3>
                 <p>Reference codes are unique globally across the whole Value Group and must not be reused across
-                    different projects or document types. The allowed format is determined by the main category.</p>
+                    different projects or document types. They are always three characters long. The allowed format is determined by the main category.</p>
                 <ul class="space-y-1.5 pl-1">
                     <li class="flex gap-2">
                         <span class="text-muted-foreground shrink-0">→</span>
@@ -205,34 +205,154 @@
             <twig:Separator />
 
             <div class="space-y-2">
-                <h3 class="font-semibold text-foreground">Titles</h3>
-                <p>Titles should be concise but clear. Only alphanumeric characters (A-Z, a-z, 0-9) and spaces are
-                    allowed, with a maximum length of <strong>48 characters</strong> including spaces. </p>
+                <h3 class="font-semibold text-foreground">Revision</h3>
+                <ul class="space-y-2.5 pl-1">
+                    <li class="flex gap-2">
+                        <span class="text-muted-foreground shrink-0">→</span>
+                        <span><strong>Interim</strong>: alphanumeric suffix starting at <code
+                                class="bg-muted px-1.5 py-0.5 rounded font-mono font-bold text-neutral-700 dark:text-gray-300 text-xs">0A</code>,
+                            incrementing the letter for each subsequent draft.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-muted-foreground shrink-0">→</span>
+                        <span><strong>Released</strong>: numeric suffix starting at <code
+                                class="bg-muted px-1.5 py-0.5 rounded font-mono font-bold text-neutral-700 dark:text-gray-300 text-xs">00</code>,
+                            incrementing for each subsequent formal reissue.</span>
+                    </li>
+                </ul>
 
-                <p>The 22-character document code is <strong>always</strong> followed by a single space and then the title. Do
-                    <strong>not</strong> separate the code from the title using a hyphen or any other character.
-                </p>
-
-                <div class="flex items-center gap-1.5 text-xs">
+                <div class="flex flex-wrap items-center gap-1.5 text-xs">
+                    <span class="mr-1 text-muted-foreground">Example sequence:</span>
                     <code
-                        class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">VG0-AAB-REP-000-000-0A</code>
-                    <span
-                        class="inline-flex items-center gap-1 bg-red-100 dark:bg-red-950 px-1.5 py-1 border border-red-200 dark:border-red-800 rounded font-sans text-red-600 dark:text-red-400">
-                        <twig:ux:icon name="material-symbols:space-bar" class="size-3.5" />
-                        space
-                    </span>
+                        class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">0A</code>
+                    <span class="font-bold text-muted-foreground">→</span>
                     <code
-                        class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">Title</code>
+                        class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">0B</code>
+                    <span class="font-bold text-muted-foreground">→</span>
+                    <code
+                        class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">0C</code>
+                    <span class="font-bold text-muted-foreground">→</span>
+                    <code
+                        class="bg-emerald-100 dark:bg-emerald-900 px-2 py-1 rounded font-mono font-bold text-emerald-700 dark:text-emerald-300">00</code>
+                    <span class="font-bold text-muted-foreground">→</span>
+                    <code
+                        class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">1A</code>
+                    <span class="font-bold text-muted-foreground">→</span>
+                    <code
+                        class="bg-emerald-100 dark:bg-emerald-900 px-2 py-1 rounded font-mono font-bold text-emerald-700 dark:text-emerald-300">01</code>
                 </div>
 
-                <p>The title utilises <code class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300 text-xs">Title Case</code>. This means that each word in the title should start with a capital letter, except for certain short words (like "and", "or", "the") unless they are the first or last word of the title.
-                </p>
+                <div
+                    class="flex gap-2 bg-amber-50 dark:bg-amber-950 px-3 py-2 border border-amber-200 dark:border-amber-800 rounded text-amber-800 dark:text-amber-200">
+                    <twig:ux:icon name="material-symbols:warning-outline" class="mt-0.5 size-4 shrink-0" />
+                    <p>Don't use a released format (00) for a document still under internal review.
+                    </p>
+                </div>
+            </div>
+
+            <twig:Separator />
+
+            <div class="space-y-2">
+                <h3 class="font-semibold text-foreground">Titles</h3>
+                <ul class="space-y-2.5 pl-1">
+                    <li class="flex gap-2">
+                        <span class="text-muted-foreground shrink-0">→</span>
+                        <span><strong>Character set</strong>: only alphanumeric characters (A-Z, a-z, 0-9) and spaces
+                            are allowed, with a maximum length of <strong>48 characters</strong> including
+                            spaces.</span>
+                    </li>
+                    <li class="flex flex-col gap-1.5">
+                        <div class="flex gap-2">
+                            <span class="text-muted-foreground shrink-0">→</span>
+                            <span><strong>Separator</strong>: the 22-character document code is <strong>always</strong>
+                                followed by a single space and then the title. Do <strong>not</strong> separate the
+                                code from the title using a hyphen or any other character.</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 pl-5 text-xs">
+                            <code
+                                class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">VG0-AAB-REP-000-000-0A</code>
+                            <span
+                                class="inline-flex items-center gap-1 bg-emerald-100 dark:bg-emerald-900 px-1.5 py-1 border border-emerald-200 dark:border-emerald-800 rounded font-sans text-emerald-700 dark:text-emerald-300">
+                                <twig:ux:icon name="material-symbols:space-bar" class="size-3.5" />
+                                space
+                            </span>
+                            <code
+                                class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">Title</code>
+                        </div>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-muted-foreground shrink-0">→</span>
+                        <span><strong>Casing</strong>: the title utilises <code
+                                class="bg-muted px-1.5 py-0.5 rounded font-mono font-bold text-neutral-700 dark:text-gray-300 text-xs">Title Case</code>.
+                            Each word should start with a capital letter, except for certain short words (like "and",
+                            "or", "the") unless they are the first or last word of the title. Abbreviations can be fully capitalised, e.g. <code
+                                class="bg-muted px-1.5 py-0.5 rounded font-mono font-bold text-neutral-700 dark:text-gray-300 text-xs">pid → PID</code>.</span>
+                    </li>
+                </ul>
 
                 <div
                     class="flex gap-2 bg-emerald-50 dark:bg-emerald-950 px-3 py-2 border border-emerald-200 dark:border-emerald-800 rounded text-emerald-800 dark:text-emerald-200">
-                    <span class="font-bold text-emerald-600 shrink-0">✓</span>The Ledger has built-in sanitisation and a
+                    <span class="font-bold text-emerald-600 shrink-0">✓</span>The Ledger has built-in sanitisation and
                     character limit.
                 </div>
+            </div>
+
+        </twig:Card:Content>
+    </twig:Card>
+
+    {# ── Examples ─────────────────────────────────────────────────────── #}
+    <twig:Card class="xl:col-span-2">
+        <twig:Card:Header>
+            <twig:Card:Title>Examples</twig:Card:Title>
+            <twig:Card:Description>Correct and incorrect identifiers</twig:Card:Description>
+        </twig:Card:Header>
+        <twig:Card:Content class="space-y-5 text-sm">
+
+            <div class="space-y-2">
+                <p class="font-semibold text-emerald-700">Correct</p>
+                <ul class="space-y-2">
+                    <li class="flex items-center gap-2">
+                        <span class="font-bold text-emerald-600 shrink-0">✓</span>
+                        <code class="bg-emerald-100 dark:bg-emerald-900 px-2 py-1 rounded font-mono font-bold text-emerald-700 dark:text-emerald-300 text-xs">VG0-AAB-REP-000-000-0A Site Survey</code>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="font-bold text-emerald-600 shrink-0">✓</span>
+                        <code class="bg-emerald-100 dark:bg-emerald-900 px-2 py-1 rounded font-mono font-bold text-emerald-700 dark:text-emerald-300 text-xs">VC1-045-DWG-020-003-01 Piping Layout</code>
+                    </li>
+                </ul>
+            </div>
+
+            <twig:Separator />
+
+            <div class="space-y-2">
+                <p class="font-semibold text-destructive">Incorrect</p>
+                <ul class="space-y-2">
+                    <li class="flex items-center gap-2">
+                        <span class="font-bold text-destructive shrink-0">✗</span>
+                        <code class="bg-red-100 dark:bg-red-900 px-2 py-1 rounded font-mono font-bold text-red-700 dark:text-red-300 text-xs">VG0–AAB–REP–000–000–0A Site Survey</code>
+                        <span class="text-muted-foreground">en dash used instead of hyphen-minus</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="font-bold text-destructive shrink-0">✗</span>
+                        <code class="bg-red-100 dark:bg-red-900 px-2 py-1 rounded font-mono font-bold text-red-700 dark:text-red-300 text-xs">VG0-AAB-REP-000-000-0A-Site Survey</code>
+                        <span class="text-muted-foreground">hyphen used between code and title instead of a space</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="font-bold text-destructive shrink-0">✗</span>
+                        <code class="bg-red-100 dark:bg-red-900 px-2 py-1 rounded font-mono font-bold text-red-700 dark:text-red-300 text-xs">vg0-aab-rep-000-000-0a Site Survey</code>
+                        <span class="text-muted-foreground">code must be fully capitalised</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="font-bold text-destructive shrink-0">✗</span>
+                        <code class="bg-red-100 dark:bg-red-900 px-2 py-1 rounded font-mono font-bold text-red-700 dark:text-red-300 text-xs">VG0-AB-REP-000-000-0A Site Survey</code>
+                        <span class="text-muted-foreground">reference code for a study must be three letters</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="font-bold text-destructive shrink-0">✗</span>
+                        <code class="bg-red-100 dark:bg-red-900 px-2 py-1 rounded font-mono font-bold text-red-700 dark:text-red-300 text-xs">VG0-AAB-REP-000-000-0A P&ID System</code>
+                        <span class="text-muted-foreground">title contains characters other than letters, digits and spaces</span>
+                    </li>
+                </ul>
             </div>
 
         </twig:Card:Content>
@@ -258,7 +378,7 @@
                         <li class="flex gap-2">
                             <span class="font-bold text-emerald-600 shrink-0">✓</span>
                             Start with an interim revision (0A) and promote to a final release (00) only when the
-                            document is formally issued and approved.
+                            document is formally approved and issued.
                         </li>
                         <li class="flex gap-2">
                             <span class="font-bold text-emerald-600 shrink-0">✓</span>
@@ -299,10 +419,6 @@
                         <li class="flex gap-2">
                             <span class="font-bold text-destructive shrink-0">✗</span>
                             Don't create document identifiers outside of Value Ledger. Even for one-offs.
-                        </li>
-                        <li class="flex gap-2">
-                            <span class="font-bold text-destructive shrink-0">✗</span>
-                            Don't use a final revision format (00) for documents still under internal review.
                         </li>
                         <li class="flex gap-2">
                             <span class="font-bold text-destructive shrink-0">✗</span>

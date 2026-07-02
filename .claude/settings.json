@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(php bin/console lint:container)",
-      "Bash(php bin/console router:match /ledger/export)"
+      "Bash(php bin/console router:match /ledger/export)",
+      "Bash(php -l src/Entity/DocumentEntry.php)",
+      "Bash(php -l src/Twig/Components/DocumentWizard.php)",
+      "Bash(php -l src/Form/DocumentEntryType.php)",
+      "Bash(php -r ' *)"
     ]
   }
 }

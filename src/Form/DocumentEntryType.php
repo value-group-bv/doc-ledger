@@ -52,7 +52,8 @@ class DocumentEntryType extends AbstractType
                 'constraints' => [new Range(min: 0, max: 999)],
             ])
             ->add('title', TextType::class, [
-                'constraints' => [new NotBlank(), new Length(max: 255)],
+                'constraints' => [new NotBlank(), new Length(max: 48)],
+                'attr'        => ['maxlength' => 48],
             ])
             ->add('comments', TextareaType::class, [
                 'required' => false,

@@ -1,5 +1,12 @@
 # Release Notes
 
+## Version 0.11.0 (02 July 2026)
+
+- Enhanced `Guide` page with examples section.
+- Enhanced title sanitation. It now also automatically applies _Title Case_ except for certain short words, and _UPPER CASE_ for certain abbreviations.
+- Simplified and consolidated back-end code for title sanitation.
+- Updated dependencies.
+
 ## Version 0.10.1 (01 July 2026)
 
 - Updated page title of ledger page.

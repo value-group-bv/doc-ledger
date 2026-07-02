@@ -14,6 +14,17 @@ use Symfony\Component\Uid\Uuid;
 #[UniqueEntity(fields: ['subsidiary', 'mainCategory', 'docType', 'subCategory', 'docNumber', 'revision'], message: 'This document ID already exists in the ledger.')]
 class DocumentEntry
 {
+    /* Words kept lowercase in Title Case unless first or last */
+    private const TITLE_CASE_MINOR_WORDS = [
+        'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'in',
+        'nor', 'of', 'on', 'or', 'so', 'the', 'to', 'up', 'yet',
+    ];
+
+    /* Abbreviations always fully capitalised, e.g. "pid" → "PID" */
+    private const UPPERCASE_WORDS = [
+        'pid', 'pfd', 'iso', 'api', 'iec', 'ansi', 'astm', 'bs', 'din', 'en'
+    ];
+
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -106,7 +117,28 @@ class DocumentEntry
     public function setRevision(string $revision): static { $this->revision = $revision; return $this; }
 
     public function getTitle(): string { return $this->title; }
-    public function setTitle(string $title): static { $this->title = $title; return $this; }
+
+    public function setTitle(string $title): static
+    {
+        $title = trim(preg_replace('/[^A-Za-z0-9 ]/', '', $title));
+        $title = preg_replace('/\s+/', ' ', $title);
+
+        $words = explode(' ', strtolower($title));
+        $lastIndex = count($words) - 1;
+        foreach ($words as $i => &$word) {
+            if ($word === '') continue;
+
+            if (in_array($word, self::UPPERCASE_WORDS, true)) {
+                $word = strtoupper($word);
+            } elseif ($i === 0 || $i === $lastIndex || !in_array($word, self::TITLE_CASE_MINOR_WORDS, true)) {
+                $word = ucfirst($word);
+            }
+        }
+        unset($word);
+
+        $this->title = implode(' ', $words);
+        return $this;
+    }
 
     public function getComments(): ?string { return $this->comments; }
     public function setComments(?string $comments): static { $this->comments = $comments; return $this; }
