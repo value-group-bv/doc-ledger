@@ -22,7 +22,7 @@ class DocumentEntry
 
     /* Abbreviations always fully capitalised, e.g. "pid" → "PID" */
     private const UPPERCASE_WORDS = [
-        'pid', 'pfd', 'iso', 'api', 'iec', 'ansi', 'astm', 'bs', 'din', 'en'
+        'pid', 'pfd', 'iso', 'api', 'iec', 'ansi', 'astm', 'bs', 'din', 'en', '3d', 'cad', 'ccs', 'occs', 'grp', 'grve', 'gre', 'co2', 'ga'
     ];
 
     #[ORM\Id]

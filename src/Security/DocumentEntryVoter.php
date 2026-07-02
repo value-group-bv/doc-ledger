@@ -4,12 +4,15 @@ namespace App\Security;
 
 use App\Entity\DocumentEntry;
 use App\Entity\User;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 
 class DocumentEntryVoter extends Voter
 {
+    public function __construct(private readonly Security $security) {}
+
     protected function supports(string $attribute, mixed $subject): bool
     {
         return in_array($attribute, ['edit_entry', 'delete_entry'], true)
@@ -24,8 +27,8 @@ class DocumentEntryVoter extends Voter
         /** @var DocumentEntry $entry */
         $entry = $subject;
 
-        // Admins can do anything
-        if (in_array('ROLE_ADMIN', $token->getRoleNames(), true)) return true;
+        // Admins (and roles above it in the hierarchy, e.g. ROLE_SUPERADMIN) can do anything
+        if ($this->security->isGranted('ROLE_ADMIN')) return true;
 
         // Users can only edit/delete their own entries
         return $entry->getCreatedBy()?->getId() === $user->getId();

@@ -1,5 +1,11 @@
 # Release Notes
 
+## Version 0.11.1 (02 July 2026)
+
+- FIX: Superadmins could not edit entries created by 'regular' admins.
+- FIX: Updating applicable subsidiary and/or maincat for existing sub categories did not work in all web browsers.
+- FIX: Quickly clicking multiple times on same document ID would make the `Copied` message wrongfully persistent.
+
 ## Version 0.11.0 (02 July 2026)
 
 - Enhanced `Guide` page with examples section.

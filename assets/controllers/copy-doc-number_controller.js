@@ -5,6 +5,8 @@ export default class extends Controller {
 
     connect() {
         this.buttonTargets.forEach(button => {
+            button.dataset.originalText = button.textContent;
+            button.dataset.originalStyle = button.style.cssText;
             button.addEventListener('click', this.copyToClipboard.bind(this));
         });
     }
@@ -17,15 +19,14 @@ export default class extends Controller {
             await navigator.clipboard.writeText(docNumber);
 
             // Visual feedback
-            const originalText = button.textContent;
-            const originalStyle = button.style.cssText;
+            clearTimeout(button._copyResetTimeout);
 
             button.textContent = '✓ Copied';
             button.style.opacity = '1';
 
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.style.cssText = originalStyle;
+            button._copyResetTimeout = setTimeout(() => {
+                button.textContent = button.dataset.originalText;
+                button.style.cssText = button.dataset.originalStyle;
             }, 2000);
         } catch (err) {
             console.error('Failed to copy:', err);

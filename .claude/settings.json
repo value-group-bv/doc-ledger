@@ -6,7 +6,23 @@
       "Bash(php -l src/Entity/DocumentEntry.php)",
       "Bash(php -l src/Twig/Components/DocumentWizard.php)",
       "Bash(php -l src/Form/DocumentEntryType.php)",
-      "Bash(php -r ' *)"
+      "Bash(php -r ' *)",
+      "Bash(node -e \"console.log\\(1\\)\")",
+      "Bash(npx --yes playwright --version)",
+      "Bash(npm install *)",
+      "Bash(node test.js)",
+      "Bash(git -C /home/rutger/vg-docledger log --oneline -- templates/admin/index.html.twig)",
+      "Bash(git -C /home/rutger/vg-docledger log -p --follow -- templates/admin/index.html.twig)",
+      "Read(//home/rutger/.cache/**)",
+      "Bash(node test2.js)",
+      "Bash(node ./test2.js)",
+      "Bash(node -e ' *)",
+      "Bash(php bin/console lint:twig templates/admin/index.html.twig)",
+      "Bash(git -C /home/rutger/vg-docledger log -p -- src/Security/DocumentEntryVoter.php)",
+      "Bash(xargs -I{} cat {})",
+      "Bash(php -l src/Security/DocumentEntryVoter.php)",
+      "Bash(php bin/console debug:container App\\\\\\\\Security\\\\\\\\DocumentEntryVoter)",
+      "Bash(node --check /home/rutger/vg-docledger/assets/controllers/copy-doc-number_controller.js)"
     ]
   }
 }

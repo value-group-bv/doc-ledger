@@ -188,9 +188,9 @@
                     {% for sc in subCategories %}
                     {% if sc.id == editSubcatId %}
                     <tr>
-                        <form method="post" action="{{ path('admin_subcat_update', {id: sc.id}) }}" class="contents">
                         <td class="py-1">
-                            <select name="subsidiaryId"
+                            <form id="subcat-edit-{{ sc.id }}" method="post" action="{{ path('admin_subcat_update', {id: sc.id}) }}"></form>
+                            <select name="subsidiaryId" form="subcat-edit-{{ sc.id }}"
                                 class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-8 text-sm transition-[color,box-shadow]">
                                 <option value="0">All</option>
                                 {% for s in subsidiaries %}
@@ -199,7 +199,7 @@
                             </select>
                         </td>
                         <td class="py-1">
-                            <select name="mainCategoryId"
+                            <select name="mainCategoryId" form="subcat-edit-{{ sc.id }}"
                                 class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-8 text-sm transition-[color,box-shadow]">
                                 <option value="0">All</option>
                                 {% for mc in mainCategories %}
@@ -208,7 +208,7 @@
                             </select>
                         </td>
                         <td class="py-1">
-                            <select name="docTypeId"
+                            <select name="docTypeId" form="subcat-edit-{{ sc.id }}"
                                 class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-8 text-sm transition-[color,box-shadow]">
                                 {% for dt in docTypes %}
                                 <option value="{{ dt.id }}" {% if dt.id == sc.docType.id %}selected{% endif %}>{{ dt.code }}</option>
@@ -216,18 +216,17 @@
                             </select>
                         </td>
                         <td class="py-1">
-                            <input name="code" type="number" min="0" max="999" value="{{ sc.code }}"
+                            <input name="code" type="number" min="0" max="999" value="{{ sc.code }}" form="subcat-edit-{{ sc.id }}"
                                 class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-24 h-8 font-mono text-sm transition-[color,box-shadow]" />
                         </td>
                         <td class="py-1">
-                            <input name="description" value="{{ sc.description }}"
+                            <input name="description" value="{{ sc.description }}" form="subcat-edit-{{ sc.id }}"
                                 class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-8 text-sm transition-[color,box-shadow]" />
                         </td>
                         <td class="py-1 text-right whitespace-nowrap">
-                            <button type="submit" class="mr-3 text-primary text-xs hover:underline">Save</button>
+                            <button type="submit" form="subcat-edit-{{ sc.id }}" class="mr-3 text-primary text-xs hover:underline">Save</button>
                             <a href="{{ path('admin_index') }}" class="text-muted-foreground text-xs hover:underline">Cancel</a>
                         </td>
-                        </form>
                     </tr>
                     {% else %}
                     <tr>
