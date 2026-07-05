@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 0.12.0 (x)
+
+- Updated hover styling on ledger table. 
+ 
 ## Version 0.11.1 (02 July 2026)
 
 - FIX: Superadmins could not edit entries created by 'regular' admins.

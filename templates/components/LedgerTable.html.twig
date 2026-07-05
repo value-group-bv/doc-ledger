@@ -192,7 +192,7 @@
             </thead>
             <tbody class="divide-y divide-border">
                 {% for entry in entries %}
-                <tr class="hover:bg-muted/30 transition-colors">
+                <tr class="hover:bg-muted transition-colors">
                     <td class="px-4 py-3" data-controller="copy-doc-number">
                         <button type="button" data-copy-doc-number-target="button"
                             data-copy-doc-number="{{ entry.getDocumentId() }}"
