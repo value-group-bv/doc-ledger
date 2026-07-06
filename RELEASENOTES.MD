@@ -2,7 +2,8 @@
 
 ## Version 0.12.0 (x)
 
-- Updated hover styling on ledger table. 
+- Updated hover styling on ledger table.
+- Updated styling on login page.
  
 ## Version 0.11.1 (02 July 2026)
 
