@@ -368,6 +368,7 @@
                         <th class="pb-2 text-left">Requestor</th>
                         <th class="pb-2 text-left">Subsidiary</th>
                         <th class="pb-2 text-left">Created</th>
+                        <th></th>
                     </tr></thead>
                     <tbody class="divide-y divide-border">
                     {% for fc in recentFeasibilityCodes %}
@@ -377,8 +378,14 @@
                         <td class="py-2">{{ fc.requestor }}</td>
                         <td class="py-2 font-mono text-muted-foreground">{{ fc.subsidiary.code }}</td>
                         <td class="py-2 text-muted-foreground text-xs">{{ fc.createdAt|date('d M Y H:i') }}</td>
+                        <td class="py-2 text-right whitespace-nowrap">
+                            <form method="post" action="{{ path('admin_feasibility_code_delete', {id: fc.id}) }}"
+                                onsubmit="return confirm('Delete feasibility code {{ fc.code }}?')" class="inline">
+                                <button type="submit" class="text-destructive text-xs hover:underline">Delete</button>
+                            </form>
+                        </td>
                     </tr>
-                    {% else %}<tr><td colspan="5" class="py-3 text-muted-foreground text-center">None yet.</td></tr>
+                    {% else %}<tr><td colspan="6" class="py-3 text-muted-foreground text-center">None yet.</td></tr>
                     {% endfor %}
                     </tbody>
                 </table>

@@ -101,6 +101,22 @@ class AdminController extends AbstractController
         return $response;
     }
 
+    #[Route('/feasibility-code/{id}/delete', name: 'feasibility_code_delete', methods: ['POST'])]
+    public function feasibilityCodeDelete(int $id, FeasibilityCodeRepository $feasibilityCodes): Response
+    {
+        $entity = $feasibilityCodes->find($id);
+        if (!$entity) {
+            return $this->redirectToRoute('admin_index');
+        }
+
+        $code = $entity->getCode();
+        $this->em->remove($entity);
+        $this->em->flush();
+        $this->addFlash('success', "Feasibility code '{$code}' deleted.");
+
+        return $this->redirectToRoute('admin_index');
+    }
+
     // ── Subsidiaries ──────────────────────────────────────────────────────────
 
     #[Route('/subsidiary/new', name: 'subsidiary_new', methods: ['POST'])]

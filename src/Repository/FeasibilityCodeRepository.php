@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\DocSubsidiary;
 use App\Entity\FeasibilityCode;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /** @extends ServiceEntityRepository<FeasibilityCode> */
@@ -13,34 +14,57 @@ class FeasibilityCodeRepository extends ServiceEntityRepository
     /** Size of the AAA–ZZZ pool (26^3) */
     private const POOL_SIZE = 17576;
 
+    /** Bounded retries for the rare case two requests race for the same free code. */
+    private const MAX_ALLOCATE_ATTEMPTS = 5;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, FeasibilityCode::class);
     }
 
     /**
-     * Allocates the next unused AAA–ZZZ code and persists a new feasibility
-     * project record for it. The code is derived from the row's own
-     * autoincrement id, so allocation is race-safe without extra locking.
+     * Allocates the lowest unused AAA–ZZZ code and persists a new feasibility
+     * project record for it. Deleting an entry frees its code for reuse.
+     * Uniqueness under concurrent requests is enforced by the DB's unique
+     * index on `code`, with a retry on collision rather than extra locking.
      */
     public function allocate(DocSubsidiary $subsidiary, string $title, string $requestor): FeasibilityCode
     {
-        $entry = new FeasibilityCode();
-        $entry->setSubsidiary($subsidiary)->setTitle($title)->setRequestor($requestor);
-
         $em = $this->getEntityManager();
-        $em->persist($entry);
-        $em->flush();
 
-        $index = $entry->getId();
-        if ($index > self::POOL_SIZE) {
-            throw new \RuntimeException('Feasibility reference code pool (AAA–ZZZ) is exhausted.');
+        for ($attempt = 0; $attempt < self::MAX_ALLOCATE_ATTEMPTS; $attempt++) {
+            $code = $this->findLowestFreeCode();
+
+            $entry = new FeasibilityCode();
+            $entry->setSubsidiary($subsidiary)->setTitle($title)->setRequestor($requestor)->setCode($code);
+
+            try {
+                $em->persist($entry);
+                $em->flush();
+
+                return $entry;
+            } catch (UniqueConstraintViolationException) {
+                $em->clear();
+            }
         }
 
-        $entry->setCode(self::codeForIndex($index));
-        $em->flush();
+        throw new \RuntimeException('Could not allocate a feasibility code after multiple concurrent attempts; please retry.');
+    }
 
-        return $entry;
+    private function findLowestFreeCode(): string
+    {
+        $usedCodes = array_flip($this->getEntityManager()->getConnection()->fetchFirstColumn(
+            'SELECT code FROM feasibility_code WHERE code IS NOT NULL'
+        ));
+
+        for ($i = 1; $i <= self::POOL_SIZE; $i++) {
+            $candidate = self::codeForIndex($i);
+            if (!isset($usedCodes[$candidate])) {
+                return $candidate;
+            }
+        }
+
+        throw new \RuntimeException('Feasibility reference code pool (AAA–ZZZ) is exhausted.');
     }
 
     /** @return FeasibilityCode[] */
