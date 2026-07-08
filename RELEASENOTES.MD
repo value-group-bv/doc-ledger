@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 0.12.2 (08 July 2026)
+
+- Deletion and re-release of API keys now possible.
+
 ## Version 0.12.1 (08 July 2026)
 
 - FIX: API authentication bug.

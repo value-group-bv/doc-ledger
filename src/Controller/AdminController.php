@@ -49,6 +49,7 @@ class AdminController extends AbstractController
             'users' => $users->findBy([], ['createdAt' => 'DESC']),
             'recentFeasibilityCodes' => $feasibilityCodes->findRecent(10),
             'editSubcatId' => (int) $request->query->get('editSubcat', 0),
+            'editFeasibilityCodeId' => (int) $request->query->get('editFeasibilityCode', 0),
         ]);
     }
 
@@ -99,6 +100,31 @@ class AdminController extends AbstractController
         $response->headers->set('Cache-Control', 'max-age=0');
 
         return $response;
+    }
+
+    #[Route('/feasibility-code/{id}/edit', name: 'feasibility_code_edit', methods: ['GET'])]
+    public function feasibilityCodeEdit(int $id): Response
+    {
+        return $this->redirectToRoute('admin_index', ['editFeasibilityCode' => $id]);
+    }
+
+    #[Route('/feasibility-code/{id}/update', name: 'feasibility_code_update', methods: ['POST'])]
+    public function feasibilityCodeUpdate(int $id, Request $request, FeasibilityCodeRepository $feasibilityCodes): Response
+    {
+        $entity = $feasibilityCodes->find($id);
+        $title = trim((string) $request->request->get('title', ''));
+
+        if (!$entity) {
+            $this->addFlash('error', 'Feasibility code not found.');
+        } elseif (!$title) {
+            $this->addFlash('error', 'Title is required.');
+        } else {
+            $entity->setTitle($title);
+            $this->em->flush();
+            $this->addFlash('success', "Feasibility code '{$entity->getCode()}' updated.");
+        }
+
+        return $this->redirectToRoute('admin_index');
     }
 
     #[Route('/feasibility-code/{id}/delete', name: 'feasibility_code_delete', methods: ['POST'])]

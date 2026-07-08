@@ -372,6 +372,25 @@
                     </tr></thead>
                     <tbody class="divide-y divide-border">
                     {% for fc in recentFeasibilityCodes %}
+                    {% if fc.id == editFeasibilityCodeId %}
+                    <tr>
+                        <td class="py-1 font-mono font-semibold">
+                            {{ fc.code }}
+                            <form id="fc-edit-{{ fc.id }}" method="post" action="{{ path('admin_feasibility_code_update', {id: fc.id}) }}"></form>
+                        </td>
+                        <td class="py-1">
+                            <input name="title" value="{{ fc.title }}" form="fc-edit-{{ fc.id }}"
+                                class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-8 text-sm transition-[color,box-shadow]" />
+                        </td>
+                        <td class="py-1">{{ fc.requestor }}</td>
+                        <td class="py-1 font-mono text-muted-foreground">{{ fc.subsidiary.code }}</td>
+                        <td class="py-1 text-muted-foreground text-xs">{{ fc.createdAt|date('d M Y H:i') }}</td>
+                        <td class="py-1 text-right whitespace-nowrap">
+                            <button type="submit" form="fc-edit-{{ fc.id }}" class="mr-3 text-primary text-xs hover:underline">Save</button>
+                            <a href="{{ path('admin_index') }}" class="text-muted-foreground text-xs hover:underline">Cancel</a>
+                        </td>
+                    </tr>
+                    {% else %}
                     <tr>
                         <td class="py-2 font-mono font-semibold">{{ fc.code }}</td>
                         <td class="py-2">{{ fc.title }}</td>
@@ -379,12 +398,14 @@
                         <td class="py-2 font-mono text-muted-foreground">{{ fc.subsidiary.code }}</td>
                         <td class="py-2 text-muted-foreground text-xs">{{ fc.createdAt|date('d M Y H:i') }}</td>
                         <td class="py-2 text-right whitespace-nowrap">
+                            <a href="{{ path('admin_feasibility_code_edit', {id: fc.id}) }}" class="mr-3 text-xs hover:underline">Edit</a>
                             <form method="post" action="{{ path('admin_feasibility_code_delete', {id: fc.id}) }}"
                                 onsubmit="return confirm('Delete feasibility code {{ fc.code }}?')" class="inline">
                                 <button type="submit" class="text-destructive text-xs hover:underline">Delete</button>
                             </form>
                         </td>
                     </tr>
+                    {% endif %}
                     {% else %}<tr><td colspan="6" class="py-3 text-muted-foreground text-center">None yet.</td></tr>
                     {% endfor %}
                     </tbody>
