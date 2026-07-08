@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 0.12.0 (xx July 2026)
+
+- Updated styling on error pages in-line with login page updates
+
 ## Version 0.11.2 (07 July 2026)
 
 - Updated hover styling on ledger table.
