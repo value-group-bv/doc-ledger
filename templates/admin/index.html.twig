@@ -344,6 +344,48 @@
             </twig:Card:Content>
         </twig:Card>
 
+        {# ── Feasibility codes ────────────────────────────────────────────────── #}
+        <twig:Card class="xl:col-span-2">
+            <twig:Card:Header>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <twig:Card:Title>Feasibility Codes</twig:Card:Title>
+                        <twig:Card:Description>Most recently created via the API</twig:Card:Description>
+                    </div>
+                    <a href="{{ path('admin_feasibility_codes_export') }}"
+                        class="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground text-xs transition-colors shrink-0">
+                        <twig:ux:icon name="material-symbols:download" class="size-3" />
+                        Export to XLSX
+                    </a>
+                </div>
+            </twig:Card:Header>
+            <twig:Card:Content>
+                <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead><tr class="border-border border-b text-muted-foreground text-xs">
+                        <th class="pb-2 text-left">Code</th>
+                        <th class="pb-2 text-left">Title</th>
+                        <th class="pb-2 text-left">Requestor</th>
+                        <th class="pb-2 text-left">Subsidiary</th>
+                        <th class="pb-2 text-left">Created</th>
+                    </tr></thead>
+                    <tbody class="divide-y divide-border">
+                    {% for fc in recentFeasibilityCodes %}
+                    <tr>
+                        <td class="py-2 font-mono font-semibold">{{ fc.code }}</td>
+                        <td class="py-2">{{ fc.title }}</td>
+                        <td class="py-2">{{ fc.requestor }}</td>
+                        <td class="py-2 font-mono text-muted-foreground">{{ fc.subsidiary.code }}</td>
+                        <td class="py-2 text-muted-foreground text-xs">{{ fc.createdAt|date('d M Y H:i') }}</td>
+                    </tr>
+                    {% else %}<tr><td colspan="5" class="py-3 text-muted-foreground text-center">None yet.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </twig:Card:Content>
+        </twig:Card>
+
         {# ── Users ─────────────────────────────────────────────────────────────── #}
         <twig:Card class="xl:col-span-2">
             <twig:Card:Header>

@@ -11,11 +11,15 @@ use App\Repository\DocPredefinedNumberRepository;
 use App\Repository\DocSubCategoryRepository;
 use App\Repository\DocSubsidiaryRepository;
 use App\Repository\DocTypeRepository;
+use App\Repository\FeasibilityCodeRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -34,6 +38,7 @@ class AdminController extends AbstractController
         DocSubCategoryRepository $subCats,
         DocPredefinedNumberRepository $predefined,
         UserRepository $users,
+        FeasibilityCodeRepository $feasibilityCodes,
     ): Response {
         return $this->render('admin/index.html.twig', [
             'subsidiaries' => $subsidiaries->findBy([], ['sortOrder' => 'ASC']),
@@ -42,8 +47,58 @@ class AdminController extends AbstractController
             'subCategories' => $subCats->findBy([], ['docType' => 'ASC', 'code' => 'ASC']),
             'predefinedNumbers' => $predefined->findBy([], ['subCategory' => 'ASC', 'code' => 'ASC']),
             'users' => $users->findBy([], ['createdAt' => 'DESC']),
+            'recentFeasibilityCodes' => $feasibilityCodes->findRecent(10),
             'editSubcatId' => (int) $request->query->get('editSubcat', 0),
         ]);
+    }
+
+    #[Route('/feasibility-codes/export', name: 'feasibility_codes_export')]
+    public function feasibilityCodesExport(FeasibilityCodeRepository $feasibilityCodes): StreamedResponse
+    {
+        $entries = $feasibilityCodes->findAllOrderedByCreatedAt();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Feasibility Codes');
+
+        $headers = ['Code', 'Title', 'Requestor', 'Subsidiary', 'Created At'];
+        $sheet->fromArray([$headers], null, 'A1');
+
+        $headerStyle = [
+            'font' => ['bold' => true],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E0E0E2']],
+        ];
+        $sheet->getStyle('A1:E1')->applyFromArray($headerStyle);
+        $sheet->freezePane('A2');
+
+        $row = 2;
+        foreach ($entries as $entry) {
+            $sheet->fromArray([[
+                $entry->getCode(),
+                $entry->getTitle(),
+                $entry->getRequestor(),
+                $entry->getSubsidiary()->getCode(),
+                $entry->getCreatedAt()->format('Y-m-d H:i'),
+            ]], null, 'A' . $row, true);
+            $row++;
+        }
+
+        foreach (range('A', 'E') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $filename = 'FeasibilityCodesExport-' . date('Y-m-d') . '.xlsx';
+        $writer = new Xlsx($spreadsheet);
+
+        $response = new StreamedResponse(static function () use ($writer): void {
+            $writer->save('php://output');
+        });
+
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
+        $response->headers->set('Cache-Control', 'max-age=0');
+
+        return $response;
     }
 
     // ── Subsidiaries ──────────────────────────────────────────────────────────

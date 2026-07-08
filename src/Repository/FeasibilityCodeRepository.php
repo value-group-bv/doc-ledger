@@ -43,6 +43,25 @@ class FeasibilityCodeRepository extends ServiceEntityRepository
         return $entry;
     }
 
+    /** @return FeasibilityCode[] */
+    public function findRecent(int $limit): array
+    {
+        return $this->createQueryBuilder('f')
+            ->orderBy('f.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /** @return FeasibilityCode[] */
+    public function findAllOrderedByCreatedAt(): array
+    {
+        return $this->createQueryBuilder('f')
+            ->orderBy('f.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
     /** Converts a 1-based index into a 3-letter code: 1 => AAA, 2 => AAB, … 17576 => ZZZ */
     private static function codeForIndex(int $index): string
     {
