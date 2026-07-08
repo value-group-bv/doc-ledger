@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 0.12.1 (08 July 2026)
+
+- FIX: API authentication bug.
+
 ## Version 0.12.0 (08 July 2026)
 
 - Added API preparations in the Ledger app framework.

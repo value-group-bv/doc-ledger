@@ -145,7 +145,7 @@ class AdminController extends AbstractController
         $entity->setApiKey($plaintextKey);
         $this->em->flush();
 
-        $this->addFlash('success', "New API key for {$entity->getCode()}: {$plaintextKey} // copy it now, it won't be shown again.");
+        $this->addFlash('success', "New API key for {$entity->getCode()}: {$plaintextKey} - Copy it now, it won't be shown again.");
 
         return $this->redirectToRoute('admin_index');
     }
