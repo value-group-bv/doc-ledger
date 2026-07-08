@@ -30,6 +30,12 @@ class DocSubsidiary
     #[ORM\Column(options: ['default' => 0])]
     private int $sortOrder = 0;
 
+    #[ORM\Column(nullable: true)]
+    private ?string $apiKeyHash = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $apiKeyGeneratedAt = null;
+
     #[ORM\OneToMany(targetEntity: DocumentEntry::class, mappedBy: 'subsidiary')]
     private Collection $documentEntries;
 
@@ -45,6 +51,17 @@ class DocSubsidiary
     public function setDescription(string $description): static { $this->description = $description; return $this; }
     public function getSortOrder(): int { return $this->sortOrder; }
     public function setSortOrder(int $sortOrder): static { $this->sortOrder = $sortOrder; return $this; }
+
+    public function getApiKeyHash(): ?string { return $this->apiKeyHash; }
+    public function getApiKeyGeneratedAt(): ?\DateTimeImmutable { return $this->apiKeyGeneratedAt; }
+
+    public function setApiKey(string $plaintextKey): static
+    {
+        $this->apiKeyHash = password_hash($plaintextKey, PASSWORD_DEFAULT);
+        $this->apiKeyGeneratedAt = new \DateTimeImmutable();
+        return $this;
+    }
+
     public function getDocumentEntries(): Collection { return $this->documentEntries; }
 
     public function __toString(): string { return "{$this->code} — {$this->description}"; }

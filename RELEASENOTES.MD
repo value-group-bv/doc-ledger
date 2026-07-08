@@ -1,8 +1,10 @@
 # Release Notes
 
-## Version 0.12.0 (xx July 2026)
+## Version 0.12.0 (08 July 2026)
 
-- Updated styling on error pages in-line with login page updates
+- Added API preparations in the Ledger app framework.
+- Created an API for creating feasibility reference codes.
+- Updated styling on error pages in-line with login page updates.
 
 ## Version 0.11.2 (07 July 2026)
 
@@ -10,7 +12,7 @@
 - Updated styling on login page.
 - Updated abbreviations list.
 - Updated dependencies.
- 
+
 ## Version 0.11.1 (02 July 2026)
 
 - FIX: Superadmins could not edit entries created by 'regular' admins.

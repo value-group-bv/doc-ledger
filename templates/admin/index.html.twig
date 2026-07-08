@@ -38,6 +38,7 @@
                     <thead><tr class="border-border border-b text-muted-foreground text-xs">
                         <th class="pb-2 text-left">Code</th>
                         <th class="pb-2 text-left">Description</th>
+                        <th class="pb-2 text-left">API key</th>
                         <th></th>
                     </tr></thead>
                     <tbody class="divide-y divide-border">
@@ -45,14 +46,25 @@
                     <tr>
                         <td class="py-2 font-mono font-semibold">{{ s.code }}</td>
                         <td class="py-2">{{ s.description }}</td>
-                        <td class="py-2 text-right">
+                        <td class="py-2 text-muted-foreground text-xs">
+                            {% if s.apiKeyGeneratedAt %}
+                            Generated {{ s.apiKeyGeneratedAt|date('d M Y') }}
+                            {% else %}
+                            None yet
+                            {% endif %}
+                        </td>
+                        <td class="py-2 text-right whitespace-nowrap">
+                            <form method="post" action="{{ path('admin_subsidiary_apikey_generate', {id: s.id}) }}"
+                                onsubmit="return confirm('{{ s.apiKeyGeneratedAt ? 'Regenerate' : 'Generate' }} API key for {{ s.code }}? {{ s.apiKeyGeneratedAt ? 'The old key will stop working.' : '' }}')" class="inline">
+                                <button type="submit" class="mr-3 text-primary text-xs hover:underline">{{ s.apiKeyGeneratedAt ? 'Regenerate' : 'Generate' }} key</button>
+                            </form>
                             <form method="post" action="{{ path('admin_subsidiary_delete', {id: s.id}) }}"
-                                onsubmit="return confirm('Delete {{ s.code }}?')">
+                                onsubmit="return confirm('Delete {{ s.code }}?')" class="inline">
                                 <button type="submit" class="text-destructive text-xs hover:underline">Delete</button>
                             </form>
                         </td>
                     </tr>
-                    {% else %}<tr><td colspan="3" class="py-3 text-muted-foreground text-center">None yet.</td></tr>
+                    {% else %}<tr><td colspan="4" class="py-3 text-muted-foreground text-center">None yet.</td></tr>
                     {% endfor %}
                     </tbody>
                 </table>

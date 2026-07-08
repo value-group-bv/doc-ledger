@@ -13,6 +13,14 @@ security:
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
 
+        api:
+            pattern: ^/api
+            stateless: true
+            entry_point: App\Security\ApiKeyAuthenticator
+
+            custom_authenticators:
+                - App\Security\ApiKeyAuthenticator
+
         main:
             lazy: true
             provider: app_user_provider
@@ -32,6 +40,7 @@ security:
         - { path: ^/_error, roles: PUBLIC_ACCESS }
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/logout, roles: PUBLIC_ACCESS }
+        - { path: ^/api, roles: ROLE_API }
         - { path: ^/, roles: ROLE_USER }
 
 when@test:

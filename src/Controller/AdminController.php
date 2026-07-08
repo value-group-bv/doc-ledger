@@ -78,6 +78,23 @@ class AdminController extends AbstractController
         return $this->redirectToRoute('admin_index');
     }
 
+    #[Route('/subsidiary/{id}/apikey/generate', name: 'subsidiary_apikey_generate', methods: ['POST'])]
+    public function subsidiaryApiKeyGenerate(int $id): Response
+    {
+        $entity = $this->em->find(DocSubsidiary::class, $id);
+        if (!$entity) {
+            return $this->redirectToRoute('admin_index');
+        }
+
+        $plaintextKey = sprintf('fk_%s_%s', strtolower($entity->getCode()), bin2hex(random_bytes(24)));
+        $entity->setApiKey($plaintextKey);
+        $this->em->flush();
+
+        $this->addFlash('success', "New API key for {$entity->getCode()}: {$plaintextKey} // copy it now, it won't be shown again.");
+
+        return $this->redirectToRoute('admin_index');
+    }
+
     #[Route('/subsidiary/{id}/delete', name: 'subsidiary_delete', methods: ['POST'])]
     public function subsidiaryDelete(int $id): Response
     {
