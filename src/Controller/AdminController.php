@@ -472,6 +472,8 @@ class AdminController extends AbstractController
         foreach ($titleWords->findBy(['type' => $type]) as $existing) {
             $this->em->remove($existing);
         }
+        $this->em->flush();
+
         foreach ($words as $word) {
             $entity = new DocTitleWord();
             $entity->setWord($word)->setType($type);

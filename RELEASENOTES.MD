@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 0.13.1 (09 July 2026)
+
+- FIX: Bug fixed making saving capitalisation list impossible.
+
 ## Version 0.13.0 (09 July 2026)
 
 - Abbreviation capitalisation list is now on the `Admin` page rather than hardcoded in the backend.
