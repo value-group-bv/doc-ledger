@@ -5,11 +5,13 @@ namespace App\Controller;
 use App\Entity\DocMainCategory;
 use App\Entity\DocSubCategory;
 use App\Entity\DocSubsidiary;
+use App\Entity\DocTitleWord;
 use App\Entity\DocType;
 use App\Repository\DocMainCategoryRepository;
 use App\Repository\DocPredefinedNumberRepository;
 use App\Repository\DocSubCategoryRepository;
 use App\Repository\DocSubsidiaryRepository;
+use App\Repository\DocTitleWordRepository;
 use App\Repository\DocTypeRepository;
 use App\Repository\FeasibilityCodeRepository;
 use App\Repository\UserRepository;
@@ -39,6 +41,7 @@ class AdminController extends AbstractController
         DocPredefinedNumberRepository $predefined,
         UserRepository $users,
         FeasibilityCodeRepository $feasibilityCodes,
+        DocTitleWordRepository $titleWords,
     ): Response {
         return $this->render('admin/index.html.twig', [
             'subsidiaries' => $subsidiaries->findBy([], ['sortOrder' => 'ASC']),
@@ -48,6 +51,8 @@ class AdminController extends AbstractController
             'predefinedNumbers' => $predefined->findBy([], ['subCategory' => 'ASC', 'code' => 'ASC']),
             'users' => $users->findBy([], ['createdAt' => 'DESC']),
             'recentFeasibilityCodes' => $feasibilityCodes->findRecent(10),
+            'minorWords' => $titleWords->findBy(['type' => DocTitleWord::TYPE_MINOR], ['word' => 'ASC']),
+            'uppercaseWords' => $titleWords->findBy(['type' => DocTitleWord::TYPE_UPPERCASE], ['word' => 'ASC']),
             'editSubcatId' => (int) $request->query->get('editSubcat', 0),
             'editFeasibilityCodeId' => (int) $request->query->get('editFeasibilityCode', 0),
         ]);
@@ -435,6 +440,50 @@ class AdminController extends AbstractController
             $this->em->flush();
             $this->addFlash('success', 'Predefined number deleted.');
         }
+        return $this->redirectToRoute('admin_index');
+    }
+
+    // ── Title casing words ───────────────────────────────────────────────────
+
+    #[Route('/title-words/update', name: 'title_words_update', methods: ['POST'])]
+    public function titleWordsUpdate(Request $request, DocTitleWordRepository $titleWords): Response
+    {
+        $type = $request->request->get('type');
+        if (!\in_array($type, [DocTitleWord::TYPE_MINOR, DocTitleWord::TYPE_UPPERCASE], true)) {
+            $this->addFlash('error', 'Invalid word list.');
+            return $this->redirectToRoute('admin_index');
+        }
+
+        $otherType = $type === DocTitleWord::TYPE_MINOR ? DocTitleWord::TYPE_UPPERCASE : DocTitleWord::TYPE_MINOR;
+        $otherWords = $titleWords->findWordsByType($otherType);
+
+        $words = [];
+        foreach (explode(',', (string) $request->request->get('words', '')) as $word) {
+            $word = strtolower(trim($word));
+            if ($word !== '' && preg_match('/^[a-z0-9]{1,30}$/', $word)) {
+                $words[$word] = true;
+            }
+        }
+        $words = array_keys($words);
+
+        $skipped = array_intersect($words, $otherWords);
+        $words = array_diff($words, $otherWords);
+
+        foreach ($titleWords->findBy(['type' => $type]) as $existing) {
+            $this->em->remove($existing);
+        }
+        foreach ($words as $word) {
+            $entity = new DocTitleWord();
+            $entity->setWord($word)->setType($type);
+            $this->em->persist($entity);
+        }
+        $this->em->flush();
+
+        if ($skipped) {
+            $this->addFlash('error', 'Skipped (already used in the other list): ' . implode(', ', $skipped));
+        }
+        $this->addFlash('success', 'Word list updated.');
+
         return $this->redirectToRoute('admin_index');
     }
 

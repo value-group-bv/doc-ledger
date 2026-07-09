@@ -67,6 +67,16 @@ class FeasibilityCodeRepository extends ServiceEntityRepository
         throw new \RuntimeException('Feasibility reference code pool (AAA–ZZZ) is exhausted.');
     }
 
+    /** Most recently created feasibility code across all subsidiaries, or null if none exist yet. */
+    public function findLatest(): ?FeasibilityCode
+    {
+        return $this->createQueryBuilder('f')
+            ->orderBy('f.createdAt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     /** @return FeasibilityCode[] */
     public function findRecent(int $limit): array
     {

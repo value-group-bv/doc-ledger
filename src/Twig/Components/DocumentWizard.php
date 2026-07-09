@@ -14,6 +14,7 @@ use App\Repository\DocSubCategoryRepository;
 use App\Repository\DocSubsidiaryRepository;
 use App\Repository\DocTypeRepository;
 use App\Repository\DocumentEntryRepository;
+use App\Service\TitleCaseFormatter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
@@ -72,6 +73,7 @@ class DocumentWizard
         private readonly DocumentEntryRepository $entries,
         private readonly EntityManagerInterface $em,
         private readonly Security $security,
+        private readonly TitleCaseFormatter $titleCaseFormatter,
     ) {}
 
     /** @return DocSubsidiary[] */
@@ -190,7 +192,7 @@ class DocumentWizard
         $entry->setSubCategory($subCategory);
         $entry->setDocNumber($docNumber);
         $entry->setRevision('00');
-        $entry->setTitle($this->title);
+        $entry->setTitle($this->titleCaseFormatter->format($this->title));
         $entry->setComments($this->comments ?: null);
         $entry->setCreatedBy($this->security->getUser());
 

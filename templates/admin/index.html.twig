@@ -179,6 +179,39 @@
             </twig:Card:Content>
         </twig:Card>
 
+        {# ── Title casing words ───────────────────────────────────────────────── #}
+        <twig:Card>
+            <twig:Card:Header>
+                <twig:Card:Title>Lowercased</twig:Card:Title>
+                <twig:Card:Description>Kept lowercase unless first or last word. Note that entries need to be edited before changes take effect</twig:Card:Description>
+            </twig:Card:Header>
+            <twig:Card:Content>
+                <form method="post" action="{{ path('admin_title_words_update') }}" class="flex flex-col gap-2">
+                    <input type="hidden" name="type" value="minor" />
+                    <textarea name="words" rows="4"
+                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full text-sm transition-[color,box-shadow]"
+                        >{{ minorWords|map(w => w.word)|join(', ') }}</textarea>
+                    <button type="submit" class="inline-flex items-center self-end bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Save</button>
+                </form>
+            </twig:Card:Content>
+        </twig:Card>
+
+        <twig:Card>
+            <twig:Card:Header>
+                <twig:Card:Title>Uppercased</twig:Card:Title>
+                <twig:Card:Description>Always fully capitalised. Note that entries need to be edited before changes take effect</twig:Card:Description>
+            </twig:Card:Header>
+            <twig:Card:Content>
+                <form method="post" action="{{ path('admin_title_words_update') }}" class="flex flex-col gap-2">
+                    <input type="hidden" name="type" value="uppercase" />
+                    <textarea name="words" rows="4"
+                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full text-sm transition-[color,box-shadow]"
+                        >{{ uppercaseWords|map(w => w.word)|join(', ') }}</textarea>
+                    <button type="submit" class="inline-flex items-center self-end bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Save</button>
+                </form>
+            </twig:Card:Content>
+        </twig:Card>
+
         {# ── Sub categories ───────────────────────────────────────────────────── #}
         <twig:Card class="xl:col-span-2">
             <twig:Card:Header>
@@ -365,7 +398,7 @@
                     <thead><tr class="border-border border-b text-muted-foreground text-xs">
                         <th class="pb-2 text-left">Code</th>
                         <th class="pb-2 text-left">Title</th>
-                        <th class="pb-2 text-left">Requestor</th>
+                        <th class="hidden sm:table-cell pb-2 text-left">Requestor</th>
                         <th class="pb-2 text-left">Subsidiary</th>
                         <th class="pb-2 text-left">Created</th>
                         <th></th>
@@ -382,7 +415,7 @@
                             <input name="title" value="{{ fc.title }}" form="fc-edit-{{ fc.id }}"
                                 class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-8 text-sm transition-[color,box-shadow]" />
                         </td>
-                        <td class="py-1">{{ fc.requestor }}</td>
+                        <td class="hidden sm:table-cell py-1">{{ fc.requestor }}</td>
                         <td class="py-1 font-mono text-muted-foreground">{{ fc.subsidiary.code }}</td>
                         <td class="py-1 text-muted-foreground text-xs">{{ fc.createdAt|date('d M Y H:i') }}</td>
                         <td class="py-1 text-right whitespace-nowrap">
@@ -394,7 +427,7 @@
                     <tr>
                         <td class="py-2 font-mono font-semibold">{{ fc.code }}</td>
                         <td class="py-2">{{ fc.title }}</td>
-                        <td class="py-2">{{ fc.requestor }}</td>
+                        <td class="hidden sm:table-cell py-2">{{ fc.requestor }}</td>
                         <td class="py-2 font-mono text-muted-foreground">{{ fc.subsidiary.code }}</td>
                         <td class="py-2 text-muted-foreground text-xs">{{ fc.createdAt|date('d M Y H:i') }}</td>
                         <td class="py-2 text-right whitespace-nowrap">

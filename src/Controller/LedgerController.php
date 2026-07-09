@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Form\DocumentEntryType;
 use App\Repository\DocumentEntryRepository;
+use App\Service\TitleCaseFormatter;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -94,7 +95,7 @@ class LedgerController extends AbstractController
 
     #[IsGranted('ROLE_ADMIN')]
     #[Route('/ledger/{id}/edit', name: 'ledger_edit')]
-    public function edit(Uuid $id, Request $request): Response
+    public function edit(Uuid $id, Request $request, TitleCaseFormatter $titleCaseFormatter): Response
     {
         $entry = $this->entries->find($id);
         if (!$entry) throw $this->createNotFoundException();
@@ -106,6 +107,7 @@ class LedgerController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entry->setReferenceCode($entry->getMainCategory()->getReferenceCode());
+            $entry->setTitle($titleCaseFormatter->format($entry->getTitle()));
             $this->em->flush();
             $this->addFlash('success', "Entry updated: {$entry->getDocumentId()}");
             return $this->redirectToRoute('ledger_index');

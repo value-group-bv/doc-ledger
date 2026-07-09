@@ -39,4 +39,22 @@ class FeasibilityCodeController extends AbstractController
             'createdAt' => $entry->getCreatedAt()->format(DATE_ATOM),
         ], 201);
     }
+
+    #[Route('/latest', name: 'latest', methods: ['GET'])]
+    public function latest(FeasibilityCodeRepository $feasibilityCodes): JsonResponse
+    {
+        $entry = $feasibilityCodes->findLatest();
+
+        if (!$entry) {
+            return $this->json(['error' => 'No feasibility codes have been created yet.'], 404);
+        }
+
+        return $this->json([
+            'code' => $entry->getCode(),
+            'title' => $entry->getTitle(),
+            'requestor' => $entry->getRequestor(),
+            'subsidiary' => $entry->getSubsidiary()->getCode(),
+            'createdAt' => $entry->getCreatedAt()->format(DATE_ATOM),
+        ]);
+    }
 }
