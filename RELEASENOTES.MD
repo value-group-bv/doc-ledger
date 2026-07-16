@@ -1,5 +1,12 @@
 # Release Notes
 
+## Version 1.0.0 (16 July 2026)
+
+- Bumped to first major release version! Jippieee 😁.
+- Added simple audit log for superadmins to monitor events.
+- Small styling updates on `Guide` page.
+- Small routing update for `Admin` page.
+
 ## Version 0.13.1 (09 July 2026)
 
 - FIX: Bug fixed making saving capitalisation list impossible.

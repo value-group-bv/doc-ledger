@@ -4,6 +4,7 @@ namespace App\Security;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Service\AuditLogger;
 use Doctrine\ORM\EntityManagerInterface;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Security\Authenticator\OAuth2Authenticator;
@@ -28,7 +29,8 @@ class AzureAuthenticator extends OAuth2Authenticator implements AuthenticationEn
         private readonly EntityManagerInterface $em,
         private readonly UserRepository $users,
         private readonly RouterInterface $router,
-        private readonly RequestStack $requestStack
+        private readonly RequestStack $requestStack,
+        private readonly AuditLogger $auditLogger,
     ) {}
 
     public function supports(Request $request): ?bool
@@ -81,6 +83,11 @@ class AzureAuthenticator extends OAuth2Authenticator implements AuthenticationEn
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
+        $user = $token->getUser();
+        if ($user instanceof User) {
+            $this->auditLogger->log($user->getEmail(), 'auth.login', 'Signed in');
+        }
+
         return new RedirectResponse($this->router->generate('ledger_index'));
     }
 

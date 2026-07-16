@@ -7,6 +7,7 @@ use App\Entity\DocSubCategory;
 use App\Entity\DocSubsidiary;
 use App\Entity\DocTitleWord;
 use App\Entity\DocType;
+use App\Entity\User;
 use App\Repository\DocMainCategoryRepository;
 use App\Repository\DocPredefinedNumberRepository;
 use App\Repository\DocSubCategoryRepository;
@@ -15,6 +16,7 @@ use App\Repository\DocTitleWordRepository;
 use App\Repository\DocTypeRepository;
 use App\Repository\FeasibilityCodeRepository;
 use App\Repository\UserRepository;
+use App\Service\AuditLogger;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -29,9 +31,12 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/admin', name: 'admin_')]
 class AdminController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $em) {}
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly AuditLogger $auditLogger,
+    ) {}
 
-    #[Route('/', name: 'index')]
+    #[Route('', name: 'index')]
     public function index(
         Request $request,
         DocSubsidiaryRepository $subsidiaries,
@@ -469,6 +474,8 @@ class AdminController extends AbstractController
         $skipped = array_intersect($words, $otherWords);
         $words = array_diff($words, $otherWords);
 
+        $previousWords = $titleWords->findWordsByType($type);
+
         foreach ($titleWords->findBy(['type' => $type]) as $existing) {
             $this->em->remove($existing);
         }
@@ -480,6 +487,22 @@ class AdminController extends AbstractController
             $this->em->persist($entity);
         }
         $this->em->flush();
+
+        $added = array_diff($words, $previousWords);
+        $removed = array_diff($previousWords, $words);
+        if ($added || $removed) {
+            $detail = "Updated {$type} title words";
+            if ($added) {
+                $detail .= ' (+' . implode(', ', $added) . ')';
+            }
+            if ($removed) {
+                $detail .= ' (-' . implode(', ', $removed) . ')';
+            }
+            $user = $this->getUser();
+            if ($user instanceof User) {
+                $this->auditLogger->log($user->getEmail(), 'setting.updated', $detail);
+            }
+        }
 
         if ($skipped) {
             $this->addFlash('error', 'Skipped (already used in the other list): ' . implode(', ', $skipped));

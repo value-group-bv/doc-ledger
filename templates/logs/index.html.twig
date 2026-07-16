@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% set page_title = 'Audit Log' %}
+{% set page_header = true %}
+
+{% block body %}
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="font-heading font-bold text-foreground text-3xl">Audit Log</h1>
+            <p class="mt-1 text-muted-foreground">Ledger changes, setting changes, logins and API calls</p>
+        </div>
+    </div>
+
+    <twig:Card>
+        <twig:Card:Header>
+            <form method="get" class="flex items-center gap-2">
+                <label for="event-filter" class="text-muted-foreground text-sm">Event</label>
+                <select id="event-filter" name="event" onchange="this.form.submit()"
+                    class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-8 font-mono text-xs transition-[color,box-shadow]">
+                    <option value="">All events</option>
+                    {% for event in events %}
+                    <option value="{{ event }}" {% if selectedEvent == event %}selected{% endif %}>{{ event }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </twig:Card:Header>
+        <twig:Card:Content>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-primary/10 border-border border-b">
+                        <tr>
+                            <th class="px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">Date/time</th>
+                            <th class="px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">User</th>
+                            <th class="px-4 py-3 font-medium text-muted-foreground text-left whitespace-nowrap">Event</th>
+                            <th class="px-4 py-3 font-medium text-muted-foreground text-left">Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border">
+                        {% for entry in entries %}
+                        <tr>
+                            <td class="px-4 py-3 text-muted-foreground text-xs whitespace-nowrap">{{ entry.createdAt|date('Y-m-d H:i:s') }}</td>
+                            <td class="px-4 py-3 whitespace-nowrap">{{ entry.actor }}</td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <twig:Badge variant="secondary" class="font-mono text-xs">{{ entry.event }}</twig:Badge>
+                            </td>
+                            <td class="px-4 py-3 text-muted-foreground">{{ entry.detail }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="px-4 py-6 text-muted-foreground text-center">No audit log entries yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if totalPages > 1 %}
+            <div class="flex justify-between items-center mt-4 text-muted-foreground text-sm">
+                <span>Page {{ page }} of {{ totalPages }}</span>
+                <div class="flex gap-2">
+                    {% if page > 1 %}
+                    <a href="{{ path('logs_index', {event: selectedEvent, page: page - 1}) }}" class="hover:text-foreground underline">Previous</a>
+                    {% endif %}
+                    {% if page < totalPages %}
+                    <a href="{{ path('logs_index', {event: selectedEvent, page: page + 1}) }}" class="hover:text-foreground underline">Next</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </twig:Card:Content>
+    </twig:Card>
+{% endblock %}
