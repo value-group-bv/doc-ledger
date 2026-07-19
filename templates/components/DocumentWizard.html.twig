@@ -109,11 +109,16 @@
             <p class="text-muted-foreground text-sm">No pre-defined numbers for this sub category. Next available: <strong>{{ "%03d"|format(this.suggestedDocNumber) }}</strong></p>
             {% endif %}
             {% else %}
+            {% set hasValue = manualDocNumber|default('')|length > 0 %}
+            {% set isInvalid = hasValue and (manualDocNumber < '0' or manualDocNumber > '999') %}
             <input type="number" data-model="manualDocNumber"
                 data-action="input->live#update:debounce(300ms)"
                 value="{{ manualDocNumber }}"
                 min="0" max="999" placeholder="{{ "%03d"|format(this.suggestedDocNumber) }} (next available)"
-                class="flex bg-background px-3 py-2 border border-input rounded-md shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-10 font-mono text-sm" />
+                class="flex bg-background px-3 py-2 border {% if isInvalid %}border-destructive{% else %}border-input{% endif %} rounded-md shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-10 font-mono text-sm" />
+            {% if isInvalid %}
+            <p class="text-destructive text-sm">Document number must be between 0 and 999</p>
+            {% endif %}
             {% endif %}
         </div>
         {% endif %}
@@ -151,9 +156,11 @@
         {% endif %}
 
         {# Submit #}
+        {% set manualHasValue = manualDocNumber|default('')|length > 0 %}
+        {% set docNumInvalid = docNumberMode == 1 and manualHasValue and (manualDocNumber < '0' or manualDocNumber > '999') %}
         <button type="button"
             data-action="live#action" data-live-action-param="save"
-            {% if not subsidiaryId or not mainCategoryId or not docTypeId or not subCategoryId or not title %}
+            {% if not subsidiaryId or not mainCategoryId or not docTypeId or not subCategoryId or not title or docNumInvalid %}
             disabled
             {% endif %}
             class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 mt-2 px-6 rounded-md h-10 font-medium text-primary-foreground text-sm transition-colors disabled:cursor-not-allowed">

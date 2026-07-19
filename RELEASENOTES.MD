@@ -1,5 +1,10 @@
 # Release Notes
 
+
+## Version 1.0.1 (19 July 2026)
+
+- FIX: Bug on document number validation upon creating new ledger entry.
+
 ## Version 1.0.0 (16 July 2026)
 
 - Bumped to first major release version! Jippieee 😁.

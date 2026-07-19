@@ -179,6 +179,10 @@ class DocumentWizard
         if (!$subsidiary || !$mainCategory || !$docType || !$subCategory) return;
 
         $docNumber = $this->resolvedDocNumber();
+        if ($docNumber < 0 || $docNumber > 999) {
+            $this->duplicateError = 'Document number must be between 0 and 999.';
+            return;
+        }
         if ($this->entries->isDuplicate($this->subsidiaryId, $this->mainCategoryId, $this->docTypeId, $this->subCategoryId, $docNumber, '00')) {
             $this->duplicateError = 'This document ID already exists in the ledger.';
             return;
