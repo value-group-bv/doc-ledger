@@ -1,5 +1,11 @@
 # Release Notes
 
+## Version 1.0.2 (31 July 2026)
+
+- FIX: Bug on login resulting in invalid callback parameter error.
+- Small styling update on `Logs` page.
+- Small styling update on `Ledger` page table header colours.
+- Updated external dependencies.
 
 ## Version 1.0.1 (19 July 2026)
 
