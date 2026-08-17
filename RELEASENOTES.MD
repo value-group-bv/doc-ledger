@@ -1,5 +1,10 @@
 # Release Notes
 
+## Version 1.0.3 (17 August 2026)
+
+- Updated text for Microsoft button on `Login` page
+- Updated dependencies
+
 ## Version 1.0.2 (31 July 2026)
 
 - FIX: Bug on login resulting in invalid callback parameter error.
