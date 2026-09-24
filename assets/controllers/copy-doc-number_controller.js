@@ -1,36 +1,33 @@
 import { Controller } from '@hotwired/stimulus';
+import { buildDocId } from './doc-id-override_controller.js';
 
 export default class extends Controller {
-    static targets = ['button'];
-
-    connect() {
-        this.buttonTargets.forEach(button => {
-            button.dataset.originalText = button.textContent;
-            button.dataset.originalStyle = button.style.cssText;
-            button.addEventListener('click', this.copyToClipboard.bind(this));
-        });
-    }
-
-    async copyToClipboard(event) {
-        const button = event.currentTarget;
-        const docNumber = button.getAttribute('data-copy-doc-number');
+    async copy() {
+        const button = this.element;
+        const docId = buildDocId(button, { withRevision: true });
 
         try {
-            await navigator.clipboard.writeText(docNumber);
+            await navigator.clipboard.writeText(docId);
 
             // Visual feedback
-            clearTimeout(button._copyResetTimeout);
+            clearTimeout(this.resetTimeout);
 
+            button.docIdCopied = true;
             button.textContent = '✓ Copied';
             button.style.opacity = '1';
 
-            button._copyResetTimeout = setTimeout(() => {
-                button.textContent = button.dataset.originalText;
-                button.style.cssText = button.dataset.originalStyle;
+            this.resetTimeout = setTimeout(() => {
+                button.docIdCopied = false;
+                button.textContent = buildDocId(button, { withRevision: false });
+                button.style.removeProperty('opacity');
             }, 2000);
         } catch (err) {
             console.error('Failed to copy:', err);
             alert('Failed to copy to clipboard');
         }
+    }
+
+    disconnect() {
+        clearTimeout(this.resetTimeout);
     }
 }

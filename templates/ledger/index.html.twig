@@ -10,10 +10,36 @@
             }
         }
     </style>
-    <div class="flex justify-between items-center mb-6">
+    <div data-controller="doc-id-override">
+    <div class="flex sm:flex-row flex-col sm:justify-between sm:items-end gap-4 mb-6">
         <div>
             <h1 class="font-heading font-bold text-foreground text-3xl">Ledger</h1>
             <p class="mt-1 text-muted-foreground">All registered document IDs</p>
+        </div>
+
+        {# Temporary override of reference code / revision in displayed and copied IDs (not saved) #}
+        <div class="flex items-end gap-2">
+            <div>
+                <label for="doc-id-override-ref" class="block mb-1 text-muted-foreground text-xs">Reference code</label>
+                <input type="text" id="doc-id-override-ref" maxlength="3" placeholder="000 / AAA"
+                    autocomplete="off" spellcheck="false"
+                    data-doc-id-override-target="ref" data-action="input->doc-id-override#update"
+                    title="3 digits (001) or 3 letters (AAA, PRO)"
+                    class="flex bg-background shadow-xs px-3 py-2 border border-input aria-invalid:border-destructive focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-28 h-9 font-mono placeholder:font-sans placeholder:text-muted-foreground text-sm uppercase placeholder:normal-case transition-[color,box-shadow]" />
+            </div>
+            <div>
+                <label for="doc-id-override-rev" class="block mb-1 text-muted-foreground text-xs">Revision</label>
+                <input type="text" id="doc-id-override-rev" maxlength="2" placeholder="00 / 0A"
+                    autocomplete="off" spellcheck="false"
+                    data-doc-id-override-target="rev" data-action="input->doc-id-override#update"
+                    title="Final release (00, 01) or interim version (0A, 1F)"
+                    class="flex bg-background shadow-xs px-3 py-2 border border-input aria-invalid:border-destructive focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-24 h-9 font-mono placeholder:font-sans placeholder:text-muted-foreground text-sm uppercase placeholder:normal-case transition-[color,box-shadow]" />
+            </div>
+            <button type="button" hidden data-doc-id-override-target="clear" data-action="doc-id-override#clear"
+                class="inline-flex justify-center items-center hover:bg-muted border border-border rounded-md size-9 text-muted-foreground hover:text-foreground transition-colors"
+                title="Clear override">
+                <twig:ux:icon name="material-symbols:close" class="size-4" />
+            </button>
         </div>
     </div>
 
@@ -29,5 +55,6 @@
             <twig:LedgerTable />
         </twig:Card:Content>
     </twig:Card>
+    </div>
 </div>
 {% endblock %}

@@ -36,7 +36,12 @@
             {{ form_row(form.subCategory) }}
         </div>
         {{ form_row(form.docNumber) }}
-        {{ form_row(form.title) }}
+        <div class="gap-2 grid">
+            {{ form_label(form.title) }}
+            {{ form_widget(form.title) }}
+            <p class="text-muted-foreground text-xs">Only alphanumeric characters (A-Z, a-z, 0-9) and spaces are allowed, max. 48 characters</p>
+            {{ form_errors(form.title) }}
+        </div>
         {{ form_row(form.comments) }}
 
         <div class="flex gap-3 pt-2">
@@ -60,7 +65,7 @@
                 onsubmit="return confirm('Delete {{ entry.documentId }}? This cannot be undone.')">
                 <input type="hidden" name="_token" value="{{ csrf_token('delete_entry_' ~ entry.id) }}">
                 <button type="submit"
-                    class="inline-flex items-center gap-2 border border-destructive text-destructive hover:bg-destructive/10 px-4 rounded-md h-9 font-medium text-sm transition-colors">
+                    class="inline-flex items-center gap-2 hover:bg-destructive/10 px-4 border border-destructive rounded-md h-9 font-medium text-destructive text-sm transition-colors">
                     <twig:ux:icon name="material-symbols:delete-outline" class="size-4" />
                     Delete entry
                 </button>

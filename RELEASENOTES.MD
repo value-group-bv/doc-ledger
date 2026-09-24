@@ -1,9 +1,15 @@
 # Release Notes
 
+## Version 1.1.0 (24 September 2026)
+
+- Added generic field for user to fill in project code and revision number. This code is then displayed on document identifiers.
+- Improved clarity on `Add` and `Edit` entry pages on allowable characters in document title.
+- Updated dependencies
+
 ## Version 1.0.3 (17 August 2026)
 
-- Updated text for Microsoft button on `Login` page
-- Updated dependencies
+- Updated text for Microsoft button on `Login` page.
+- Updated dependencies.
 
 ## Version 1.0.2 (31 July 2026)
 

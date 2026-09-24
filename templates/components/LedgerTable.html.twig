@@ -193,17 +193,24 @@
             <tbody class="divide-y divide-border">
                 {% for entry in entries %}
                 <tr class="hover:bg-muted transition-colors">
-                    <td class="px-4 py-3" data-controller="copy-doc-number">
-                        <button type="button" data-copy-doc-number-target="button"
-                            data-copy-doc-number="{{ entry.getDocumentId() }}"
+                    <td class="px-4 py-3">
+                        <button type="button" data-controller="copy-doc-number"
+                            data-action="copy-doc-number#copy"
+                            data-doc-id-head="{{ entry.subsidiary.code }}{{ entry.mainCategory.code }}"
+                            data-doc-id-ref="{{ entry.referenceCode }}"
+                            data-doc-id-tail="{{ entry.docType.code }}-{{ entry.subCategory.formattedCode }}-{{ '%03d'|format(entry.docNumber) }}"
+                            data-doc-id-rev="{{ entry.revision }}"
                             class="hover:opacity-80 px-2 py-0.5 border rounded font-[450] font-mono text-[13px] whitespace-nowrap transition-opacity cursor-pointer"
                             style="{{ subsidiary_doc_number_style(entry.subsidiary.code) }}"
                             title="Click to copy document ID">
                             {{ entry.documentIdBase }}
                         </button>
                     </td>
-                    <td class="px-4 py-3 max-w-xs font-medium text-foreground truncate">
-                        {{ entry.title }}
+                    <td class="px-4 py-3 max-w-xs font-medium text-foreground">
+                        <button type="button" data-controller="copy-text" data-action="copy-text#copy"
+                            data-copy-text-text-value="{{ entry.title }}"
+                            class="block hover:opacity-80 w-full text-left truncate transition-opacity cursor-pointer"
+                            title="Click to copy title">{{ entry.title }}</button>
                     </td>
                     <td class="sm:table-cell px-4 py-3 text-muted-foreground text-xs" style="display: none;">
                         {{ entry.subsidiary.code }}
