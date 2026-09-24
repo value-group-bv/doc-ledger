@@ -8,7 +8,7 @@
 
 - Added generic field for user to fill in project code and revision number. This code is then displayed on document identifiers.
 - Improved clarity on `New` and `Edit` entry pages on allowable characters in document title.
-- Updated dependencies
+- Updated dependencies.
 
 ## Version 1.0.3 (17 August 2026)
 
