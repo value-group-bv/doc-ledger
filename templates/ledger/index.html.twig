@@ -4,11 +4,6 @@
 
 {% block body %}
     <style>
-        @media (min-width: 640px) {
-            td[style*="display: none"] {
-                display: table-cell !important;
-            }
-        }
         /* Dim entries that aren't valid under the main category override */
         {% for mc in mainCategories %}
         [data-doc-id-override-main-value="{{ mc.code }}"] tbody tr:has([data-doc-id-mains]:not([data-doc-id-mains~="{{ mc.code }}"])) {

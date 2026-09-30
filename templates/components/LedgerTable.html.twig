@@ -219,14 +219,14 @@
                             class="block hover:opacity-80 w-full text-left truncate transition-opacity cursor-pointer"
                             title="Click to copy title">{{ entry.title }}</button>
                     </td>
-                    <td class="sm:table-cell px-4 py-3 text-muted-foreground text-xs" style="display: none;">
+                    <td class="hidden sm:table-cell px-4 py-3 text-muted-foreground text-xs">
                         {{ entry.subsidiary.code }}
                     </td>
-                    <td class="sm:table-cell px-4 py-3" style="display: none;">
+                    <td class="hidden sm:table-cell px-4 py-3">
                         <twig:Badge style="{{ doc_type_badge_style(entry.docType.code) }}">{{ entry.docType.code }}
                         </twig:Badge>
                     </td>
-                    <td class="sm:table-cell px-4 py-3 text-muted-foreground text-xs" style="display: none;">
+                    <td class="hidden sm:table-cell px-4 py-3 text-muted-foreground text-xs">
                         {{ entry.mainCategory.code }} - {{ entry.mainCategory.description }}
                         {% if entry.alternateMainCategories is not empty %}
                         <span class="block text-muted-foreground/70" title="Also valid under these main categories">
@@ -234,10 +234,10 @@
                         </span>
                         {% endif %}
                     </td>
-                    <td class="sm:table-cell px-4 py-3 text-muted-foreground text-xs" style="display: none;">
+                    <td class="hidden sm:table-cell px-4 py-3 text-muted-foreground text-xs">
                         {{ entry.subCategory.formattedCode }} - {{ entry.subCategory.description }}
                     </td>
-                    <td class="sm:table-cell px-4 py-3 font-mono text-muted-foreground text-xs" style="display: none;">
+                    <td class="hidden sm:table-cell px-4 py-3 font-mono text-muted-foreground text-xs">
                         {{ '%03d'|format(entry.docNumber) }}
                     </td>
                     {% if is_granted('ROLE_ADMIN') %}
