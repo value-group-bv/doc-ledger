@@ -20,12 +20,14 @@
         </div>
 
         {# Project view: temporary override of main category / reference code / revision in displayed and copied IDs (not saved) #}
-        <div class="bg-card group-data-[override-active=true]/override:bg-primary/5 p-3 border border-border group-data-[override-active=true]/override:border-primary/40 rounded-lg transition-colors">
-            <p class="flex items-center gap-1.5 mb-2 font-medium text-foreground text-xs">
-                <twig:ux:icon name="material-symbols:visibility-outline" class="size-4 text-muted-foreground" />
-                Project view
-                <span class="font-normal text-muted-foreground">- shows and copies IDs for one project, nothing is saved</span>
-            </p>
+        <div class="flex sm:flex-row flex-col sm:items-center gap-3 bg-card group-data-[override-active=true]/override:bg-primary/5 px-3 py-2.5 border border-border group-data-[override-active=true]/override:border-primary/40 rounded-lg transition-colors">
+            <div class="sm:pr-3 sm:border-border sm:border-r sm:max-w-32 text-xs">
+                <p class="flex items-center gap-1.5 font-medium text-foreground">
+                    <twig:ux:icon name="material-symbols:visibility-outline" class="size-4 text-muted-foreground shrink-0" />
+                    Project view
+                </p>
+                <p class="mt-0.5 text-muted-foreground">Modifies IDs for your project</p>
+            </div>
             <div class="flex flex-wrap items-end gap-2">
                 <div>
                     <label for="doc-id-override-main" class="block mb-1 text-muted-foreground text-xs">Main category</label>
