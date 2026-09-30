@@ -16,49 +16,63 @@
         }
         {% endfor %}
     </style>
-    <div data-controller="doc-id-override" data-doc-id-override-refs-value="{{ referenceCodePlaceholders }}">
+    <div data-controller="doc-id-override" data-doc-id-override-refs-value="{{ referenceCodePlaceholders }}"
+        data-override-active="false" class="group/override">
     <div class="flex sm:flex-row flex-col sm:justify-between sm:items-end gap-4 mb-6">
         <div>
             <h1 class="font-heading font-bold text-foreground text-3xl">Ledger</h1>
             <p class="mt-1 text-muted-foreground">All registered document IDs</p>
         </div>
 
-        {# Temporary override of main category / reference code / revision in displayed and copied IDs (not saved) #}
-        <div class="flex items-end gap-2">
-            <div>
-                <label for="doc-id-override-main" class="block mb-1 text-muted-foreground text-xs">Main category</label>
-                <twig:Select id="doc-id-override-main"
-                    data-doc-id-override-target="main" data-action="change->doc-id-override#update"
-                    title="Show entries that are also valid under this main category with it; other entries are dimmed"
-                    class="w-28 h-9 font-mono">
-                    <option value="">-</option>
-                    {% for mc in mainCategories %}
-                    <option value="{{ mc.code }}">{{ mc.code }}</option>
-                    {% endfor %}
-                </twig:Select>
+        {# Project view: temporary override of main category / reference code / revision in displayed and copied IDs (not saved) #}
+        <div class="bg-card group-data-[override-active=true]/override:bg-primary/5 p-3 border border-border group-data-[override-active=true]/override:border-primary/40 rounded-lg transition-colors">
+            <p class="flex items-center gap-1.5 mb-2 font-medium text-foreground text-xs">
+                <twig:ux:icon name="material-symbols:visibility-outline" class="size-4 text-muted-foreground" />
+                Project view
+                <span class="font-normal text-muted-foreground">- shows and copies IDs for one project, nothing is saved</span>
+            </p>
+            <div class="flex flex-wrap items-end gap-2">
+                <div>
+                    <label for="doc-id-override-main" class="block mb-1 text-muted-foreground text-xs">Main category</label>
+                    <twig:Select id="doc-id-override-main"
+                        data-doc-id-override-target="main" data-action="change->doc-id-override#update"
+                        title="Show entries that are also valid under this main category with it; other entries are dimmed"
+                        class="w-28 h-9 font-mono">
+                        <option value="">-</option>
+                        {% for mc in mainCategories %}
+                        <option value="{{ mc.code }}">{{ mc.code }}</option>
+                        {% endfor %}
+                    </twig:Select>
+                </div>
+                <div>
+                    <label for="doc-id-override-ref" class="block mb-1 text-muted-foreground text-xs">Reference code</label>
+                    <twig:Input type="text" id="doc-id-override-ref" maxlength="3" placeholder="000 / AAA"
+                        autocomplete="off" spellcheck="false"
+                        data-doc-id-override-target="ref" data-action="input->doc-id-override#update"
+                        title="3 digits (001) or 3 letters (AAA, PRO)"
+                        class="aria-invalid:border-destructive w-28 h-9 placeholder:font-sans font-mono uppercase placeholder:normal-case" />
+                </div>
+                <div>
+                    <label for="doc-id-override-rev" class="block mb-1 text-muted-foreground text-xs">Revision</label>
+                    <twig:Input type="text" id="doc-id-override-rev" maxlength="2" placeholder="00 / 0A"
+                        autocomplete="off" spellcheck="false"
+                        data-doc-id-override-target="rev" data-action="input->doc-id-override#update"
+                        title="Final release (00, 01) or interim version (0A, 1F)"
+                        class="aria-invalid:border-destructive w-24 h-9 placeholder:font-sans font-mono uppercase placeholder:normal-case" />
+                </div>
+                <button type="button" hidden data-doc-id-override-target="clear" data-action="doc-id-override#clear"
+                    class="inline-flex justify-center items-center hover:bg-muted border border-border rounded-md size-9 text-muted-foreground hover:text-foreground transition-colors"
+                    title="Clear override">
+                    <twig:ux:icon name="material-symbols:close" class="size-4" />
+                </button>
             </div>
-            <div>
-                <label for="doc-id-override-ref" class="block mb-1 text-muted-foreground text-xs">Reference code</label>
-                <twig:Input type="text" id="doc-id-override-ref" maxlength="3" placeholder="000 / AAA"
-                    autocomplete="off" spellcheck="false"
-                    data-doc-id-override-target="ref" data-action="input->doc-id-override#update"
-                    title="3 digits (001) or 3 letters (AAA, PRO)"
-                    class="aria-invalid:border-destructive w-28 h-9 placeholder:font-sans font-mono uppercase placeholder:normal-case" />
-            </div>
-            <div>
-                <label for="doc-id-override-rev" class="block mb-1 text-muted-foreground text-xs">Revision</label>
-                <twig:Input type="text" id="doc-id-override-rev" maxlength="2" placeholder="00 / 0A"
-                    autocomplete="off" spellcheck="false"
-                    data-doc-id-override-target="rev" data-action="input->doc-id-override#update"
-                    title="Final release (00, 01) or interim version (0A, 1F)"
-                    class="aria-invalid:border-destructive w-24 h-9 placeholder:font-sans font-mono uppercase placeholder:normal-case" />
-            </div>
-            <button type="button" hidden data-doc-id-override-target="clear" data-action="doc-id-override#clear"
-                class="inline-flex justify-center items-center hover:bg-muted border border-border rounded-md size-9 text-muted-foreground hover:text-foreground transition-colors"
-                title="Clear override">
-                <twig:ux:icon name="material-symbols:close" class="size-4" />
-            </button>
         </div>
+    </div>
+
+    <div role="status" class="hidden group-data-[override-active=true]/override:flex items-center gap-2 bg-primary/5 mb-4 px-3 py-2 border border-primary/30 rounded-lg text-foreground text-sm">
+        <twig:ux:icon name="material-symbols:info-outline" class="size-4 text-primary shrink-0" />
+        <span data-doc-id-override-target="summary"></span>
+        <button type="button" data-action="doc-id-override#clear" class="ml-auto text-primary text-xs hover:underline shrink-0">Clear</button>
     </div>
 
     {{ include('_flashes.html.twig') }}

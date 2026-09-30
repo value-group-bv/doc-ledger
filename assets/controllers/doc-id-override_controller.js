@@ -28,19 +28,26 @@ export function buildDocId(button, { withRevision }) {
     return withRevision ? `${base}-${rev}` : base;
 }
 
+const STORAGE_KEY = 'doc-id-override';
+
 /**
  * Temporarily overrides the main category, reference code and revision shown
- * in (and copied from) the ledger's document IDs. Nothing is persisted.
+ * in (and copied from) the ledger's document IDs. Nothing is saved server-side;
+ * the override survives navigation within the browser session only, and a
+ * banner states what is active so it can't be forgotten.
  *
  * Only text content is touched: the live component re-applies externally
  * changed attributes after a re-render, which would leak stale values into
  * rows that now show a different entry.
  */
 export default class extends Controller {
-    static targets = ['main', 'ref', 'rev', 'clear'];
+    static targets = ['main', 'ref', 'rev', 'clear', 'summary'];
     static values = { main: String, ref: String, rev: String, refs: Object };
 
     connect() {
+        this.restore();
+        this.update();
+
         // Re-apply after the LedgerTable live component re-renders rows.
         this.observer = new MutationObserver(() => this.render());
         this.observer.observe(this.element, { childList: true, characterData: true, subtree: true });
@@ -54,7 +61,51 @@ export default class extends Controller {
         this.mainValue = this.mainTarget.value;
         this.refValue = this.read(this.refTarget, REF_PATTERN);
         this.revValue = this.read(this.revTarget, REV_PATTERN);
-        this.clearTarget.hidden = !this.mainTarget.value && !this.refTarget.value && !this.revTarget.value;
+
+        const active = Boolean(this.mainTarget.value || this.refTarget.value || this.revTarget.value);
+        this.clearTarget.hidden = !active;
+        this.element.dataset.overrideActive = active ? 'true' : 'false';
+        this.summaryTarget.textContent = this.summary();
+        this.persist();
+    }
+
+    summary() {
+        const parts = [];
+        if (this.mainValue) parts.push(`main category ${this.mainValue}`);
+        if (this.refValue) parts.push(`reference ${this.refValue}`);
+        if (this.revValue) parts.push(`revision ${this.revValue}`);
+        if (!parts.length) return '';
+
+        const list = parts.length > 1 ? `${parts.slice(0, -1).join(', ')} and ${parts.at(-1)}` : parts[0];
+        const dimmed = this.mainValue ? ` Entries not valid under main category ${this.mainValue} are dimmed.` : '';
+        return `Showing document IDs with ${list}.${dimmed}`;
+    }
+
+    persist() {
+        try {
+            const state = { main: this.mainTarget.value, ref: this.refTarget.value, rev: this.revTarget.value };
+            if (state.main || state.ref || state.rev) {
+                sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } else {
+                sessionStorage.removeItem(STORAGE_KEY);
+            }
+        } catch {
+            // Storage can be unavailable (private mode, blocked site data); the override still works.
+        }
+    }
+
+    restore() {
+        try {
+            const state = JSON.parse(sessionStorage.getItem(STORAGE_KEY) ?? 'null');
+            if (!state) return;
+            if ([...this.mainTarget.options].some(option => option.value === state.main)) {
+                this.mainTarget.value = state.main;
+            }
+            this.refTarget.value = state.ref ?? '';
+            this.revTarget.value = state.rev ?? '';
+        } catch {
+            // Ignore unreadable or unavailable storage.
+        }
     }
 
     clear() {
