@@ -2,18 +2,16 @@
 
 ## Version 1.2.0 (30 September 2026)
 
-- Document identifiers now have a list of allowed main categories, rather than just one. Though you still need to set a default one.
+- Document identifiers can now have a list of allowed main categories, rather than just one. Though you still need to set a default one.
 - The `Predefined Document Number` section and it's codebase have been omitted. It wasn't as useful as I thought it'd be.
-- The project view on the `Ledger` page can now also switch the main category. Documents that aren't allowed under it are dimmed.
-- The project view is more compact, remembers its values while you browse and accepts a single-digit revision (`7` becomes `07`).
-- `New` and `Edit` pages now warn right away when a document ID already exists.
+- Updated styling of the `project view` block (where you can set main category, reference code and revision) and now remembers values while you browse. It also dims ledger entries which are invalid for the set main category.
+- The `New` entry page now warns right away when a document ID already exists.
 - The `Admin` page is split into tabs.
 - Deleting something now asks for confirmation in a proper popup instead of the browser's default one.
 - After editing a sub category or feasibility code, the page returns to that row.
-- Success and error messages now look right in dark mode.
-- Input fields look the same on every page.
+- Success and error messages now look more consistent in dark mode.
+- Updated input field styling to look more the same on every page.
 - Updated dependencies.
-
 
 ## Version 1.1.1 (24 September 2026)
 

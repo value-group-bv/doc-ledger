@@ -33,7 +33,7 @@
                     <label for="doc-id-override-main" class="block mb-1 text-muted-foreground text-xs">Main category</label>
                     <twig:Select id="doc-id-override-main"
                         data-doc-id-override-target="main" data-action="change->doc-id-override#update"
-                        title="Show entries that are also valid under this main category with it; other entries are dimmed"
+                        title="Also dims invalid entries"
                         class="w-28 h-9 font-mono">
                         <option value="">-</option>
                         {% for mc in mainCategories %}
