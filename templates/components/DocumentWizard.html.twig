@@ -2,10 +2,10 @@
 
 {% if savedDocumentId %}
 {# ── Success state ──────────────────────────────────────────────────────────── #}
-<twig:Alert class="bg-emerald-50 mb-6 border-emerald-200">
-    <twig:ux:icon name="material-symbols:check-circle-outline" class="size-4 text-emerald-600" />
-    <twig:Alert:Title class="text-emerald-800">Entry registered</twig:Alert:Title>
-    <twig:Alert:Description class="text-emerald-700">
+<twig:Alert variant="success" class="mb-6">
+    <twig:ux:icon name="material-symbols:check-circle-outline" class="size-4" />
+    <twig:Alert:Title>Entry registered</twig:Alert:Title>
+    <twig:Alert:Description>
         Document ID <code class="font-mono font-semibold">{{ savedDocumentId }}</code> has been saved to the ledger.
     </twig:Alert:Description>
 </twig:Alert>
@@ -157,19 +157,19 @@
         {# Duplicate error — conflicts are checked live, duplicateError covers anything caught on save #}
         {% set conflicts = this.conflictingDocumentIds %}
         {% if conflicts is not empty %}
-        <twig:Alert class="bg-red-50 border-red-200">
-            <twig:ux:icon name="material-symbols:error-outline" class="size-4 text-red-600" />
-            <twig:Alert:Title class="text-red-800">Duplicate document ID</twig:Alert:Title>
-            <twig:Alert:Description class="text-red-700">
+        <twig:Alert variant="destructive">
+            <twig:ux:icon name="material-symbols:error-outline" class="size-4" />
+            <twig:Alert:Title>Duplicate document ID</twig:Alert:Title>
+            <twig:Alert:Description>
                 {% for id in conflicts %}<code class="font-mono">{{ id }}</code>{% if not loop.last %}, {% endif %}{% endfor %}
                 already {{ conflicts|length == 1 ? 'exists' : 'exist' }} in the ledger. Pick another document number{% if alternateMainCategoryIds is not empty %} or untick the clashing main category{% endif %}.
             </twig:Alert:Description>
         </twig:Alert>
         {% elseif duplicateError %}
-        <twig:Alert class="bg-red-50 border-red-200">
-            <twig:ux:icon name="material-symbols:error-outline" class="size-4 text-red-600" />
-            <twig:Alert:Title class="text-red-800">Duplicate document ID</twig:Alert:Title>
-            <twig:Alert:Description class="text-red-700">{{ duplicateError }}</twig:Alert:Description>
+        <twig:Alert variant="destructive">
+            <twig:ux:icon name="material-symbols:error-outline" class="size-4" />
+            <twig:Alert:Title>Duplicate document ID</twig:Alert:Title>
+            <twig:Alert:Description>{{ duplicateError }}</twig:Alert:Description>
         </twig:Alert>
         {% endif %}
 

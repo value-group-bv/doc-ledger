@@ -11,18 +11,7 @@
         </div>
     </div>
 
-    {% for message in app.flashes('success') %}
-    <twig:Alert class="bg-emerald-50 mb-4 border-emerald-200">
-        <twig:ux:icon name="material-symbols:check-circle-outline" class="size-4 text-emerald-600" />
-        <twig:Alert:Description class="text-emerald-800">{{ message }}</twig:Alert:Description>
-    </twig:Alert>
-    {% endfor %}
-    {% for message in app.flashes('error') %}
-    <twig:Alert class="bg-red-50 mb-4 border-red-200">
-        <twig:ux:icon name="material-symbols:error-outline" class="size-4 text-red-600" />
-        <twig:Alert:Description class="text-red-800">{{ message }}</twig:Alert:Description>
-    </twig:Alert>
-    {% endfor %}
+    {{ include('_flashes.html.twig') }}
 
     <div class="gap-8 grid grid-cols-1 xl:grid-cols-2">
 

@@ -61,12 +61,7 @@
         </div>
     </div>
 
-    {% for message in app.flashes('success') %}
-    <twig:Alert class="bg-emerald-50 mb-4 border-emerald-200">
-        <twig:ux:icon name="material-symbols:check-circle-outline" class="size-4 text-emerald-600" />
-        <twig:Alert:Description class="text-emerald-800">{{ message }}</twig:Alert:Description>
-    </twig:Alert>
-    {% endfor %}
+    {{ include('_flashes.html.twig') }}
 
     <twig:Card>
         <twig:Card:Content class="p-6">

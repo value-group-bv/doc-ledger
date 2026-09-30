@@ -16,11 +16,7 @@
         </div>
     </div>
 
-    {% for message in app.flashes('error') %}
-    <twig:Alert variant="destructive" class="mb-4">
-        <twig:Alert:Description>{{ message }}</twig:Alert:Description>
-    </twig:Alert>
-    {% endfor %}
+    {{ include('_flashes.html.twig') }}
 
     <twig:Card>
         <twig:Card:Content class="p-6">

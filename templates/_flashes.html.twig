@@ -1,0 +1,13 @@
+{# Success and error flash messages, shown at the top of a page #}
+{% for message in app.flashes('success') %}
+<twig:Alert variant="success" class="mb-4">
+    <twig:ux:icon name="material-symbols:check-circle-outline" class="size-4" />
+    <twig:Alert:Description>{{ message }}</twig:Alert:Description>
+</twig:Alert>
+{% endfor %}
+{% for message in app.flashes('error') %}
+<twig:Alert variant="destructive" class="mb-4">
+    <twig:ux:icon name="material-symbols:error-outline" class="size-4" />
+    <twig:Alert:Description>{{ message }}</twig:Alert:Description>
+</twig:Alert>
+{% endfor %}
