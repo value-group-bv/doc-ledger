@@ -33,15 +33,15 @@ const STORAGE_KEY = 'doc-id-override';
 /**
  * Temporarily overrides the main category, reference code and revision shown
  * in (and copied from) the ledger's document IDs. Nothing is saved server-side;
- * the override survives navigation within the browser session only, and a
- * banner states what is active so it can't be forgotten.
+ * the override survives navigation within the browser session only, and the
+ * panel is tinted while it is active so it can't be forgotten.
  *
  * Only text content is touched: the live component re-applies externally
  * changed attributes after a re-render, which would leak stale values into
  * rows that now show a different entry.
  */
 export default class extends Controller {
-    static targets = ['main', 'ref', 'rev', 'clear', 'summary'];
+    static targets = ['main', 'ref', 'rev', 'clear'];
     static values = { main: String, ref: String, rev: String, refs: Object };
 
     connect() {
@@ -65,20 +65,7 @@ export default class extends Controller {
         const active = Boolean(this.mainTarget.value || this.refTarget.value || this.revTarget.value);
         this.clearTarget.hidden = !active;
         this.element.dataset.overrideActive = active ? 'true' : 'false';
-        this.summaryTarget.textContent = this.summary();
         this.persist();
-    }
-
-    summary() {
-        const parts = [];
-        if (this.mainValue) parts.push(`main category ${this.mainValue}`);
-        if (this.refValue) parts.push(`reference ${this.refValue}`);
-        if (this.revValue) parts.push(`revision ${this.revValue}`);
-        if (!parts.length) return '';
-
-        const list = parts.length > 1 ? `${parts.slice(0, -1).join(', ')} and ${parts.at(-1)}` : parts[0];
-        const dimmed = this.mainValue ? ` Entries not valid under main category ${this.mainValue} are dimmed.` : '';
-        return `Showing document IDs with ${list}.${dimmed}`;
     }
 
     persist() {
