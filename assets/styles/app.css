@@ -141,3 +141,13 @@
 
 }
 
+
+/* Brief highlight of a table row reached via #anchor (e.g. after saving it); fades so it doesn't stick */
+@theme {
+    --animate-row-flash: row-flash 2s ease-out;
+
+    @keyframes row-flash {
+        from { background-color: color-mix(in oklab, var(--primary) 12%, transparent); }
+        to { background-color: transparent; }
+    }
+}

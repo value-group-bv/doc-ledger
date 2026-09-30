@@ -14,7 +14,7 @@
     {{ include('_flashes.html.twig') }}
 
     {# Editing a row forces the tab it lives on; otherwise the browser reopens the last used tab #}
-    {% set forcedTab = editSubcatId ? 'numbering' : (editFeasibilityCodeId ? 'api' : '') %}
+    {% set forcedTab = (editSubcatId or editMaincatId) ? 'numbering' : (editFeasibilityCodeId ? 'api' : '') %}
     <twig:Tabs defaultValue="{{ forcedTab ?: 'numbering' }}" data-tabs-remember-value="admin" data-tabs-forced-value="{{ forcedTab ? 'true' : 'false' }}" class="gap-6">
         <twig:Tabs:List class="flex-wrap py-1 group-data-[orientation=horizontal]/tabs:h-auto">
             <twig:Tabs:Trigger value="numbering" class="px-3 py-1 h-auto">Numbering</twig:Tabs:Trigger>
@@ -96,7 +96,7 @@
                             </tr></thead>
                             <tbody class="divide-y divide-border">
                             {% for mc in mainCategories %}
-                            <tr>
+                            <tr id="maincat-{{ mc.id }}" class="target:animate-row-flash scroll-mt-24">
                                 <td class="py-2 font-mono font-semibold">{{ mc.code }}</td>
                                 <td class="py-2">
                                     <form method="post" action="{{ path('admin_maincat_set_refcode', {id: mc.id}) }}">
@@ -108,13 +108,26 @@
                                         </twig:Select>
                                     </form>
                                 </td>
+                                {% if mc.id == editMaincatId %}
+                                <td class="py-1">
+                                    <form id="maincat-edit-{{ mc.id }}" data-turbo="false" method="post" action="{{ path('admin_maincat_update', {id: mc.id}) }}"></form>
+                                    <twig:Input name="description" value="{{ mc.description }}" form="maincat-edit-{{ mc.id }}" required autofocus
+                                        class="px-2 py-0 rounded h-8" />
+                                </td>
+                                <td class="py-1 text-right whitespace-nowrap">
+                                    <button type="submit" form="maincat-edit-{{ mc.id }}" class="mr-3 text-primary text-xs hover:underline">Save</button>
+                                    <a href="{{ path('admin_index', {_fragment: 'maincat-' ~ mc.id}) }}" class="text-muted-foreground text-xs hover:underline">Cancel</a>
+                                </td>
+                                {% else %}
                                 <td class="py-2">{{ mc.description }}</td>
-                                <td class="py-2 text-right">
+                                <td class="py-2 text-right whitespace-nowrap">
+                                    <a href="{{ path('admin_index', {editMaincat: mc.id, _fragment: 'maincat-' ~ mc.id}) }}" class="mr-3 text-xs hover:underline">Edit</a>
                                     <form method="post" action="{{ path('admin_maincat_delete', {id: mc.id}) }}"
-                                        data-turbo-confirm="Delete main category {{ mc.code }}?">
+                                        data-turbo-confirm="Delete main category {{ mc.code }}?" class="inline">
                                         <button type="submit" class="text-destructive text-xs hover:underline">Delete</button>
                                     </form>
                                 </td>
+                                {% endif %}
                             </tr>
                             {% else %}<tr><td colspan="4" class="py-3 text-muted-foreground text-center">None yet.</td></tr>
                             {% endfor %}
@@ -199,7 +212,7 @@
                             <tbody class="divide-y divide-border">
                             {% for sc in subCategories %}
                             {% if sc.id == editSubcatId %}
-                            <tr id="subcat-{{ sc.id }}" class="target:bg-primary/5 transition-colors scroll-mt-24">
+                            <tr id="subcat-{{ sc.id }}" class="target:animate-row-flash scroll-mt-24">
                                 <td class="py-1">
                                     <form id="subcat-edit-{{ sc.id }}" data-turbo="false" method="post" action="{{ path('admin_subcat_update', {id: sc.id}) }}"></form>
                                     <twig:Select name="subsidiaryId" form="subcat-edit-{{ sc.id }}"
@@ -241,7 +254,7 @@
                                 </td>
                             </tr>
                             {% else %}
-                            <tr id="subcat-{{ sc.id }}" class="target:bg-primary/5 transition-colors scroll-mt-24">
+                            <tr id="subcat-{{ sc.id }}" class="target:animate-row-flash scroll-mt-24">
                                 <td class="py-2 font-mono text-muted-foreground">{{ sc.subsidiary ? sc.subsidiary.code : 'All' }}</td>
                                 <td class="py-2 font-mono text-muted-foreground">{{ sc.mainCategory ? sc.mainCategory.code : 'All' }}</td>
                                 <td class="py-2"><twig:Badge style="{{ doc_type_badge_style(sc.docType.code) }}">{{ sc.docType.code }}</twig:Badge></td>
@@ -359,7 +372,7 @@
                         <tbody class="divide-y divide-border">
                         {% for fc in recentFeasibilityCodes %}
                         {% if fc.id == editFeasibilityCodeId %}
-                        <tr id="fc-{{ fc.id }}" class="target:bg-primary/5 transition-colors scroll-mt-24">
+                        <tr id="fc-{{ fc.id }}" class="target:animate-row-flash scroll-mt-24">
                             <td class="py-1 font-mono font-semibold">
                                 {{ fc.code }}
                                 <form id="fc-edit-{{ fc.id }}" data-turbo="false" method="post" action="{{ path('admin_feasibility_code_update', {id: fc.id}) }}"></form>
@@ -377,7 +390,7 @@
                             </td>
                         </tr>
                         {% else %}
-                        <tr id="fc-{{ fc.id }}" class="target:bg-primary/5 transition-colors scroll-mt-24">
+                        <tr id="fc-{{ fc.id }}" class="target:animate-row-flash scroll-mt-24">
                             <td class="py-2 font-mono font-semibold">{{ fc.code }}</td>
                             <td class="py-2">{{ fc.title }}</td>
                             <td class="hidden sm:table-cell py-2">{{ fc.requestor }}</td>

@@ -1,5 +1,10 @@
 # Release Notes
 
+## Version 1.2.1 (xx 2026)
+
+- Fixed bug where main category with number 0 wasn't possible to create.
+- It's now possible to modify names of main categories without deleting them.
+
 ## Version 1.2.0 (30 September 2026)
 
 - Document identifiers can now have a list of allowed main categories, rather than just one. Though you still need to set a default one.

@@ -55,6 +55,7 @@ class AdminController extends AbstractController
             'recentFeasibilityCodes' => $feasibilityCodes->findRecent(10),
             'minorWords' => $titleWords->findBy(['type' => DocTitleWord::TYPE_MINOR], ['word' => 'ASC']),
             'uppercaseWords' => $titleWords->findBy(['type' => DocTitleWord::TYPE_UPPERCASE], ['word' => 'ASC']),
+            'editMaincatId' => (int) $request->query->get('editMaincat', 0),
             'editSubcatId' => (int) $request->query->get('editSubcat', 0),
             'editFeasibilityCodeId' => (int) $request->query->get('editFeasibilityCode', 0),
         ]);
@@ -233,7 +234,12 @@ class AdminController extends AbstractController
             ? $request->request->get('referenceCode')
             : '000';
 
-        if ($code && $description) {
+        // Explicit checks: '0' is a valid code but falsy in PHP
+        if (!preg_match('/^\d$/', $code)) {
+            $this->addFlash('error', 'Code must be a single digit (0-9).');
+        } elseif ($description === '') {
+            $this->addFlash('error', 'Description is required.');
+        } else {
             $entity = new DocMainCategory();
             $entity->setCode($code)->setDescription($description)->setReferenceCode($referenceCode);
             $this->em->persist($entity);
@@ -258,6 +264,29 @@ class AdminController extends AbstractController
         if ($entity && \in_array($value, ['000', 'AAA', 'PRO'], true)) {
             $entity->setReferenceCode($value);
             $this->em->flush();
+        }
+
+        return $this->redirectToRoute('admin_index');
+    }
+
+    /** Only the description can be changed: the code is part of every document ID */
+    #[Route('/maincat/{id}/update', name: 'maincat_update', methods: ['POST'])]
+    public function maincatUpdate(int $id, Request $request): Response
+    {
+        $entity = $this->em->find(DocMainCategory::class, $id);
+        $description = trim((string) $request->request->get('description', ''));
+
+        if (!$entity) {
+            $this->addFlash('error', 'Main category not found.');
+        } elseif (!$description) {
+            $this->addFlash('error', 'Description is required.');
+        } else {
+            $entity->setDescription($description);
+            $this->em->flush();
+            $this->addFlash('success', "Main category '{$entity->getCode()}' updated.");
+
+            // Back to the (highlighted) row; errors stay at the top where their message shows
+            return $this->redirectToRoute('admin_index', ['_fragment' => "maincat-$id"]);
         }
 
         return $this->redirectToRoute('admin_index');
