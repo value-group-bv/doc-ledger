@@ -16,11 +16,11 @@
     {# Editing a row forces the tab it lives on; otherwise the browser reopens the last used tab #}
     {% set forcedTab = editSubcatId ? 'numbering' : (editFeasibilityCodeId ? 'api' : '') %}
     <twig:Tabs defaultValue="{{ forcedTab ?: 'numbering' }}" data-tabs-remember-value="admin" data-tabs-forced-value="{{ forcedTab ? 'true' : 'false' }}" class="gap-6">
-        <twig:Tabs:List class="flex-wrap py-1 group-data-[orientation=horizontal]/tabs:h-auto">
-            <twig:Tabs:Trigger value="numbering" class="px-3 py-2 h-auto">Numbering</twig:Tabs:Trigger>
-            <twig:Tabs:Trigger value="title-casing" class="px-3 py-2 h-auto">Title casing</twig:Tabs:Trigger>
-            <twig:Tabs:Trigger value="api" class="px-3 py-2 h-auto">API</twig:Tabs:Trigger>
-            <twig:Tabs:Trigger value="users" class="px-3 py-2 h-auto">Users <span class="inline-flex justify-center items-center bg-foreground/10 px-1 rounded-full min-w-5 h-5 font-medium tabular-nums text-muted-foreground text-xs leading-none">{{ users|length }}</span></twig:Tabs:Trigger>
+        <twig:Tabs:List class="flex-wrap py-0.5 group-data-[orientation=horizontal]/tabs:h-auto">
+            <twig:Tabs:Trigger value="numbering" class="px-3 py-1 h-auto">Numbering</twig:Tabs:Trigger>
+            <twig:Tabs:Trigger value="title-casing" class="px-3 py-1 h-auto">Title casing</twig:Tabs:Trigger>
+            <twig:Tabs:Trigger value="api" class="px-3 py-1 h-auto">API</twig:Tabs:Trigger>
+            <twig:Tabs:Trigger value="users" class="px-3 py-1 h-auto">Users <span class="inline-flex justify-center items-center bg-foreground/10 px-1 rounded-full min-w-5 h-5 font-medium tabular-nums text-muted-foreground text-xs leading-none">{{ users|length }}</span></twig:Tabs:Trigger>
         </twig:Tabs:List>
 
         <twig:Tabs:Content value="numbering">
