@@ -4,6 +4,8 @@ import { Controller } from '@hotwired/stimulus';
 const REF_PATTERN = /^(\d{3}|[A-Z]{3})$/;
 // Revision: final release (00, 01…) or interim version (0A, 1F…).
 const REV_PATTERN = /^\d[0-9A-Z]$/;
+// A single digit is shorthand for that final release: 7 means 07.
+const padRevision = value => (/^\d$/.test(value) ? `0${value}` : value);
 
 /**
  * Builds the document ID for a ledger button, applying any active override
@@ -60,7 +62,7 @@ export default class extends Controller {
     update() {
         this.mainValue = this.mainTarget.value;
         this.refValue = this.read(this.refTarget, REF_PATTERN);
-        this.revValue = this.read(this.revTarget, REV_PATTERN);
+        this.revValue = this.read(this.revTarget, REV_PATTERN, padRevision);
 
         const active = Boolean(this.mainTarget.value || this.refTarget.value || this.revTarget.value);
         this.clearTarget.hidden = !active;
@@ -115,11 +117,18 @@ export default class extends Controller {
         this.render();
     }
 
-    read(input, pattern) {
+    /** Shows the padded revision once the field is left (not while typing, so "12" can still be entered) */
+    padRevision() {
+        this.revTarget.value = padRevision(this.revTarget.value.toUpperCase());
+        this.update();
+    }
+
+    read(input, pattern, normalize = value => value) {
         input.value = input.value.toUpperCase();
-        const valid = pattern.test(input.value);
+        const value = normalize(input.value);
+        const valid = pattern.test(value);
         input.setAttribute('aria-invalid', input.value !== '' && !valid ? 'true' : 'false');
-        return valid ? input.value : '';
+        return valid ? value : '';
     }
 
     render() {

@@ -51,8 +51,8 @@
                     <label for="doc-id-override-rev" class="block mb-1 text-muted-foreground text-xs">Revision</label>
                     <twig:Input type="text" id="doc-id-override-rev" maxlength="2" placeholder="00 / 0A"
                         autocomplete="off" spellcheck="false"
-                        data-doc-id-override-target="rev" data-action="input->doc-id-override#update"
-                        title="Final release (00, 01) or interim version (0A, 1F)"
+                        data-doc-id-override-target="rev" data-action="input->doc-id-override#update blur->doc-id-override#padRevision"
+                        title="Final release (00, 01, or just 1) or interim version (0A, 1F)"
                         class="aria-invalid:border-destructive w-24 h-9 placeholder:font-sans font-mono uppercase placeholder:normal-case" />
                 </div>
                 <button type="button" hidden data-doc-id-override-target="clear" data-action="doc-id-override#clear"
