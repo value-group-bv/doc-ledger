@@ -18,7 +18,7 @@
 {%- endblock %}
 
 {%- block form_widget_simple -%}
-    {%- set base_class = 'flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm placeholder:text-muted-foreground shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50' -%}
+    {%- set base_class = 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50' -%}
     {%- if errors|length -%}
         {%- set base_class = base_class ~ ' border-destructive focus-visible:ring-destructive' -%}
     {%- endif -%}
@@ -27,7 +27,7 @@
 {%- endblock %}
 
 {%- block textarea_widget -%}
-    {%- set base_class = 'border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:border-destructive flex field-sizing-content min-h-16 w-full rounded-md border bg-muted px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50' -%}
+    {%- set base_class = 'border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:border-destructive flex field-sizing-content min-h-16 w-full rounded-md border bg-background px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50' -%}
     {%- set attr = attr|merge({class: (base_class ~ ' ' ~ (attr.class ?? ''))|trim}) -%}
     <textarea {{ block('widget_attributes') }}>{{ value }}</textarea>
 {%- endblock textarea_widget -%}
@@ -36,7 +36,7 @@
     {%- if required and placeholder is none and not placeholder_in_choices and not multiple and (attr.size is not defined or attr.size <= 1) -%}
         {%- set required = false -%}
     {%- endif -%}
-    {%- set base_class = 'flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50' -%}
+    {%- set base_class = 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50' -%}
     {%- if errors|length -%}
         {%- set base_class = base_class ~ ' border-destructive focus-visible:ring-destructive' -%}
     {%- endif -%}
@@ -58,6 +58,11 @@
         {{- block('choice_widget_options') -}}
     </select>
 {%- endblock choice_widget_collapsed -%}
+
+{%- block checkbox_widget -%}
+    {%- set attr = attr|merge({class: ('size-4 inline-block align-middle accent-primary ' ~ (attr.class ?? ''))|trim}) -%}
+    <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+{%- endblock %}
 
 {%- block form_errors -%}
     {%- if errors|length > 0 -%}

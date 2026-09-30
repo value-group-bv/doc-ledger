@@ -19,6 +19,12 @@
 {% else %}
 {# ── Wizard form ─────────────────────────────────────────────────────────────── #}
 
+{# Fetched up front: inside <twig:Select> blocks, `this` is the Select component #}
+{% set subsidiaries = this.subsidiaries %}
+{% set mainCategories = this.mainCategories %}
+{% set docTypes = this.docTypes %}
+{% set subCategories = this.subCategories %}
+
 <div class="gap-8 grid grid-cols-1 lg:grid-cols-3">
 
     {# Left: form fields #}
@@ -29,49 +35,45 @@
         <div class="gap-4 grid grid-cols-2">
             <div class="gap-2 grid">
                 <label class="font-medium text-sm">Subsidiary</label>
-                <select data-model="subsidiaryId" data-action="change->live#action"
-                    class="flex bg-background px-3 py-2 border border-input rounded-md shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-10 text-sm">
+                <twig:Select data-model="subsidiaryId" data-action="change->live#action">
                     <option value="0">select</option>
-                    {% for s in this.subsidiaries %}
+                    {% for s in subsidiaries %}
                     <option value="{{ s.id }}" {% if subsidiaryId == s.id %}selected{% endif %}>{{ s.code }} - {{ s.description }}</option>
                     {% endfor %}
-                </select>
+                </twig:Select>
             </div>
             <div class="gap-2 grid">
                 <label class="font-medium text-sm">Main category</label>
-                <select data-model="mainCategoryId" data-action="change->live#action"
-                    class="flex bg-background px-3 py-2 border border-input rounded-md shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-10 text-sm">
+                <twig:Select data-model="mainCategoryId" data-action="change->live#action">
                     <option value="0">select</option>
-                    {% for mc in this.mainCategories %}
+                    {% for mc in mainCategories %}
                     <option value="{{ mc.id }}" {% if mainCategoryId == mc.id %}selected{% endif %}>{{ mc.code }} - {{ mc.description }}</option>
                     {% endfor %}
-                </select>
+                </twig:Select>
             </div>
         </div>
 
         {# Row 2: Doc type #}
         <div class="gap-2 grid">
             <label class="font-medium text-sm">Document type</label>
-            <select data-model="docTypeId" data-action="change->live#action"
-                class="flex bg-background px-3 py-2 border border-input rounded-md shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-10 text-sm">
+            <twig:Select data-model="docTypeId" data-action="change->live#action">
                 <option value="0">select</option>
-                {% for dt in this.docTypes %}
+                {% for dt in docTypes %}
                 <option value="{{ dt.id }}" {% if docTypeId == dt.id %}selected{% endif %}>{{ dt.code }} - {{ dt.description }}</option>
                 {% endfor %}
-            </select>
+            </twig:Select>
         </div>
 
         {# Row 4: Sub category — shown once doc type is selected #}
         {% if docTypeId %}
         <div class="gap-2 grid">
             <label class="font-medium text-sm">Sub category</label>
-            <select data-model="subCategoryId" data-action="change->live#action"
-                class="flex bg-background px-3 py-2 border border-input rounded-md shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-10 text-sm">
+            <twig:Select data-model="subCategoryId" data-action="change->live#action">
                 <option value="0">select</option>
-                {% for sc in this.subCategories %}
+                {% for sc in subCategories %}
                 <option value="{{ sc.id }}" {% if subCategoryId == sc.id %}selected{% endif %}>{{ sc.formattedCode }} - {{ sc.description }}</option>
                 {% endfor %}
-            </select>
+            </twig:Select>
         </div>
         {% endif %}
 
@@ -83,13 +85,13 @@
             <div class="flex gap-4 mb-2">
                 <label class="flex items-center gap-2 text-sm cursor-pointer">
                     <input type="radio" data-model="docNumberMode" value="0"
-                        data-action="change->live#action"
+                        data-action="change->live#action" class="size-4 accent-primary"
                         {% if docNumberMode == 0 %}checked{% endif %} />
                     Next available
                 </label>
                 <label class="flex items-center gap-2 text-sm cursor-pointer">
                     <input type="radio" data-model="docNumberMode" value="1"
-                        data-action="change->live#action"
+                        data-action="change->live#action" class="size-4 accent-primary"
                         {% if docNumberMode == 1 %}checked{% endif %} />
                     Manual (000 - 999)
                 </label>
@@ -100,11 +102,12 @@
             {% else %}
             {% set hasValue = manualDocNumber|default('')|length > 0 %}
             {% set isInvalid = hasValue and (manualDocNumber < '0' or manualDocNumber > '999') %}
-            <input type="number" data-model="manualDocNumber"
+            <twig:Input type="number" data-model="manualDocNumber"
                 data-action="input->live#update:debounce(300ms)"
                 value="{{ manualDocNumber }}"
-                min="0" max="999" placeholder="{{ "%03d"|format(this.suggestedDocNumber) }} (next available)"
-                class="flex bg-background px-3 py-2 border {% if isInvalid %}border-destructive{% else %}border-input{% endif %} rounded-md shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-10 font-mono text-sm" />
+                min="0" max="999" placeholder="{{ '%03d'|format(this.suggestedDocNumber) }} (next available)"
+                aria-invalid="{{ isInvalid ? 'true' : 'false' }}"
+                class="font-mono aria-invalid:border-destructive" />
             {% if isInvalid %}
             <p class="text-destructive text-sm">Document number must be between 0 and 999</p>
             {% endif %}
@@ -119,8 +122,8 @@
             <div class="flex flex-wrap gap-x-4 gap-y-2">
                 {% for mc in alternateOptions %}
                 <label class="flex items-center gap-2 text-sm cursor-pointer">
-                    <input type="checkbox" data-model="alternateMainCategoryIds" value="{{ mc.id }}"
-                        {% if mc.id in alternateMainCategoryIds %}checked{% endif %} />
+                    <twig:Checkbox data-model="alternateMainCategoryIds" value="{{ mc.id }}"
+                        :checked="mc.id in alternateMainCategoryIds" />
                     {{ mc.code }} - {{ mc.description }}
                 </label>
                 {% endfor %}
@@ -133,14 +136,13 @@
         {# Row 6: Title #}
         <div class="gap-2 grid">
             <label class="font-medium text-sm">Title <span class="font-normal text-muted-foreground text-xs">(human-readable)</span></label>
-            <input type="text" data-model="title"
+            <twig:Input type="text" data-model="title"
                 data-action="input->live#update:debounce(300ms)"
                 oninput="this.value=this.value.replace(/[^A-Za-z0-9 ]/g,'')"
                 value="{{ title }}"
                 maxlength="48"
                 pattern="[A-Za-z0-9 ]+"
-                placeholder="e.g. System PID"
-                class="flex bg-background px-3 py-2 border border-input rounded-md shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-10 text-sm" />
+                placeholder="e.g. System PID" />
             <p class="text-muted-foreground text-xs">Only alphanumeric characters (A-Z, a-z, 0-9) and spaces are allowed, max. 48 characters</p>
         </div>
 

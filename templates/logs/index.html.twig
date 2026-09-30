@@ -15,13 +15,13 @@
         <twig:Card:Header>
             <form method="get" class="flex items-center gap-2">
                 <label for="event-filter" class="text-muted-foreground text-sm">Event</label>
-                <select id="event-filter" name="event" onchange="this.form.submit()"
-                    class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-8 font-mono text-xs transition-[color,box-shadow]">
+                <twig:Select id="event-filter" name="event" onchange="this.form.submit()"
+                    class="w-auto px-2 rounded h-8 font-mono text-xs py-0">
                     <option value="">All events</option>
                     {% for event in events %}
                     <option value="{{ event }}" {% if selectedEvent == event %}selected{% endif %}>{{ event }}</option>
                     {% endfor %}
-                </select>
+                </twig:Select>
             </form>
         </twig:Card:Header>
         <twig:Card:Content>

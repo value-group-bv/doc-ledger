@@ -59,10 +59,10 @@
                 </table>
                 </div>
                 <form method="post" action="{{ path('admin_subsidiary_new') }}" class="flex flex-wrap gap-2">
-                    <input name="code" placeholder="Code" maxlength="2"
-                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-24 h-9 text-sm transition-[color,box-shadow]" />
-                    <input name="description" placeholder="Description"
-                        class="flex flex-1 bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-9 text-sm transition-[color,box-shadow]" />
+                    <twig:Input name="code" placeholder="Code" maxlength="2"
+                        class="w-24 h-9" />
+                    <twig:Input name="description" placeholder="Description"
+                        class="w-auto flex-1 h-9" />
                     <button type="submit" class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
                 </form>
             </twig:Card:Content>
@@ -89,12 +89,12 @@
                         <td class="py-2 font-mono font-semibold">{{ mc.code }}</td>
                         <td class="py-2">
                             <form method="post" action="{{ path('admin_maincat_set_refcode', {id: mc.id}) }}">
-                                <select name="referenceCode" onchange="this.form.submit()"
-                                    class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-7 font-mono text-xs transition-[color,box-shadow]">
+                                <twig:Select name="referenceCode" onchange="this.form.submit()"
+                                    class="w-auto px-2 rounded h-7 font-mono text-xs py-0">
                                     <option value="000" {% if mc.referenceCode == '000' %}selected{% endif %}>000</option>
                                     <option value="AAA" {% if mc.referenceCode == 'AAA' %}selected{% endif %}>AAA</option>
                                     <option value="PRO" {% if mc.referenceCode == 'PRO' %}selected{% endif %}>PRO</option>
-                                </select>
+                                </twig:Select>
                             </form>
                         </td>
                         <td class="py-2">{{ mc.description }}</td>
@@ -111,16 +111,16 @@
                 </table>
                 </div>
                 <form method="post" action="{{ path('admin_maincat_new') }}" class="flex flex-wrap gap-2">
-                    <input name="code" placeholder="Code" maxlength="1"
-                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-20 h-9 text-sm transition-[color,box-shadow]" />
-                    <select name="referenceCode"
-                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-9 font-mono text-sm transition-[color,box-shadow]">
+                    <twig:Input name="code" placeholder="Code" maxlength="1"
+                        class="w-20 h-9" />
+                    <twig:Select name="referenceCode"
+                        class="w-auto h-9 font-mono">
                         <option value="000">000</option>
                         <option value="AAA">AAA</option>
                         <option value="PRO">PRO</option>
-                    </select>
-                    <input name="description" placeholder="Description"
-                        class="flex flex-1 bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-9 text-sm transition-[color,box-shadow]" />
+                    </twig:Select>
+                    <twig:Input name="description" placeholder="Description"
+                        class="w-auto flex-1 h-9" />
                     <button type="submit" class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
                 </form>
             </twig:Card:Content>
@@ -158,11 +158,11 @@
                 </table>
                 </div>
                 <form method="post" action="{{ path('admin_doctype_new') }}" class="flex flex-wrap gap-2">
-                    <input name="code" placeholder="Code" maxlength="3" pattern="[A-Za-z]+"
+                    <twig:Input name="code" placeholder="Code" maxlength="3" pattern="[A-Za-z]+"
                         oninput="this.value=this.value.replace(/[^A-Za-z]/g,'')"
-                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-28 h-9 text-sm transition-[color,box-shadow]" />
-                    <input name="description" placeholder="Description"
-                        class="flex flex-1 bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-9 text-sm transition-[color,box-shadow]" />
+                        class="w-28 h-9" />
+                    <twig:Input name="description" placeholder="Description"
+                        class="w-auto flex-1 h-9" />
                     <button type="submit" class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
                 </form>
             </twig:Card:Content>
@@ -177,9 +177,7 @@
             <twig:Card:Content>
                 <form method="post" action="{{ path('admin_title_words_update') }}" class="flex flex-col gap-2">
                     <input type="hidden" name="type" value="minor" />
-                    <textarea name="words" rows="4"
-                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full text-sm transition-[color,box-shadow]"
-                        >{{ minorWords|map(w => w.word)|join(', ') }}</textarea>
+                    <twig:Textarea name="words" rows="4">{{ minorWords|map(w => w.word)|join(', ') }}</twig:Textarea>
                     <button type="submit" class="inline-flex items-center self-end bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Save</button>
                 </form>
             </twig:Card:Content>
@@ -193,9 +191,7 @@
             <twig:Card:Content>
                 <form method="post" action="{{ path('admin_title_words_update') }}" class="flex flex-col gap-2">
                     <input type="hidden" name="type" value="uppercase" />
-                    <textarea name="words" rows="4"
-                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full text-sm transition-[color,box-shadow]"
-                        >{{ uppercaseWords|map(w => w.word)|join(', ') }}</textarea>
+                    <twig:Textarea name="words" rows="4">{{ uppercaseWords|map(w => w.word)|join(', ') }}</twig:Textarea>
                     <button type="submit" class="inline-flex items-center self-end bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Save</button>
                 </form>
             </twig:Card:Content>
@@ -224,38 +220,38 @@
                     <tr>
                         <td class="py-1">
                             <form id="subcat-edit-{{ sc.id }}" method="post" action="{{ path('admin_subcat_update', {id: sc.id}) }}"></form>
-                            <select name="subsidiaryId" form="subcat-edit-{{ sc.id }}"
-                                class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-8 text-sm transition-[color,box-shadow]">
+                            <twig:Select name="subsidiaryId" form="subcat-edit-{{ sc.id }}"
+                                class="w-auto px-2 rounded h-8 py-0">
                                 <option value="0">All</option>
                                 {% for s in subsidiaries %}
                                 <option value="{{ s.id }}" {% if sc.subsidiary and s.id == sc.subsidiary.id %}selected{% endif %}>{{ s.code }}</option>
                                 {% endfor %}
-                            </select>
+                            </twig:Select>
                         </td>
                         <td class="py-1">
-                            <select name="mainCategoryId" form="subcat-edit-{{ sc.id }}"
-                                class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-8 text-sm transition-[color,box-shadow]">
+                            <twig:Select name="mainCategoryId" form="subcat-edit-{{ sc.id }}"
+                                class="w-auto px-2 rounded h-8 py-0">
                                 <option value="0">All</option>
                                 {% for mc in mainCategories %}
                                 <option value="{{ mc.id }}" {% if sc.mainCategory and mc.id == sc.mainCategory.id %}selected{% endif %}>{{ mc.code }}</option>
                                 {% endfor %}
-                            </select>
+                            </twig:Select>
                         </td>
                         <td class="py-1">
-                            <select name="docTypeId" form="subcat-edit-{{ sc.id }}"
-                                class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-8 text-sm transition-[color,box-shadow]">
+                            <twig:Select name="docTypeId" form="subcat-edit-{{ sc.id }}"
+                                class="w-auto px-2 rounded h-8 py-0">
                                 {% for dt in docTypes %}
                                 <option value="{{ dt.id }}" {% if dt.id == sc.docType.id %}selected{% endif %}>{{ dt.code }}</option>
                                 {% endfor %}
-                            </select>
+                            </twig:Select>
                         </td>
                         <td class="py-1">
-                            <input name="code" type="number" min="0" max="999" value="{{ sc.code }}" form="subcat-edit-{{ sc.id }}"
-                                class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-24 h-8 font-mono text-sm transition-[color,box-shadow]" />
+                            <twig:Input name="code" type="number" min="0" max="999" value="{{ sc.code }}" form="subcat-edit-{{ sc.id }}"
+                                class="px-2 rounded w-24 h-8 font-mono py-0" />
                         </td>
                         <td class="py-1">
-                            <input name="description" value="{{ sc.description }}" form="subcat-edit-{{ sc.id }}"
-                                class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-8 text-sm transition-[color,box-shadow]" />
+                            <twig:Input name="description" value="{{ sc.description }}" form="subcat-edit-{{ sc.id }}"
+                                class="px-2 rounded h-8 py-0" />
                         </td>
                         <td class="py-1 text-right whitespace-nowrap">
                             <button type="submit" form="subcat-edit-{{ sc.id }}" class="mr-3 text-primary text-xs hover:underline">Save</button>
@@ -284,31 +280,31 @@
                 </table>
                 </div>
                 <form method="post" action="{{ path('admin_subcat_new') }}" class="flex flex-wrap gap-2">
-                    <select name="subsidiaryId"
-                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-9 text-sm transition-[color,box-shadow]">
+                    <twig:Select name="subsidiaryId"
+                        class="w-auto h-9">
                         <option value="0">All subsidiaries</option>
                         {% for s in subsidiaries %}
                         <option value="{{ s.id }}">{{ s.code }}</option>
                         {% endfor %}
-                    </select>
-                    <select name="mainCategoryId"
-                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-9 text-sm transition-[color,box-shadow]">
+                    </twig:Select>
+                    <twig:Select name="mainCategoryId"
+                        class="w-auto h-9">
                         <option value="0">All main cats.</option>
                         {% for mc in mainCategories %}
                         <option value="{{ mc.id }}">{{ mc.code }} - {{ mc.description }}</option>
                         {% endfor %}
-                    </select>
-                    <select name="docTypeId" required
-                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-9 text-sm transition-[color,box-shadow]">
+                    </twig:Select>
+                    <twig:Select name="docTypeId" required
+                        class="w-auto h-9">
                         <option value="">Doc type…</option>
                         {% for dt in docTypes %}
                         <option value="{{ dt.id }}">{{ dt.code }}</option>
                         {% endfor %}
-                    </select>
-                    <input name="code" type="number" min="0" max="999" placeholder="Code (0–999)" required
-                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-36 h-9 text-sm transition-[color,box-shadow]" />
-                    <input name="description" placeholder="Description" required
-                        class="flex flex-1 bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 min-w-48 h-9 text-sm transition-[color,box-shadow]" />
+                    </twig:Select>
+                    <twig:Input name="code" type="number" min="0" max="999" placeholder="Code (0–999)" required
+                        class="w-36 h-9" />
+                    <twig:Input name="description" placeholder="Description" required
+                        class="w-auto flex-1 min-w-48 h-9" />
                     <button type="submit" class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
                 </form>
             </twig:Card:Content>
@@ -349,8 +345,8 @@
                             <form id="fc-edit-{{ fc.id }}" method="post" action="{{ path('admin_feasibility_code_update', {id: fc.id}) }}"></form>
                         </td>
                         <td class="py-1">
-                            <input name="title" value="{{ fc.title }}" form="fc-edit-{{ fc.id }}"
-                                class="bg-background shadow-xs px-2 border border-input focus-visible:border-ring rounded outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-8 text-sm transition-[color,box-shadow]" />
+                            <twig:Input name="title" value="{{ fc.title }}" form="fc-edit-{{ fc.id }}"
+                                class="px-2 rounded h-8 py-0" />
                         </td>
                         <td class="hidden sm:table-cell py-1">{{ fc.requestor }}</td>
                         <td class="py-1 font-mono text-muted-foreground">{{ fc.subsidiary.code }}</td>

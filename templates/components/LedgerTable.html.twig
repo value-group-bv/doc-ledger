@@ -1,6 +1,10 @@
 {% set entries = this.entries %}
 {% set totalPages = this.totalPages %}
 {% set totalCount = this.totalCount %}
+{# Fetched up front: inside <twig:Select> blocks, `this` is the Select component #}
+{% set subsidiaries = this.subsidiaries %}
+{% set docTypes = this.docTypes %}
+{% set mainCategories = this.mainCategories %}
 
 <div {{ attributes }}>
 
@@ -10,47 +14,47 @@
         {# Search - full width on mobile #}
         <div class="sm:flex-1 mb-3 sm:mb-0 w-full sm:min-w-[200px]">
             <label class="block mb-1 text-muted-foreground text-xs">Search</label>
-            <input type="text" data-model="search" data-action="input->live#update:debounce(300ms)" value="{{ search }}"
+            <twig:Input type="text" data-model="search" data-action="input->live#update:debounce(300ms)" value="{{ search }}"
                 placeholder="Search by document ID, title, or keywords"
-                class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-9 placeholder:text-muted-foreground text-sm transition-[color,box-shadow]" />
+                class="h-9" />
         </div>
 
         {# Subsidiary filter #}
         <div class="hidden sm:block mb-3 sm:mb-0 w-full sm:w-36">
             <label class="block mb-1 text-muted-foreground text-xs">Subsidiary</label>
-            <select data-model="subsidiaryFilter" data-action="change->live#action" data-live-action-param="applyFilter"
-                class="flex bg-background shadow-xs px-3 py-2 border border-input focus:border-ring rounded-md outline-none focus:ring-[3px] focus:ring-ring/50 w-full h-9 text-sm transition-[color,box-shadow]">
+            <twig:Select data-model="subsidiaryFilter" data-action="change->live#action" data-live-action-param="applyFilter"
+                class="h-9">
                 <option value="0">All</option>
-                {% for s in this.subsidiaries %}
+                {% for s in subsidiaries %}
                 <option value="{{ s.id }}" {% if subsidiaryFilter==s.id %}selected{% endif %}>{{ s.code }}</option>
                 {% endfor %}
-            </select>
+            </twig:Select>
         </div>
 
         {# Doc type filter #}
         <div class="hidden sm:block mb-3 sm:mb-0 w-full sm:w-36">
             <label class="block mb-1 text-muted-foreground text-xs">Document type</label>
-            <select data-model="docTypeFilter" data-action="change->live#action" data-live-action-param="applyFilter"
-                class="flex bg-background shadow-xs px-3 py-2 border border-input focus:border-ring rounded-md outline-none focus:ring-[3px] focus:ring-ring/50 w-full h-9 text-sm transition-[color,box-shadow]">
+            <twig:Select data-model="docTypeFilter" data-action="change->live#action" data-live-action-param="applyFilter"
+                class="h-9">
                 <option value="0">All</option>
-                {% for dt in this.docTypes %}
+                {% for dt in docTypes %}
                 <option value="{{ dt.id }}" {% if docTypeFilter==dt.id %}selected{% endif %}>{{ dt.code }}</option>
                 {% endfor %}
-            </select>
+            </twig:Select>
         </div>
 
         {# Main category filter #}
         <div class="hidden sm:block mb-3 sm:mb-0 w-full sm:w-44">
             <label class="block mb-1 text-muted-foreground text-xs">Main category</label>
-            <select data-model="mainCategoryFilter" data-action="change->live#action"
+            <twig:Select data-model="mainCategoryFilter" data-action="change->live#action"
                 data-live-action-param="applyFilter"
-                class="flex bg-background shadow-xs px-3 py-2 border border-input focus:border-ring rounded-md outline-none focus:ring-[3px] focus:ring-ring/50 w-full h-9 text-sm transition-[color,box-shadow]">
+                class="h-9">
                 <option value="0">All</option>
-                {% for mc in this.mainCategories %}
+                {% for mc in mainCategories %}
                 <option value="{{ mc.id }}" {% if mainCategoryFilter==mc.id %}selected{% endif %}>{{ mc.code }} - {{
                     mc.description }}</option>
                 {% endfor %}
-            </select>
+            </twig:Select>
         </div>
 
         {# Reset #}
