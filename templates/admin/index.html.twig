@@ -20,7 +20,7 @@
             <twig:Tabs:Trigger value="numbering" class="px-3">Numbering</twig:Tabs:Trigger>
             <twig:Tabs:Trigger value="title-casing" class="px-3">Title casing</twig:Tabs:Trigger>
             <twig:Tabs:Trigger value="api" class="px-3">API</twig:Tabs:Trigger>
-            <twig:Tabs:Trigger value="users" class="px-3">Users <span class="text-muted-foreground text-xs">{{ users|length }}</span></twig:Tabs:Trigger>
+            <twig:Tabs:Trigger value="users" class="px-3">Users <span class="inline-flex justify-center items-center bg-foreground/10 px-1.5 rounded-full min-w-5 h-5 font-medium tabular-nums text-muted-foreground text-xs leading-none">{{ users|length }}</span></twig:Tabs:Trigger>
         </twig:Tabs:List>
 
         <twig:Tabs:Content value="numbering">
@@ -199,7 +199,7 @@
                             <tbody class="divide-y divide-border">
                             {% for sc in subCategories %}
                             {% if sc.id == editSubcatId %}
-                            <tr id="subcat-{{ sc.id }}" class="target:bg-primary/5 scroll-mt-24 transition-colors">
+                            <tr id="subcat-{{ sc.id }}" class="target:bg-primary/5 transition-colors scroll-mt-24">
                                 <td class="py-1">
                                     <form id="subcat-edit-{{ sc.id }}" data-turbo="false" method="post" action="{{ path('admin_subcat_update', {id: sc.id}) }}"></form>
                                     <twig:Select name="subsidiaryId" form="subcat-edit-{{ sc.id }}"
@@ -241,7 +241,7 @@
                                 </td>
                             </tr>
                             {% else %}
-                            <tr id="subcat-{{ sc.id }}" class="target:bg-primary/5 scroll-mt-24 transition-colors">
+                            <tr id="subcat-{{ sc.id }}" class="target:bg-primary/5 transition-colors scroll-mt-24">
                                 <td class="py-2 font-mono text-muted-foreground">{{ sc.subsidiary ? sc.subsidiary.code : 'All' }}</td>
                                 <td class="py-2 font-mono text-muted-foreground">{{ sc.mainCategory ? sc.mainCategory.code : 'All' }}</td>
                                 <td class="py-2"><twig:Badge style="{{ doc_type_badge_style(sc.docType.code) }}">{{ sc.docType.code }}</twig:Badge></td>
@@ -359,7 +359,7 @@
                         <tbody class="divide-y divide-border">
                         {% for fc in recentFeasibilityCodes %}
                         {% if fc.id == editFeasibilityCodeId %}
-                        <tr id="fc-{{ fc.id }}" class="target:bg-primary/5 scroll-mt-24 transition-colors">
+                        <tr id="fc-{{ fc.id }}" class="target:bg-primary/5 transition-colors scroll-mt-24">
                             <td class="py-1 font-mono font-semibold">
                                 {{ fc.code }}
                                 <form id="fc-edit-{{ fc.id }}" data-turbo="false" method="post" action="{{ path('admin_feasibility_code_update', {id: fc.id}) }}"></form>
@@ -377,7 +377,7 @@
                             </td>
                         </tr>
                         {% else %}
-                        <tr id="fc-{{ fc.id }}" class="target:bg-primary/5 scroll-mt-24 transition-colors">
+                        <tr id="fc-{{ fc.id }}" class="target:bg-primary/5 transition-colors scroll-mt-24">
                             <td class="py-2 font-mono font-semibold">{{ fc.code }}</td>
                             <td class="py-2">{{ fc.title }}</td>
                             <td class="hidden sm:table-cell py-2">{{ fc.requestor }}</td>
