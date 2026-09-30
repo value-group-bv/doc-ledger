@@ -76,7 +76,7 @@
         <div class="mt-10 pt-6 border-border border-t">
             <h2 class="mb-3 font-medium text-destructive text-sm">Danger zone</h2>
             <form action="{{ path('ledger_delete', {id: entry.id}) }}" method="post"
-                onsubmit="return confirm('Delete {{ entry.documentId }}? This cannot be undone.')">
+                data-turbo-confirm="Delete {{ entry.documentId }}? This cannot be undone.">
                 <input type="hidden" name="_token" value="{{ csrf_token('delete_entry_' ~ entry.id) }}">
                 <button type="submit"
                     class="inline-flex items-center gap-2 hover:bg-destructive/10 px-4 border border-destructive rounded-md h-9 font-medium text-destructive text-sm transition-colors">

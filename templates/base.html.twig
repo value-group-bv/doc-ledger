@@ -68,6 +68,8 @@
         {% block body %}{% endblock %}
     </main>
 
+    {{ include('_confirm_dialog.html.twig') }}
+
     {% block footer %}
     {% if page_auth is not defined %}
     {{ include('_footer.html.twig') }}

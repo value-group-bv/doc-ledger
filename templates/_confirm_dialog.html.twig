@@ -1,0 +1,18 @@
+{#
+    Shared confirmation dialog for forms with data-turbo-confirm="Message". Optional on the form:
+    data-confirm-label="Regenerate" (button text, default "Delete") and
+    data-confirm-variant="default" (primary button instead of destructive). Wired up in assets/confirm_dialog.js.
+#}
+<dialog id="confirm-dialog" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-message"
+    class="top-[50%] left-[50%] z-50 fixed gap-4 bg-background open:backdrop:bg-black/50 opacity-0 open:opacity-100 shadow-lg p-6 border rounded-lg w-full sm:max-w-md max-w-[calc(100%-2rem)] text-foreground scale-95 open:scale-100 transition-all translate-x-[-50%] translate-y-[-50%] open:grid duration-200 transition-discrete starting:open:scale-95 starting:open:opacity-0">
+    <div class="gap-2 grid">
+        <h2 id="confirm-dialog-title" class="font-semibold text-lg">Are you sure?</h2>
+        <p id="confirm-dialog-message" data-confirm-message class="text-muted-foreground text-sm"></p>
+    </div>
+    <form method="dialog" data-turbo="false" class="flex sm:flex-row flex-col-reverse sm:justify-end gap-2">
+        <button value="cancel" autofocus
+            class="inline-flex justify-center items-center hover:bg-muted px-4 border border-border rounded-md h-9 text-sm transition-colors">Cancel</button>
+        <button value="confirm" data-confirm-button
+            class="inline-flex justify-center items-center px-4 rounded-md h-9 font-medium text-sm transition-colors"></button>
+    </form>
+</dialog>

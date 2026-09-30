@@ -112,7 +112,7 @@ class AdminController extends AbstractController
     #[Route('/feasibility-code/{id}/edit', name: 'feasibility_code_edit', methods: ['GET'])]
     public function feasibilityCodeEdit(int $id): Response
     {
-        return $this->redirectToRoute('admin_index', ['editFeasibilityCode' => $id]);
+        return $this->redirectToRoute('admin_index', ['editFeasibilityCode' => $id, '_fragment' => "fc-$id"]);
     }
 
     #[Route('/feasibility-code/{id}/update', name: 'feasibility_code_update', methods: ['POST'])]
@@ -129,6 +129,9 @@ class AdminController extends AbstractController
             $entity->setTitle($title);
             $this->em->flush();
             $this->addFlash('success', "Feasibility code '{$entity->getCode()}' updated.");
+
+            // Back to the (highlighted) row; errors stay at the top where their message shows
+            return $this->redirectToRoute('admin_index', ['_fragment' => "fc-$id"]);
         }
 
         return $this->redirectToRoute('admin_index');
@@ -353,7 +356,7 @@ class AdminController extends AbstractController
     #[Route('/subcat/{id}/edit', name: 'subcat_edit', methods: ['GET'])]
     public function subcatEdit(int $id): Response
     {
-        return $this->redirectToRoute('admin_index', ['editSubcat' => $id]);
+        return $this->redirectToRoute('admin_index', ['editSubcat' => $id, '_fragment' => "subcat-$id"]);
     }
 
     #[Route('/subcat/{id}/update', name: 'subcat_update', methods: ['POST'])]
@@ -382,6 +385,9 @@ class AdminController extends AbstractController
             try {
                 $this->em->flush();
                 $this->addFlash('success', "Sub category {$entity->getFormattedCode()} updated.");
+
+                // Back to the (highlighted) row; errors stay at the top where their message shows
+                return $this->redirectToRoute('admin_index', ['_fragment' => "subcat-$id"]);
             } catch (\Exception $e) {
                 $this->em->clear();
                 if ($e instanceof \Doctrine\DBAL\Exception\UniqueConstraintViolationException) {

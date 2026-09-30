@@ -5,7 +5,8 @@ import { Controller } from '@hotwired/stimulus';
  *
  * With a `remember` key, the last opened tab is kept in sessionStorage so that pages whose
  * forms redirect back to themselves (like the admin page) reopen on the same tab. The URL hash
- * (#tab-name) takes precedence, so tabs can be linked to directly. When the server marks its
+ * takes precedence: #tab-name opens that tab, #some-id opens the tab containing that element,
+ * so tabs and rows can be linked to directly. When the server marks its
  * choice as `forced` (e.g. while editing a row that lives on a specific tab), that choice wins.
  */
 export default class extends Controller {
@@ -16,16 +17,26 @@ export default class extends Controller {
         const ids = this.triggerTargets.map(trigger => trigger.dataset.tabId);
         const hash = window.location.hash.slice(1);
 
+        // A hash can also point at an element inside a tab (e.g. #subcat-12 after saving a row)
+        const hashPanel = hash ? document.getElementById(hash)?.closest('[data-slot="tabs-content"]') : null;
+
         let tab = this.activeTabValue;
         if (!this.forcedValue) {
             if (ids.includes(hash)) {
                 tab = hash;
+            } else if (hashPanel && this.element.contains(hashPanel)) {
+                tab = hashPanel.dataset.tabId;
             } else if (ids.includes(this.stored())) {
                 tab = this.stored();
             }
         }
 
         this.show(ids.includes(tab) ? tab : ids[0]);
+
+        // The browser already tried to scroll to the anchor while its tab was still hidden
+        if (hashPanel) {
+            document.getElementById(hash).scrollIntoView({ block: 'center' });
+        }
     }
 
     open(event) {
