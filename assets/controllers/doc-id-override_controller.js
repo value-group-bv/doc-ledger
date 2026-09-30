@@ -8,27 +8,37 @@ const REV_PATTERN = /^\d[0-9A-Z]$/;
 /**
  * Builds the document ID for a ledger button, applying any active override
  * from the enclosing doc-id-override controller.
+ *
+ * A main category override only applies to entries that list it in
+ * data-doc-id-mains (their default plus alternates); it also swaps in that
+ * category's reference code placeholder unless a reference code is typed.
  */
 export function buildDocId(button, { withRevision }) {
     const scope = button.closest('[data-controller~="doc-id-override"]');
-    const ref = scope?.dataset.docIdOverrideRefValue || button.dataset.docIdRef;
+    const main = scope?.dataset.docIdOverrideMainValue;
+    const bumped = main && main !== button.dataset.docIdMain
+        && button.dataset.docIdMains.split(' ').includes(main);
+
+    const head = bumped ? `${button.dataset.docIdSubsidiary}${main}` : button.dataset.docIdHead;
+    const placeholderRef = bumped ? JSON.parse(scope.dataset.docIdOverrideRefsValue)[main] : button.dataset.docIdRef;
+    const ref = scope?.dataset.docIdOverrideRefValue || placeholderRef;
     const rev = scope?.dataset.docIdOverrideRevValue || button.dataset.docIdRev;
 
-    const base = `${button.dataset.docIdHead}-${ref}-${button.dataset.docIdTail}`;
+    const base = `${head}-${ref}-${button.dataset.docIdTail}`;
     return withRevision ? `${base}-${rev}` : base;
 }
 
 /**
- * Temporarily overrides the reference code and revision shown in (and copied
- * from) the ledger's document IDs. Nothing is persisted.
+ * Temporarily overrides the main category, reference code and revision shown
+ * in (and copied from) the ledger's document IDs. Nothing is persisted.
  *
  * Only text content is touched: the live component re-applies externally
  * changed attributes after a re-render, which would leak stale values into
  * rows that now show a different entry.
  */
 export default class extends Controller {
-    static targets = ['ref', 'rev', 'clear'];
-    static values = { ref: String, rev: String };
+    static targets = ['main', 'ref', 'rev', 'clear'];
+    static values = { main: String, ref: String, rev: String, refs: Object };
 
     connect() {
         // Re-apply after the LedgerTable live component re-renders rows.
@@ -41,16 +51,22 @@ export default class extends Controller {
     }
 
     update() {
+        this.mainValue = this.mainTarget.value;
         this.refValue = this.read(this.refTarget, REF_PATTERN);
         this.revValue = this.read(this.revTarget, REV_PATTERN);
-        this.clearTarget.hidden = !this.refTarget.value && !this.revTarget.value;
+        this.clearTarget.hidden = !this.mainTarget.value && !this.refTarget.value && !this.revTarget.value;
     }
 
     clear() {
+        this.mainTarget.value = '';
         this.refTarget.value = '';
         this.revTarget.value = '';
         this.update();
         this.refTarget.focus();
+    }
+
+    mainValueChanged() {
+        this.render();
     }
 
     refValueChanged() {

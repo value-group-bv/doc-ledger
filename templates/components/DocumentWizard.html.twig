@@ -85,7 +85,7 @@
                     <input type="radio" data-model="docNumberMode" value="0"
                         data-action="change->live#action"
                         {% if docNumberMode == 0 %}checked{% endif %} />
-                    Pre-defined
+                    Next available
                 </label>
                 <label class="flex items-center gap-2 text-sm cursor-pointer">
                     <input type="radio" data-model="docNumberMode" value="1"
@@ -96,18 +96,7 @@
             </div>
 
             {% if docNumberMode == 0 %}
-            {% set predefined = this.predefinedNumbers %}
-            {% if predefined is not empty %}
-            <select data-model="predefinedNumberId" data-action="change->live#action"
-                class="flex bg-background px-3 py-2 border border-input rounded-md shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 w-full h-10 text-sm">
-                <option value="0">Auto next available ({{ "%03d"|format(this.suggestedDocNumber) }})</option>
-                {% for pn in predefined %}
-                <option value="{{ pn.id }}" {% if predefinedNumberId == pn.id %}selected{% endif %}>{{ pn.formattedCode }} - {{ pn.description }}</option>
-                {% endfor %}
-            </select>
-            {% else %}
-            <p class="text-muted-foreground text-sm">No pre-defined numbers for this sub category. Next available: <strong>{{ "%03d"|format(this.suggestedDocNumber) }}</strong></p>
-            {% endif %}
+            <p class="text-muted-foreground text-sm">Next available: <strong>{{ "%03d"|format(this.suggestedDocNumber) }}</strong></p>
             {% else %}
             {% set hasValue = manualDocNumber|default('')|length > 0 %}
             {% set isInvalid = hasValue and (manualDocNumber < '0' or manualDocNumber > '999') %}
@@ -121,6 +110,24 @@
             {% endif %}
             {% endif %}
         </div>
+
+        {# Row 5b: Alternate main categories — only for sub categories that apply to all main categories #}
+        {% set alternateOptions = this.alternateMainCategoryOptions %}
+        {% if alternateOptions is not empty %}
+        <div class="gap-2 grid">
+            <label class="font-medium text-sm">Also valid under <span class="font-normal text-muted-foreground text-xs">(optional)</span></label>
+            <div class="flex flex-wrap gap-x-4 gap-y-2">
+                {% for mc in alternateOptions %}
+                <label class="flex items-center gap-2 text-sm cursor-pointer">
+                    <input type="checkbox" data-model="alternateMainCategoryIds" value="{{ mc.id }}"
+                        {% if mc.id in alternateMainCategoryIds %}checked{% endif %} />
+                    {{ mc.code }} - {{ mc.description }}
+                </label>
+                {% endfor %}
+            </div>
+            <p class="text-muted-foreground text-xs">For documents that carry over to another main category, e.g. from feasibility to installation once a project is signed</p>
+        </div>
+        {% endif %}
         {% endif %}
 
         {# Row 6: Title #}
@@ -147,8 +154,18 @@
                 rows="3">{{ comments }}</twig:Textarea>
         </div>
 
-        {# Duplicate error #}
-        {% if duplicateError %}
+        {# Duplicate error — conflicts are checked live, duplicateError covers anything caught on save #}
+        {% set conflicts = this.conflictingDocumentIds %}
+        {% if conflicts is not empty %}
+        <twig:Alert class="bg-red-50 border-red-200">
+            <twig:ux:icon name="material-symbols:error-outline" class="size-4 text-red-600" />
+            <twig:Alert:Title class="text-red-800">Duplicate document ID</twig:Alert:Title>
+            <twig:Alert:Description class="text-red-700">
+                {% for id in conflicts %}<code class="font-mono">{{ id }}</code>{% if not loop.last %}, {% endif %}{% endfor %}
+                already {{ conflicts|length == 1 ? 'exists' : 'exist' }} in the ledger. Pick another document number{% if alternateMainCategoryIds is not empty %} or untick the clashing main category{% endif %}.
+            </twig:Alert:Description>
+        </twig:Alert>
+        {% elseif duplicateError %}
         <twig:Alert class="bg-red-50 border-red-200">
             <twig:ux:icon name="material-symbols:error-outline" class="size-4 text-red-600" />
             <twig:Alert:Title class="text-red-800">Duplicate document ID</twig:Alert:Title>
@@ -161,7 +178,7 @@
         {% set docNumInvalid = docNumberMode == 1 and manualHasValue and (manualDocNumber < '0' or manualDocNumber > '999') %}
         <button type="button"
             data-action="live#action" data-live-action-param="save"
-            {% if not subsidiaryId or not mainCategoryId or not docTypeId or not subCategoryId or not title or docNumInvalid %}
+            {% if not subsidiaryId or not mainCategoryId or not docTypeId or not subCategoryId or not title or docNumInvalid or conflicts is not empty %}
             disabled
             {% endif %}
             class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 mt-2 px-6 rounded-md h-10 font-medium text-primary-foreground text-sm transition-colors disabled:cursor-not-allowed">
@@ -175,6 +192,7 @@
     {# Right: live preview #}
     <div>
         {% set previewDocumentId = this.previewDocumentId %}
+        {% set alternatePreviewIds = this.alternatePreviewIds %}
         <twig:Card class="top-6 sticky">
             <twig:Card:Header>
                 <twig:Card:Title>Live preview</twig:Card:Title>
@@ -186,6 +204,10 @@
                         {{ previewDocumentId }}
                     </code>
                 </div>
+                {% for alternateId in alternatePreviewIds %}
+                {% if loop.first %}<p class="mt-3 mb-1 text-muted-foreground text-xs">Also valid as</p>{% endif %}
+                <code class="block font-mono text-muted-foreground text-xs text-center">{{ alternateId }}</code>
+                {% endfor %}
                 {% if title %}
                 <p class="mt-3 text-foreground text-sm">{{ title }}</p>
                 {% endif %}

@@ -29,7 +29,8 @@ class DocumentEntryRepository extends ServiceEntityRepository
             ->leftJoin('e.docType', 'dt')
             ->leftJoin('e.subCategory', 'sc')
             ->leftJoin('e.createdBy', 'u')
-            ->addSelect('s', 'mc', 'dt', 'sc', 'u');
+            ->leftJoin('e.alternateMainCategories', 'amc')
+            ->addSelect('s', 'mc', 'dt', 'sc', 'u', 'amc');
 
         if ($search) {
             $qb->andWhere(
@@ -47,7 +48,9 @@ class DocumentEntryRepository extends ServiceEntityRepository
         }
 
         if ($mainCategoryId) {
-            $qb->andWhere('mc.id = :mainCategoryId')->setParameter('mainCategoryId', $mainCategoryId);
+            // Also match entries that are valid under this category as an alternate
+            $qb->andWhere('mc.id = :mainCategoryId OR :mainCategoryId MEMBER OF e.alternateMainCategories')
+               ->setParameter('mainCategoryId', $mainCategoryId);
         }
 
         $allowedSortFields = ['e.title', 'e.referenceCode', 's.code', 'dt.code', 'mc.code', 'sc.code', 'e.docNumber'];
@@ -72,29 +75,45 @@ class DocumentEntryRepository extends ServiceEntityRepository
         return $qb;
     }
 
-    /** Returns true if a document entry with the same ID components already exists (optionally excluding a given entry by UUID) */
-    public function isDuplicate(int $subsidiaryId, int $mainCategoryId, int $docTypeId, int $subCategoryId, int $docNumber, string $revision, ?string $excludeId = null): bool
+    /**
+     * Returns the document IDs that would be claimed twice if the given entry were saved:
+     * other entries with the same subsidiary, doc type, sub category, number and revision
+     * whose allowed main categories (default + alternates) overlap with the given entry's.
+     *
+     * @return string[]
+     */
+    public function findConflictingDocumentIds(DocumentEntry $entry): array
     {
+        $allowed = $entry->getAllowedMainCategories();
+
         $qb = $this->createQueryBuilder('e')
-            ->select('COUNT(e.id)')
-            ->where('e.subsidiary = :subsidiaryId')
-            ->andWhere('e.mainCategory = :mainCategoryId')
-            ->andWhere('e.docType = :docTypeId')
-            ->andWhere('e.subCategory = :subCategoryId')
+            ->leftJoin('e.alternateMainCategories', 'amc')
+            ->addSelect('amc')
+            ->where('e.subsidiary = :subsidiary')
+            ->andWhere('e.docType = :docType')
+            ->andWhere('e.subCategory = :subCategory')
             ->andWhere('e.docNumber = :docNumber')
             ->andWhere('e.revision = :revision')
-            ->setParameter('subsidiaryId', $subsidiaryId)
-            ->setParameter('mainCategoryId', $mainCategoryId)
-            ->setParameter('docTypeId', $docTypeId)
-            ->setParameter('subCategoryId', $subCategoryId)
-            ->setParameter('docNumber', $docNumber)
-            ->setParameter('revision', $revision);
+            ->setParameter('subsidiary', $entry->getSubsidiary())
+            ->setParameter('docType', $entry->getDocType())
+            ->setParameter('subCategory', $entry->getSubCategory())
+            ->setParameter('docNumber', $entry->getDocNumber())
+            ->setParameter('revision', $entry->getRevision());
 
-        if ($excludeId !== null) {
-            $qb->andWhere('e.id != :excludeId')->setParameter('excludeId', $excludeId);
+        if ($entry->getId() !== null) {
+            $qb->andWhere('e.id != :id')->setParameter('id', $entry->getId(), 'uuid');
         }
 
-        return (int) $qb->getQuery()->getSingleScalarResult() > 0;
+        $conflicts = [];
+        foreach ($qb->getQuery()->getResult() as $other) {
+            foreach ($other->getAllowedMainCategories() as $mainCategory) {
+                if (\in_array($mainCategory, $allowed, true)) {
+                    $conflicts[] = $other->getDocumentIdFor($mainCategory);
+                }
+            }
+        }
+
+        return $conflicts;
     }
 
     /** Returns the highest docNumber used for a given docType + subCategory combination, or null if none exist */

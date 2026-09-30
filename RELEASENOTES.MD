@@ -1,5 +1,12 @@
 # Release Notes
 
+## Version 1.2.0 (30 September 2026)
+
+- Document identifiers now have a list of allowed main categories, rather than just one. Though you still need to set a default one.
+- The `Predefined Document Number` section and it's codebase have been omitted. It wasn't as useful as I thought it'd be.
+- Updated dependencies.
+
+
 ## Version 1.1.1 (24 September 2026)
 
 - Fixed critical bugfix on `New` and `Edit` pages.

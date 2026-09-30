@@ -3,15 +3,17 @@
 namespace App\Entity;
 
 use App\Repository\DocumentEntryRepository;
+use App\Validator\UniqueDocumentId;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: DocumentEntryRepository::class)]
 #[ORM\Table(name: 'document_entry')]
 #[ORM\UniqueConstraint(name: 'document_entry_unique_id', columns: ['subsidiary_id', 'main_category_id', 'doc_type_id', 'sub_category_id', 'doc_number', 'revision'])]
 #[ORM\HasLifecycleCallbacks]
-#[UniqueEntity(fields: ['subsidiary', 'mainCategory', 'docType', 'subCategory', 'docNumber', 'revision'], message: 'This document ID already exists in the ledger.')]
+#[UniqueDocumentId]
 class DocumentEntry
 {
     #[ORM\Id]
@@ -27,6 +29,16 @@ class DocumentEntry
     #[ORM\ManyToOne(targetEntity: DocMainCategory::class, inversedBy: 'documentEntries')]
     #[ORM\JoinColumn(nullable: false)]
     private DocMainCategory $mainCategory;
+
+    /**
+     * Extra main categories this document is also valid under, e.g. a feasibility (1) drawing
+     * that carries over to installation (5) once a project is signed. The ledger can display
+     * the document under any of them; the stored mainCategory remains the default.
+     */
+    #[ORM\ManyToMany(targetEntity: DocMainCategory::class)]
+    #[ORM\JoinTable(name: 'document_entry_alt_main_category')]
+    #[ORM\OrderBy(['code' => 'ASC'])]
+    private Collection $alternateMainCategories;
 
     /**
      * Project/reference code — numeric (001, 002…) for signed projects,
@@ -74,6 +86,7 @@ class DocumentEntry
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->alternateMainCategories = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -88,7 +101,36 @@ class DocumentEntry
     public function setSubsidiary(DocSubsidiary $subsidiary): static { $this->subsidiary = $subsidiary; return $this; }
 
     public function getMainCategory(): DocMainCategory { return $this->mainCategory; }
-    public function setMainCategory(DocMainCategory $mainCategory): static { $this->mainCategory = $mainCategory; return $this; }
+    public function setMainCategory(DocMainCategory $mainCategory): static
+    {
+        $this->mainCategory = $mainCategory;
+        $this->alternateMainCategories->removeElement($mainCategory);
+        return $this;
+    }
+
+    /** @return Collection<int, DocMainCategory> */
+    public function getAlternateMainCategories(): Collection { return $this->alternateMainCategories; }
+
+    public function addAlternateMainCategory(DocMainCategory $mainCategory): static
+    {
+        // The default is implicitly allowed; storing it again would only duplicate it.
+        if ($mainCategory !== ($this->mainCategory ?? null) && !$this->alternateMainCategories->contains($mainCategory)) {
+            $this->alternateMainCategories->add($mainCategory);
+        }
+        return $this;
+    }
+
+    public function removeAlternateMainCategory(DocMainCategory $mainCategory): static
+    {
+        $this->alternateMainCategories->removeElement($mainCategory);
+        return $this;
+    }
+
+    /** @return DocMainCategory[] The default main category first, followed by the alternates */
+    public function getAllowedMainCategories(): array
+    {
+        return [$this->mainCategory, ...$this->alternateMainCategories->toArray()];
+    }
 
     public function getReferenceCode(): string { return $this->referenceCode; }
     public function setReferenceCode(string $referenceCode): static { $this->referenceCode = $referenceCode; return $this; }
@@ -126,6 +168,28 @@ class DocumentEntry
             $this->subsidiary->getCode(),
             $this->mainCategory->getCode(),
             $this->referenceCode,
+            $this->docType->getCode(),
+            $this->subCategory->getFormattedCode(),
+            sprintf('%03d', $this->docNumber),
+            $this->revision
+        );
+    }
+
+    /**
+     * Document ID as it reads under the given main category, using that category's reference
+     * code placeholder, e.g. VM5-000-DWG-100-110-00 for an entry registered as VM1-AAA-….
+     */
+    public function getDocumentIdFor(DocMainCategory $mainCategory): string
+    {
+        if ($mainCategory === $this->mainCategory) {
+            return $this->getDocumentId();
+        }
+
+        return sprintf(
+            '%s%s-%s-%s-%s-%s-%s',
+            $this->subsidiary->getCode(),
+            $mainCategory->getCode(),
+            $mainCategory->getReferenceCode(),
             $this->docType->getCode(),
             $this->subCategory->getFormattedCode(),
             sprintf('%03d', $this->docNumber),

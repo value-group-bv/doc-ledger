@@ -325,58 +325,6 @@
             </twig:Card:Content>
         </twig:Card>
 
-        {# ── Predefined numbers ───────────────────────────────────────────────── #}
-        <twig:Card class="xl:col-span-2">
-            <twig:Card:Header>
-                <twig:Card:Title>Predefined Document Numbers</twig:Card:Title>
-                <twig:Card:Description>Fixed codes reserved for specific document types within a sub category</twig:Card:Description>
-            </twig:Card:Header>
-            <twig:Card:Content>
-                <div class="overflow-x-auto">
-                <table class="mb-4 w-full text-sm">
-                    <thead><tr class="border-border border-b text-muted-foreground text-xs">
-                        <th class="pb-2 text-left">Type</th>
-                        <th class="pb-2 text-left">Sub category</th>
-                        <th class="pb-2 text-left">Code</th>
-                        <th class="pb-2 text-left">Description</th>
-                        <th></th>
-                    </tr></thead>
-                    <tbody class="divide-y divide-border">
-                    {% for pn in predefinedNumbers %}
-                    <tr>
-                        <td class="py-2"><twig:Badge style="{{ doc_type_badge_style(pn.subCategory.docType.code) }}">{{ pn.subCategory.docType.code }}</twig:Badge></td>
-                        <td class="py-2 font-mono text-muted-foreground">{{ pn.subCategory.formattedCode }}</td>
-                        <td class="py-2 font-mono font-semibold">{{ pn.formattedCode }}</td>
-                        <td class="py-2">{{ pn.description }}</td>
-                        <td class="py-2 text-right">
-                            <form method="post" action="{{ path('admin_predefined_delete', {id: pn.id}) }}"
-                                onsubmit="return confirm('Delete {{ pn.formattedCode }}?')">
-                                <button type="submit" class="text-destructive text-xs hover:underline">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% else %}<tr><td colspan="5" class="py-3 text-muted-foreground text-center">None yet.</td></tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                </div>
-                <form method="post" action="{{ path('admin_predefined_new') }}" class="flex flex-wrap gap-2">
-                    <select name="subCategoryId"
-                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 h-9 text-sm transition-[color,box-shadow]">
-                        <option value="">Sub category…</option>
-                        {% for sc in subCategories %}
-                        <option value="{{ sc.id }}">{{ sc.docType.code }} - {{ sc.formattedCode }} {{ sc.description }}</option>
-                        {% endfor %}
-                    </select>
-                    <input name="code" type="number" min="0" max="999" placeholder="Code (0–999)"
-                        class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-36 h-9 text-sm transition-[color,box-shadow]" />
-                    <input name="description" placeholder="Description"
-                        class="flex flex-1 bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 min-w-48 h-9 text-sm transition-[color,box-shadow]" />
-                    <button type="submit" class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
-                </form>
-            </twig:Card:Content>
-        </twig:Card>
-
         {# ── Feasibility codes ────────────────────────────────────────────────── #}
         <twig:Card class="xl:col-span-2">
             <twig:Card:Header>

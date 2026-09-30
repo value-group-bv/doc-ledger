@@ -37,6 +37,24 @@
         </div>
         {{ form_row(form.docNumber) }}
         <div class="gap-2 grid">
+            {{ form_label(form.alternateMainCategories) }}
+            <div class="flex flex-wrap gap-x-4 gap-y-2">
+                {% for choice in form.alternateMainCategories %}
+                {# The default main category is always allowed, so it isn't offered as an alternate #}
+                {% if choice.vars.value != form.mainCategory.vars.value %}
+                <label class="flex items-center gap-2 text-sm cursor-pointer">
+                    {{ form_widget(choice) }}
+                    {{ choice.vars.label }}
+                </label>
+                {% else %}
+                {% do choice.setRendered() %}
+                {% endif %}
+                {% endfor %}
+            </div>
+            <p class="text-muted-foreground text-xs">For documents that carry over to another main category, e.g. from feasibility to installation once a project is signed. Only possible for sub categories that apply to all main categories.</p>
+            {{ form_errors(form.alternateMainCategories) }}
+        </div>
+        <div class="gap-2 grid">
             {{ form_label(form.title) }}
             {{ form_widget(form.title) }}
             <p class="text-muted-foreground text-xs">Only alphanumeric characters (A-Z, a-z, 0-9) and spaces are allowed, max. 48 characters</p>

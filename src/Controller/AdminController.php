@@ -9,7 +9,6 @@ use App\Entity\DocTitleWord;
 use App\Entity\DocType;
 use App\Entity\User;
 use App\Repository\DocMainCategoryRepository;
-use App\Repository\DocPredefinedNumberRepository;
 use App\Repository\DocSubCategoryRepository;
 use App\Repository\DocSubsidiaryRepository;
 use App\Repository\DocTitleWordRepository;
@@ -43,7 +42,6 @@ class AdminController extends AbstractController
         DocMainCategoryRepository $mainCats,
         DocTypeRepository $docTypes,
         DocSubCategoryRepository $subCats,
-        DocPredefinedNumberRepository $predefined,
         UserRepository $users,
         FeasibilityCodeRepository $feasibilityCodes,
         DocTitleWordRepository $titleWords,
@@ -53,7 +51,6 @@ class AdminController extends AbstractController
             'mainCategories' => $mainCats->findBy([], ['code' => 'ASC']),
             'docTypes' => $docTypes->findBy([], ['sortOrder' => 'ASC']),
             'subCategories' => $subCats->findBy([], ['docType' => 'ASC', 'code' => 'ASC']),
-            'predefinedNumbers' => $predefined->findBy([], ['subCategory' => 'ASC', 'code' => 'ASC']),
             'users' => $users->findBy([], ['createdAt' => 'DESC']),
             'recentFeasibilityCodes' => $feasibilityCodes->findRecent(10),
             'minorWords' => $titleWords->findBy(['type' => DocTitleWord::TYPE_MINOR], ['word' => 'ASC']),
@@ -406,44 +403,6 @@ class AdminController extends AbstractController
             $this->em->remove($entity);
             $this->em->flush();
             $this->addFlash('success', 'Sub category deleted.');
-        }
-        return $this->redirectToRoute('admin_index');
-    }
-
-    // ── Predefined numbers ────────────────────────────────────────────────────
-
-    #[Route('/predefined/new', name: 'predefined_new', methods: ['POST'])]
-    public function predefinedNew(Request $request, DocSubCategoryRepository $subCats): Response
-    {
-        $subCatId = (int) $request->request->get('subCategoryId', 0);
-        $code = (int) $request->request->get('code', 0);
-        $description = trim((string) $request->request->get('description', ''));
-        $subCategory = $subCats->find($subCatId);
-
-        if ($subCategory && $code >= 0 && $description) {
-            $entity = new \App\Entity\DocPredefinedNumber();
-            $entity->setCode($code)->setDescription($description)->setSubCategory($subCategory);
-            $this->em->persist($entity);
-            try {
-                $this->em->flush();
-                $this->addFlash('success', \sprintf("Predefined number %03d added.", $code));
-            } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException) {
-                $this->em->clear();
-                $this->addFlash('error', \sprintf("Predefined number %03d already exists for this sub category.", $code));
-            }
-        }
-
-        return $this->redirectToRoute('admin_index');
-    }
-
-    #[Route('/predefined/{id}/delete', name: 'predefined_delete', methods: ['POST'])]
-    public function predefinedDelete(int $id): Response
-    {
-        $entity = $this->em->find(\App\Entity\DocPredefinedNumber::class, $id);
-        if ($entity) {
-            $this->em->remove($entity);
-            $this->em->flush();
-            $this->addFlash('success', 'Predefined number deleted.');
         }
         return $this->redirectToRoute('admin_index');
     }

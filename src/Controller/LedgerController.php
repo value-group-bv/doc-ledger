@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Form\DocumentEntryType;
+use App\Repository\DocMainCategoryRepository;
 use App\Repository\DocumentEntryRepository;
 use App\Service\TitleCaseFormatter;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,9 +26,20 @@ class LedgerController extends AbstractController
     ) {}
 
     #[Route('/', name: 'ledger_index')]
-    public function index(): Response
+    public function index(DocMainCategoryRepository $mainCategories): Response
     {
-        return $this->render('ledger/index.html.twig');
+        $mainCategories = $mainCategories->findBy([], ['code' => 'ASC']);
+
+        // Reference code placeholder per main category code, used when the ledger shows an entry under an alternate
+        $placeholders = [];
+        foreach ($mainCategories as $mc) {
+            $placeholders[$mc->getCode()] = $mc->getReferenceCode();
+        }
+
+        return $this->render('ledger/index.html.twig', [
+            'mainCategories' => $mainCategories,
+            'referenceCodePlaceholders' => json_encode($placeholders, \JSON_FORCE_OBJECT),
+        ]);
     }
 
     #[Route('/ledger/export', name: 'ledger_export')]
@@ -39,14 +51,14 @@ class LedgerController extends AbstractController
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Ledger');
 
-        $headers = ['Document ID', 'Title', 'Subsidiary', 'Reference Code', 'Document Type', 'Main Category', 'Sub Category', 'Document Number'];
+        $headers = ['Document ID', 'Title', 'Subsidiary', 'Reference Code', 'Document Type', 'Main Category', 'Sub Category', 'Document Number', 'Also Valid Under Main Cats'];
         $sheet->fromArray([$headers], null, 'A1');
 
         $headerStyle = [
             'font' => ['bold' => true],
             'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E0E0E2']],
         ];
-        $sheet->getStyle('A1:H1')->applyFromArray($headerStyle);
+        $sheet->getStyle('A1:I1')->applyFromArray($headerStyle);
         $sheet->freezePane('A2');
 
         $row = 2;
@@ -60,6 +72,7 @@ class LedgerController extends AbstractController
                 $entry->getMainCategory()->getCode(),
                 $entry->getSubCategory()->getFormattedCode(),
                 $entry->getDocNumber(),
+                implode(', ', $entry->getAlternateMainCategories()->map(fn($mc) => $mc->getCode())->toArray()),
             ]], null, 'A' . $row, true);
             $row++;
         }
@@ -68,7 +81,7 @@ class LedgerController extends AbstractController
             $sheet->getStyle('H2:H' . $row - 1)->getNumberFormat()->setFormatCode('000');
         }
 
-        foreach (range('A', 'H') as $col) {
+        foreach (range('A', 'I') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 

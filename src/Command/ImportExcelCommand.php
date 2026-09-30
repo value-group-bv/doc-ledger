@@ -3,7 +3,6 @@
 namespace App\Command;
 
 use App\Entity\DocMainCategory;
-use App\Entity\DocPredefinedNumber;
 use App\Entity\DocSubCategory;
 use App\Entity\DocSubsidiary;
 use App\Entity\DocType;
@@ -62,7 +61,6 @@ class ImportExcelCommand extends Command
         $this->importMainCategories($spreadsheet, $io);
         $this->importDocTypes($spreadsheet, $io);
         $this->importSubCategories($spreadsheet, $io);
-        $this->importPredefinedNumbers($spreadsheet, $io);
 
         $this->em->flush();
 
@@ -197,50 +195,10 @@ class ImportExcelCommand extends Command
         $io->writeln("  Sub categories: +$count");
     }
 
-    private function importPredefinedNumbers(\PhpOffice\PhpSpreadsheet\Spreadsheet $spreadsheet, SymfonyStyle $io): void
-    {
-        $sheet = $spreadsheet->getSheetByName('DOCNUMBERS');
-        if (!$sheet) {
-            $io->warning('Sheet "DOCNUMBERS" not found — skipping predefined numbers.');
-            return;
-        }
-
-        $count = 0;
-        foreach ($sheet->getRowIterator(2) as $row) {
-            $cells = $row->getCellIterator();
-            $cells->setIterateOnlyExistingCells(false);
-            $data = $this->rowToArray($cells);
-
-            // Expected columns: SUBCAT, DESCRIPTION, CODE, DOCTYPE
-            $subCatCode  = (int) ($data[0] ?? 0);
-            $description = trim((string) ($data[1] ?? ''));
-            $code        = (int) ($data[2] ?? 0);
-            $docTypeCode = trim((string) ($data[3] ?? ''));
-
-            if (!$docTypeCode || !$description) continue;
-
-            $docType = $this->em->getRepository(DocType::class)->findOneBy(['code' => $docTypeCode]);
-            if (!$docType) continue;
-
-            $subCat = $this->em->getRepository(DocSubCategory::class)->findOneBy(['code' => $subCatCode, 'docType' => $docType]);
-            if (!$subCat) continue;
-
-            $existing = $this->em->getRepository(DocPredefinedNumber::class)->findOneBy(['code' => $code, 'subCategory' => $subCat]);
-            if ($existing) continue;
-
-            $entity = (new DocPredefinedNumber())->setCode($code)->setDescription($description)->setSubCategory($subCat);
-            $this->em->persist($entity);
-            $count++;
-        }
-
-        $io->writeln("  Predefined numbers: +$count");
-    }
-
     private function clearConfigData(SymfonyStyle $io): void
     {
         $io->warning('Clearing existing config data…');
         $connection = $this->em->getConnection();
-        $connection->executeStatement('DELETE FROM doc_predefined_number');
         $connection->executeStatement('DELETE FROM doc_sub_category');
         $connection->executeStatement('DELETE FROM doc_type');
         $connection->executeStatement('DELETE FROM doc_main_category');

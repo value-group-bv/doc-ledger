@@ -9,23 +9,41 @@
                 display: table-cell !important;
             }
         }
+        /* Dim entries that aren't valid under the main category override */
+        {% for mc in mainCategories %}
+        [data-doc-id-override-main-value="{{ mc.code }}"] tbody tr:has([data-doc-id-mains]:not([data-doc-id-mains~="{{ mc.code }}"])) {
+            opacity: 0.4;
+        }
+        {% endfor %}
     </style>
-    <div data-controller="doc-id-override">
+    <div data-controller="doc-id-override" data-doc-id-override-refs-value="{{ referenceCodePlaceholders }}">
     <div class="flex sm:flex-row flex-col sm:justify-between sm:items-end gap-4 mb-6">
         <div>
             <h1 class="font-heading font-bold text-foreground text-3xl">Ledger</h1>
             <p class="mt-1 text-muted-foreground">All registered document IDs</p>
         </div>
 
-        {# Temporary override of reference code / revision in displayed and copied IDs (not saved) #}
+        {# Temporary override of main category / reference code / revision in displayed and copied IDs (not saved) #}
         <div class="flex items-end gap-2">
+            <div>
+                <label for="doc-id-override-main" class="block mb-1 text-muted-foreground text-xs">Main category</label>
+                <select id="doc-id-override-main"
+                    data-doc-id-override-target="main" data-action="change->doc-id-override#update"
+                    title="Show entries that are also valid under this main category with it; other entries are dimmed"
+                    class="flex bg-background shadow-xs px-3 py-2 border border-input focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-28 h-9 font-mono text-sm transition-[color,box-shadow]">
+                    <option value="">-</option>
+                    {% for mc in mainCategories %}
+                    <option value="{{ mc.code }}">{{ mc.code }}</option>
+                    {% endfor %}
+                </select>
+            </div>
             <div>
                 <label for="doc-id-override-ref" class="block mb-1 text-muted-foreground text-xs">Reference code</label>
                 <input type="text" id="doc-id-override-ref" maxlength="3" placeholder="000 / AAA"
                     autocomplete="off" spellcheck="false"
                     data-doc-id-override-target="ref" data-action="input->doc-id-override#update"
                     title="3 digits (001) or 3 letters (AAA, PRO)"
-                    class="flex bg-background shadow-xs px-3 py-2 border border-input aria-invalid:border-destructive focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-28 h-9 font-mono placeholder:font-sans placeholder:text-muted-foreground text-sm uppercase placeholder:normal-case transition-[color,box-shadow]" />
+                    class="flex bg-background shadow-xs px-3 py-2 border border-input aria-invalid:border-destructive focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-28 h-9 placeholder:font-sans font-mono placeholder:text-muted-foreground text-sm uppercase placeholder:normal-case transition-[color,box-shadow]" />
             </div>
             <div>
                 <label for="doc-id-override-rev" class="block mb-1 text-muted-foreground text-xs">Revision</label>
@@ -33,7 +51,7 @@
                     autocomplete="off" spellcheck="false"
                     data-doc-id-override-target="rev" data-action="input->doc-id-override#update"
                     title="Final release (00, 01) or interim version (0A, 1F)"
-                    class="flex bg-background shadow-xs px-3 py-2 border border-input aria-invalid:border-destructive focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-24 h-9 font-mono placeholder:font-sans placeholder:text-muted-foreground text-sm uppercase placeholder:normal-case transition-[color,box-shadow]" />
+                    class="flex bg-background shadow-xs px-3 py-2 border border-input aria-invalid:border-destructive focus-visible:border-ring rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 w-24 h-9 placeholder:font-sans font-mono placeholder:text-muted-foreground text-sm uppercase placeholder:normal-case transition-[color,box-shadow]" />
             </div>
             <button type="button" hidden data-doc-id-override-target="clear" data-action="doc-id-override#clear"
                 class="inline-flex justify-center items-center hover:bg-muted border border-border rounded-md size-9 text-muted-foreground hover:text-foreground transition-colors"

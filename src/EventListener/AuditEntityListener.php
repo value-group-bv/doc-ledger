@@ -3,7 +3,6 @@
 namespace App\EventListener;
 
 use App\Entity\DocMainCategory;
-use App\Entity\DocPredefinedNumber;
 use App\Entity\DocSubCategory;
 use App\Entity\DocSubsidiary;
 use App\Entity\DocType;
@@ -38,7 +37,6 @@ class AuditEntityListener
         DocMainCategory::class,
         DocSubCategory::class,
         DocType::class,
-        DocPredefinedNumber::class,
         FeasibilityCode::class,
         User::class,
     ];
@@ -60,16 +58,30 @@ class AuditEntityListener
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
             $this->recordChange($actor, $entity, 'created');
         }
+        // Collection-only changes (e.g. ticking an alternate main category) don't schedule an
+        // entity update, so fold them into the owner's list of changed fields.
+        $updates = [];
         foreach ($uow->getScheduledEntityUpdates() as $entity) {
-            $this->recordChange($actor, $entity, 'updated', $uow->getEntityChangeSet($entity));
+            $updates[spl_object_id($entity)] = [$entity, array_keys($uow->getEntityChangeSet($entity))];
+        }
+        foreach ([...$uow->getScheduledCollectionUpdates(), ...$uow->getScheduledCollectionDeletions()] as $collection) {
+            $owner = $collection->getOwner();
+            if ($owner === null || $uow->isScheduledForInsert($owner) || $uow->isScheduledForDelete($owner)) {
+                continue;
+            }
+            $updates[spl_object_id($owner)] ??= [$owner, []];
+            $updates[spl_object_id($owner)][1][] = $collection->getMapping()->fieldName;
+        }
+        foreach ($updates as [$entity, $changedFields]) {
+            $this->recordChange($actor, $entity, 'updated', array_unique($changedFields));
         }
         foreach ($uow->getScheduledEntityDeletions() as $entity) {
             $this->recordChange($actor, $entity, 'deleted');
         }
     }
 
-    /** @param array<string, mixed> $changeSet */
-    private function recordChange(User $actor, object $entity, string $action, array $changeSet = []): void
+    /** @param string[] $changedFields */
+    private function recordChange(User $actor, object $entity, string $action, array $changedFields = []): void
     {
         $category = match (true) {
             \in_array($entity::class, self::LEDGER_ENTRY_CLASSES, true) => 'ledger_entry',
@@ -85,7 +97,7 @@ class AuditEntityListener
         $detail = match ($action) {
             'created' => "Created {$label}",
             'deleted' => "Deleted {$label}",
-            'updated' => "Updated {$label}" . ($changeSet ? ' (' . implode(', ', array_keys($changeSet)) . ')' : ''),
+            'updated' => "Updated {$label}" . ($changedFields ? ' (' . implode(', ', $changedFields) . ')' : ''),
         };
 
         $this->auditLogger->logDuringFlush($actor->getEmail(), "{$category}.{$action}", $detail);

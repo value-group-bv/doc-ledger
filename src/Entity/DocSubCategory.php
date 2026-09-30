@@ -38,16 +38,11 @@ class DocSubCategory
     #[ORM\JoinColumn(nullable: true)]
     private ?DocSubsidiary $subsidiary = null;
 
-    #[ORM\OneToMany(targetEntity: DocPredefinedNumber::class, mappedBy: 'subCategory', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[ORM\OrderBy(['code' => 'ASC'])]
-    private Collection $predefinedNumbers;
-
     #[ORM\OneToMany(targetEntity: DocumentEntry::class, mappedBy: 'subCategory')]
     private Collection $documentEntries;
 
     public function __construct()
     {
-        $this->predefinedNumbers = new ArrayCollection();
         $this->documentEntries = new ArrayCollection();
     }
 
@@ -64,9 +59,6 @@ class DocSubCategory
 
     public function getSubsidiary(): ?DocSubsidiary { return $this->subsidiary; }
     public function setSubsidiary(?DocSubsidiary $subsidiary): static { $this->subsidiary = $subsidiary; return $this; }
-
-    /** @return Collection<int, DocPredefinedNumber> */
-    public function getPredefinedNumbers(): Collection { return $this->predefinedNumbers; }
 
     public function getFormattedCode(): string { return \sprintf('%03d', $this->code); }
 

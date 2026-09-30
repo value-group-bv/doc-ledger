@@ -197,6 +197,9 @@
                         <button type="button" data-controller="copy-doc-number"
                             data-action="copy-doc-number#copy"
                             data-doc-id-head="{{ entry.subsidiary.code }}{{ entry.mainCategory.code }}"
+                            data-doc-id-subsidiary="{{ entry.subsidiary.code }}"
+                            data-doc-id-main="{{ entry.mainCategory.code }}"
+                            data-doc-id-mains="{{ entry.allowedMainCategories|map(mc => mc.code)|join(' ') }}"
                             data-doc-id-ref="{{ entry.referenceCode }}"
                             data-doc-id-tail="{{ entry.docType.code }}-{{ entry.subCategory.formattedCode }}-{{ '%03d'|format(entry.docNumber) }}"
                             data-doc-id-rev="{{ entry.revision }}"
@@ -221,6 +224,11 @@
                     </td>
                     <td class="sm:table-cell px-4 py-3 text-muted-foreground text-xs" style="display: none;">
                         {{ entry.mainCategory.code }} - {{ entry.mainCategory.description }}
+                        {% if entry.alternateMainCategories is not empty %}
+                        <span class="block text-muted-foreground/70" title="Also valid under these main categories">
+                            also {{ entry.alternateMainCategories|map(mc => mc.code)|join(', ') }}
+                        </span>
+                        {% endif %}
                     </td>
                     <td class="sm:table-cell px-4 py-3 text-muted-foreground text-xs" style="display: none;">
                         {{ entry.subCategory.formattedCode }} - {{ entry.subCategory.description }}

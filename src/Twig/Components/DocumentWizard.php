@@ -3,13 +3,11 @@
 namespace App\Twig\Components;
 
 use App\Entity\DocMainCategory;
-use App\Entity\DocPredefinedNumber;
 use App\Entity\DocSubCategory;
 use App\Entity\DocSubsidiary;
 use App\Entity\DocType;
 use App\Entity\DocumentEntry;
 use App\Repository\DocMainCategoryRepository;
-use App\Repository\DocPredefinedNumberRepository;
 use App\Repository\DocSubCategoryRepository;
 use App\Repository\DocSubsidiaryRepository;
 use App\Repository\DocTypeRepository;
@@ -17,6 +15,7 @@ use App\Repository\DocumentEntryRepository;
 use App\Service\TitleCaseFormatter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
@@ -41,15 +40,16 @@ class DocumentWizard
     #[LiveProp(writable: true)]
     public int $subCategoryId = 0;
 
-    /** 0 = use predefined, 1 = manual */
+    /** 0 = next available, 1 = manual */
     #[LiveProp(writable: true)]
     public int $docNumberMode = 0;
 
     #[LiveProp(writable: true)]
-    public int $predefinedNumberId = 0;
-
-    #[LiveProp(writable: true)]
     public string $manualDocNumber = '';
+
+    /** @var int[] Main category IDs this document is also valid under */
+    #[LiveProp(writable: true)]
+    public array $alternateMainCategoryIds = [];
 
     #[LiveProp(writable: true)]
     public string $title = '';
@@ -69,11 +69,11 @@ class DocumentWizard
         private readonly DocMainCategoryRepository $mainCategories,
         private readonly DocTypeRepository $docTypes,
         private readonly DocSubCategoryRepository $subCategories,
-        private readonly DocPredefinedNumberRepository $predefinedNumbers,
         private readonly DocumentEntryRepository $entries,
         private readonly EntityManagerInterface $em,
         private readonly Security $security,
         private readonly TitleCaseFormatter $titleCaseFormatter,
+        private readonly ValidatorInterface $validator,
     ) {}
 
     /** @return DocSubsidiary[] */
@@ -101,11 +101,42 @@ class DocumentWizard
         return $this->subCategories->findForWizard($this->docTypeId, $this->mainCategoryId, $this->subsidiaryId);
     }
 
-    /** @return DocPredefinedNumber[] — filtered by selected subCategory */
-    public function getPredefinedNumbers(): array
+    /**
+     * Main categories that can be ticked as alternates: all except the selected default,
+     * and only for sub categories that apply to every main category.
+     *
+     * @return DocMainCategory[]
+     */
+    public function getAlternateMainCategoryOptions(): array
     {
-        if (!$this->subCategoryId) return [];
-        return $this->predefinedNumbers->findBy(['subCategory' => $this->subCategoryId], ['code' => 'ASC']);
+        if (!$this->mainCategoryId || !$this->subCategoryId) return [];
+
+        $subCategory = $this->em->find(DocSubCategory::class, $this->subCategoryId);
+        if (!$subCategory || $subCategory->getMainCategory() !== null) return [];
+
+        return array_values(array_filter(
+            $this->getMainCategories(),
+            fn(DocMainCategory $mc) => $mc->getId() !== $this->mainCategoryId,
+        ));
+    }
+
+    /** @return string[] Document IDs the entry would claim that already exist, checked live while filling in the form */
+    public function getConflictingDocumentIds(): array
+    {
+        $entry = $this->buildEntry();
+        return $entry ? $this->entries->findConflictingDocumentIds($entry) : [];
+    }
+
+    /** @return string[] Document IDs the entry would also be valid as, for the preview */
+    public function getAlternatePreviewIds(): array
+    {
+        $entry = $this->buildEntry();
+        if (!$entry) return [];
+
+        return array_map(
+            fn(DocMainCategory $mc) => $entry->getDocumentIdFor($mc),
+            $entry->getAlternateMainCategories()->toArray(),
+        );
     }
 
     public function getSuggestedDocNumber(): int
@@ -117,8 +148,14 @@ class DocumentWizard
 
     public function getPreviewDocumentId(): string
     {
+        return $this->buildEntry()?->getDocumentId() ?? '—';
+    }
+
+    /** Builds an unsaved entry from the current selection, or null while the selection is incomplete */
+    private function buildEntry(): ?DocumentEntry
+    {
         if (!$this->subsidiaryId || !$this->mainCategoryId || !$this->docTypeId || !$this->subCategoryId) {
-            return '—';
+            return null;
         }
 
         $subsidiary   = $this->em->find(DocSubsidiary::class, $this->subsidiaryId);
@@ -126,30 +163,31 @@ class DocumentWizard
         $docType      = $this->em->find(DocType::class, $this->docTypeId);
         $subCategory  = $this->em->find(DocSubCategory::class, $this->subCategoryId);
 
-        if (!$subsidiary || !$mainCategory || !$docType || !$subCategory) return '—';
+        if (!$subsidiary || !$mainCategory || !$docType || !$subCategory) return null;
 
-        $docNum = $this->resolvedDocNumber();
+        $entry = new DocumentEntry();
+        $entry->setSubsidiary($subsidiary);
+        $entry->setMainCategory($mainCategory);
+        $entry->setReferenceCode($mainCategory->getReferenceCode());
+        $entry->setDocType($docType);
+        $entry->setSubCategory($subCategory);
+        $entry->setDocNumber($this->resolvedDocNumber());
+        $entry->setRevision('00');
 
-        return \sprintf(
-            '%s%s-%s-%s-%s-%s-%s',
-            $subsidiary->getCode(),
-            $mainCategory->getCode(),
-            $mainCategory->getReferenceCode(),
-            $docType->getCode(),
-            $subCategory->getFormattedCode(),
-            \sprintf('%03d', $docNum),
-            '00'
-        );
+        // Silently drops stale ticks, e.g. after switching to a scoped sub category
+        foreach ($this->getAlternateMainCategoryOptions() as $option) {
+            if (\in_array($option->getId(), array_map('intval', $this->alternateMainCategoryIds), true)) {
+                $entry->addAlternateMainCategory($option);
+            }
+        }
+
+        return $entry;
     }
 
     private function resolvedDocNumber(): int
     {
         if ($this->docNumberMode === 1) {
             return max(0, (int) $this->manualDocNumber);
-        }
-        if ($this->predefinedNumberId) {
-            $pre = $this->em->find(DocPredefinedNumber::class, $this->predefinedNumberId);
-            if ($pre) return $pre->getCode();
         }
         return $this->getSuggestedDocNumber();
     }
@@ -171,31 +209,21 @@ class DocumentWizard
             return;
         }
 
-        $subsidiary   = $this->em->find(DocSubsidiary::class, $this->subsidiaryId);
-        $mainCategory = $this->em->find(DocMainCategory::class, $this->mainCategoryId);
-        $docType      = $this->em->find(DocType::class, $this->docTypeId);
-        $subCategory  = $this->em->find(DocSubCategory::class, $this->subCategoryId);
+        $entry = $this->buildEntry();
+        if (!$entry) return;
 
-        if (!$subsidiary || !$mainCategory || !$docType || !$subCategory) return;
-
-        $docNumber = $this->resolvedDocNumber();
+        $docNumber = $entry->getDocNumber();
         if ($docNumber < 0 || $docNumber > 999) {
             $this->duplicateError = 'Document number must be between 0 and 999.';
             return;
         }
-        if ($this->entries->isDuplicate($this->subsidiaryId, $this->mainCategoryId, $this->docTypeId, $this->subCategoryId, $docNumber, '00')) {
-            $this->duplicateError = 'This document ID already exists in the ledger.';
+
+        $violations = $this->validator->validate($entry);
+        if (\count($violations) > 0) {
+            $this->duplicateError = $violations[0]->getMessage();
             return;
         }
 
-        $entry = new DocumentEntry();
-        $entry->setSubsidiary($subsidiary);
-        $entry->setMainCategory($mainCategory);
-        $entry->setReferenceCode($mainCategory->getReferenceCode());
-        $entry->setDocType($docType);
-        $entry->setSubCategory($subCategory);
-        $entry->setDocNumber($docNumber);
-        $entry->setRevision('00');
         $entry->setTitle($this->titleCaseFormatter->format($this->title));
         $entry->setComments($this->comments ?: null);
         $entry->setCreatedBy($this->security->getUser());
@@ -211,8 +239,8 @@ class DocumentWizard
         $this->docTypeId = 0;
         $this->subCategoryId = 0;
         $this->docNumberMode = 0;
-        $this->predefinedNumberId = 0;
         $this->manualDocNumber = '';
+        $this->alternateMainCategoryIds = [];
         $this->title = '';
         $this->comments = '';
 
