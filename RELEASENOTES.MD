@@ -4,6 +4,14 @@
 
 - Document identifiers now have a list of allowed main categories, rather than just one. Though you still need to set a default one.
 - The `Predefined Document Number` section and it's codebase have been omitted. It wasn't as useful as I thought it'd be.
+- The project view on the `Ledger` page can now also switch the main category. Documents that aren't allowed under it are dimmed.
+- The project view is more compact, remembers its values while you browse and accepts a single-digit revision (`7` becomes `07`).
+- `New` and `Edit` pages now warn right away when a document ID already exists.
+- The `Admin` page is split into tabs.
+- Deleting something now asks for confirmation in a proper popup instead of the browser's default one.
+- After editing a sub category or feasibility code, the page returns to that row.
+- Success and error messages now look right in dark mode.
+- Input fields look the same on every page.
 - Updated dependencies.
 
 
