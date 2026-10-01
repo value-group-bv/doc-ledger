@@ -15,6 +15,7 @@ use App\Repository\DocumentEntryRepository;
 use App\Service\TitleCaseFormatter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
@@ -22,7 +23,9 @@ use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
+/** Admin-only like /ledger/new: live actions are reachable directly, so the page's check isn't enough */
 #[AsLiveComponent]
+#[IsGranted('ROLE_ADMIN')]
 class DocumentWizard
 {
     use DefaultActionTrait;

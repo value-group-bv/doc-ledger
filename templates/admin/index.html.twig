@@ -4,471 +4,542 @@
 {% set page_header = true %}
 
 {% block body %}
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="font-heading font-bold text-foreground text-3xl">Admin</h1>
-            <p class="mt-1 text-muted-foreground">Manage system settings and users</p>
-        </div>
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h1 class="font-heading font-bold text-foreground text-3xl">Admin</h1>
+        <p class="mt-1 text-muted-foreground">Manage system settings and users</p>
     </div>
+</div>
 
-    {{ include('_flashes.html.twig') }}
+{{ include('_flashes.html.twig') }}
 
-    {# Editing a row forces the tab it lives on; otherwise the browser reopens the last used tab #}
-    {% set forcedTab = (editSubcatId or editMaincatId) ? 'numbering' : (editFeasibilityCodeId ? 'api' : '') %}
-    <twig:Tabs defaultValue="{{ forcedTab ?: 'numbering' }}" data-tabs-remember-value="admin" data-tabs-forced-value="{{ forcedTab ? 'true' : 'false' }}" class="gap-6">
-        <twig:Tabs:List class="flex-wrap py-1 group-data-[orientation=horizontal]/tabs:h-auto">
-            <twig:Tabs:Trigger value="numbering" class="px-3 py-1 h-auto">Numbering</twig:Tabs:Trigger>
-            <twig:Tabs:Trigger value="title-casing" class="px-3 py-1 h-auto">Title casing</twig:Tabs:Trigger>
-            <twig:Tabs:Trigger value="api" class="px-3 py-1 h-auto">API</twig:Tabs:Trigger>
-            <twig:Tabs:Trigger value="users" class="px-3 py-1 h-auto">Users <span class="inline-flex justify-center items-center bg-foreground/10 px-1 rounded-full min-w-5 h-5 font-medium tabular-nums text-muted-foreground text-xs leading-none">{{ users|length }}</span></twig:Tabs:Trigger>
-        </twig:Tabs:List>
+{# Editing a row forces the tab it lives on; otherwise the browser reopens the last used tab #}
+{% set forcedTab = (editSubcatId or editMaincatId) ? 'numbering' : (editFeasibilityCodeId ? 'api' : '') %}
+<twig:Tabs defaultValue="{{ forcedTab ?: 'numbering' }}" data-tabs-remember-value="admin"
+    data-tabs-forced-value="{{ forcedTab ? 'true' : 'false' }}" class="gap-6">
+    <twig:Tabs:List class="flex-wrap py-1 group-data-[orientation=horizontal]/tabs:h-auto">
+        <twig:Tabs:Trigger value="numbering" class="px-3 py-1 h-auto">Numbering</twig:Tabs:Trigger>
+        <twig:Tabs:Trigger value="title-casing" class="px-3 py-1 h-auto">Title casing</twig:Tabs:Trigger>
+        <twig:Tabs:Trigger value="api" class="px-3 py-1 h-auto">API</twig:Tabs:Trigger>
+        <twig:Tabs:Trigger value="users" class="px-3 py-1 h-auto">Users{# <span
+                class="inline-flex justify-center items-center bg-foreground/10 px-1 rounded-full min-w-5 h-5 font-medium tabular-nums text-muted-foreground text-xs leading-none">{{
+                users|length }}</span>#}</twig:Tabs:Trigger>
+    </twig:Tabs:List>
 
-        <twig:Tabs:Content value="numbering">
-            <div class="gap-8 grid grid-cols-1 xl:grid-cols-2">
-                {# ── Subsidiaries ─────────────────────────────────────────────────────── #}
-                <twig:Card>
-                    <twig:Card:Header>
-                        <twig:Card:Title>Subsidiaries</twig:Card:Title>
-                        <twig:Card:Description>Prefix codes for Value Group subsidiaries</twig:Card:Description>
-                    </twig:Card:Header>
-                    <twig:Card:Content>
-                        <div class="overflow-x-auto">
+    <twig:Tabs:Content value="numbering">
+        <div class="gap-8 grid grid-cols-1 xl:grid-cols-2">
+            {# ── Subsidiaries ─────────────────────────────────────────────────────── #}
+            <twig:Card>
+                <twig:Card:Header>
+                    <twig:Card:Title>Subsidiaries</twig:Card:Title>
+                    <twig:Card:Description>Prefix codes for Value Group subsidiaries</twig:Card:Description>
+                </twig:Card:Header>
+                <twig:Card:Content>
+                    <div class="overflow-x-auto">
                         <table class="mb-4 w-full text-sm">
-                            <thead><tr class="border-border border-b text-muted-foreground text-xs">
-                                <th class="pb-2 text-left">Code</th>
-                                <th class="pb-2 text-left">Description</th>
-                                <th class="pb-2 text-left">API key</th>
-                                <th></th>
-                            </tr></thead>
+                            <thead>
+                                <tr class="border-border border-b text-muted-foreground text-xs">
+                                    <th class="pb-2 text-left">Code</th>
+                                    <th class="pb-2 text-left">Description</th>
+                                    <th class="pb-2 text-left">API key</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
                             <tbody class="divide-y divide-border">
-                            {% for s in subsidiaries %}
-                            <tr>
-                                <td class="py-2 font-mono font-semibold">{{ s.code }}</td>
-                                <td class="py-2">{{ s.description }}</td>
-                                <td class="py-2 text-muted-foreground text-xs">
-                                    {% if s.apiKeyGeneratedAt %}
-                                    Generated {{ s.apiKeyGeneratedAt|date('d M Y') }}
+                                {% for s in subsidiaries %}
+                                <tr>
+                                    <td class="py-2 font-mono font-semibold">{{ s.code }}</td>
+                                    <td class="py-2">{{ s.description }}</td>
+                                    <td class="py-2 text-muted-foreground text-xs">
+                                        {% if s.apiKeyGeneratedAt %}
+                                        Generated {{ s.apiKeyGeneratedAt|date('d M Y') }}
+                                        {% else %}
+                                        None yet
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-2 text-right whitespace-nowrap">
+                                        <form method="post"
+                                            action="{{ path('admin_subsidiary_apikey_generate', {id: s.id}) }}"
+                                            data-turbo-confirm="{{ s.apiKeyGeneratedAt ? 'Regenerate' : 'Generate' }} API key for {{ s.code }}?{{ s.apiKeyGeneratedAt ? ' The old key will stop working.' : '' }}"
+                                            data-confirm-label="{{ s.apiKeyGeneratedAt ? 'Regenerate' : 'Generate' }}"
+                                            data-confirm-variant="{{ s.apiKeyGeneratedAt ? 'destructive' : 'default' }}"
+                                            class="inline">
+                                            <button type="submit" class="mr-3 text-primary text-xs hover:underline">{{
+                                                s.apiKeyGeneratedAt ? 'Regenerate' : 'Generate' }} key</button>
+                                        </form>
+                                        <form method="post" action="{{ path('admin_subsidiary_delete', {id: s.id}) }}"
+                                            data-turbo-confirm="Delete subsidiary {{ s.code }}?" class="inline">
+                                            <button type="submit"
+                                                class="text-destructive text-xs hover:underline">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% else %}<tr>
+                                    <td colspan="4" class="py-3 text-muted-foreground text-center">None yet.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <form method="post" action="{{ path('admin_subsidiary_new') }}" class="flex flex-wrap gap-2">
+                        <twig:Input name="code" placeholder="Code" maxlength="2" class="w-24 h-9" />
+                        <twig:Input name="description" placeholder="Description" class="flex-1 w-auto h-9" />
+                        <button type="submit"
+                            class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
+                    </form>
+                </twig:Card:Content>
+            </twig:Card>
+
+            {# ── Main categories ──────────────────────────────────────────────────── #}
+            <twig:Card>
+                <twig:Card:Header>
+                    <twig:Card:Title>Main Categories</twig:Card:Title>
+                    <twig:Card:Description>Single-digit codes</twig:Card:Description>
+                </twig:Card:Header>
+                <twig:Card:Content>
+                    <div class="overflow-x-auto">
+                        <table class="mb-4 w-full text-sm">
+                            <thead>
+                                <tr class="border-border border-b text-muted-foreground text-xs">
+                                    <th class="pb-2 text-left">Code</th>
+                                    <th class="pb-2 text-left">Ref.</th>
+                                    <th class="pb-2 text-left">Description</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-border">
+                                {% for mc in mainCategories %}
+                                <tr id="maincat-{{ mc.id }}" class="target:animate-row-flash scroll-mt-24">
+                                    <td class="py-2 font-mono font-semibold">{{ mc.code }}</td>
+                                    <td class="py-2">
+                                        <form method="post"
+                                            action="{{ path('admin_maincat_set_refcode', {id: mc.id}) }}">
+                                            <twig:Select name="referenceCode" onchange="this.form.submit()"
+                                                class="px-2 py-0 rounded w-auto h-7 font-mono text-xs">
+                                                <option value="000" {% if mc.referenceCode=='000' %}selected{% endif %}>
+                                                    000</option>
+                                                <option value="AAA" {% if mc.referenceCode=='AAA' %}selected{% endif %}>
+                                                    AAA</option>
+                                                <option value="PRO" {% if mc.referenceCode=='PRO' %}selected{% endif %}>
+                                                    PRO</option>
+                                            </twig:Select>
+                                        </form>
+                                    </td>
+                                    {% if mc.id == editMaincatId %}
+                                    <td class="py-1">
+                                        <form id="maincat-edit-{{ mc.id }}" data-turbo="false" method="post"
+                                            action="{{ path('admin_maincat_update', {id: mc.id}) }}"></form>
+                                        <twig:Input name="description" value="{{ mc.description }}"
+                                            form="maincat-edit-{{ mc.id }}" required autofocus
+                                            class="px-2 py-0 rounded h-8" />
+                                    </td>
+                                    <td class="py-1 text-right whitespace-nowrap">
+                                        <button type="submit" form="maincat-edit-{{ mc.id }}"
+                                            class="mr-3 text-primary text-xs hover:underline">Save</button>
+                                        <a href="{{ path('admin_index', {_fragment: 'maincat-' ~ mc.id}) }}"
+                                            class="text-muted-foreground text-xs hover:underline">Cancel</a>
+                                    </td>
                                     {% else %}
-                                    None yet
+                                    <td class="py-2">{{ mc.description }}</td>
+                                    <td class="py-2 text-right whitespace-nowrap">
+                                        <a href="{{ path('admin_index', {editMaincat: mc.id, _fragment: 'maincat-' ~ mc.id}) }}"
+                                            class="mr-3 text-xs hover:underline">Edit</a>
+                                        <form method="post" action="{{ path('admin_maincat_delete', {id: mc.id}) }}"
+                                            data-turbo-confirm="Delete main category {{ mc.code }}?" class="inline">
+                                            <button type="submit"
+                                                class="text-destructive text-xs hover:underline">Delete</button>
+                                        </form>
+                                    </td>
                                     {% endif %}
-                                </td>
-                                <td class="py-2 text-right whitespace-nowrap">
-                                    <form method="post" action="{{ path('admin_subsidiary_apikey_generate', {id: s.id}) }}"
-                                        data-turbo-confirm="{{ s.apiKeyGeneratedAt ? 'Regenerate' : 'Generate' }} API key for {{ s.code }}?{{ s.apiKeyGeneratedAt ? ' The old key will stop working.' : '' }}"
-                                        data-confirm-label="{{ s.apiKeyGeneratedAt ? 'Regenerate' : 'Generate' }}" data-confirm-variant="{{ s.apiKeyGeneratedAt ? 'destructive' : 'default' }}" class="inline">
-                                        <button type="submit" class="mr-3 text-primary text-xs hover:underline">{{ s.apiKeyGeneratedAt ? 'Regenerate' : 'Generate' }} key</button>
-                                    </form>
-                                    <form method="post" action="{{ path('admin_subsidiary_delete', {id: s.id}) }}"
-                                        data-turbo-confirm="Delete subsidiary {{ s.code }}?" class="inline">
-                                        <button type="submit" class="text-destructive text-xs hover:underline">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% else %}<tr><td colspan="4" class="py-3 text-muted-foreground text-center">None yet.</td></tr>
-                            {% endfor %}
+                                </tr>
+                                {% else %}<tr>
+                                    <td colspan="4" class="py-3 text-muted-foreground text-center">None yet.</td>
+                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
-                        </div>
-                        <form method="post" action="{{ path('admin_subsidiary_new') }}" class="flex flex-wrap gap-2">
-                            <twig:Input name="code" placeholder="Code" maxlength="2"
-                                class="w-24 h-9" />
-                            <twig:Input name="description" placeholder="Description"
-                                class="flex-1 w-auto h-9" />
-                            <button type="submit" class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
-                        </form>
-                    </twig:Card:Content>
-                </twig:Card>
+                    </div>
+                    <form method="post" action="{{ path('admin_maincat_new') }}" class="flex flex-wrap gap-2">
+                        <twig:Input name="code" placeholder="Code" maxlength="1" class="w-20 h-9" />
+                        <twig:Select name="referenceCode" class="w-auto h-9 font-mono">
+                            <option value="000">000</option>
+                            <option value="AAA">AAA</option>
+                            <option value="PRO">PRO</option>
+                        </twig:Select>
+                        <twig:Input name="description" placeholder="Description" class="flex-1 w-auto h-9" />
+                        <button type="submit"
+                            class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
+                    </form>
+                </twig:Card:Content>
+            </twig:Card>
 
-                {# ── Main categories ──────────────────────────────────────────────────── #}
-                <twig:Card>
-                    <twig:Card:Header>
-                        <twig:Card:Title>Main Categories</twig:Card:Title>
-                        <twig:Card:Description>Single-digit codes</twig:Card:Description>
-                    </twig:Card:Header>
-                    <twig:Card:Content>
-                        <div class="overflow-x-auto">
+            {# ── Doc types ────────────────────────────────────────────────────────── #}
+            <twig:Card>
+                <twig:Card:Header>
+                    <twig:Card:Title>Document Types</twig:Card:Title>
+                    <twig:Card:Description>Three-letter codes</twig:Card:Description>
+                </twig:Card:Header>
+                <twig:Card:Content>
+                    <div class="overflow-x-auto">
                         <table class="mb-4 w-full text-sm">
-                            <thead><tr class="border-border border-b text-muted-foreground text-xs">
-                                <th class="pb-2 text-left">Code</th>
-                                <th class="pb-2 text-left">Ref.</th>
-                                <th class="pb-2 text-left">Description</th>
-                                <th></th>
-                            </tr></thead>
+                            <thead>
+                                <tr class="border-border border-b text-muted-foreground text-xs">
+                                    <th class="pb-2 text-left">Code</th>
+                                    <th class="pb-2 text-left">Description</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
                             <tbody class="divide-y divide-border">
-                            {% for mc in mainCategories %}
-                            <tr id="maincat-{{ mc.id }}" class="target:animate-row-flash scroll-mt-24">
-                                <td class="py-2 font-mono font-semibold">{{ mc.code }}</td>
-                                <td class="py-2">
-                                    <form method="post" action="{{ path('admin_maincat_set_refcode', {id: mc.id}) }}">
-                                        <twig:Select name="referenceCode" onchange="this.form.submit()"
-                                            class="px-2 py-0 rounded w-auto h-7 font-mono text-xs">
-                                            <option value="000" {% if mc.referenceCode == '000' %}selected{% endif %}>000</option>
-                                            <option value="AAA" {% if mc.referenceCode == 'AAA' %}selected{% endif %}>AAA</option>
-                                            <option value="PRO" {% if mc.referenceCode == 'PRO' %}selected{% endif %}>PRO</option>
+                                {% for dt in docTypes %}
+                                <tr>
+                                    <td class="py-2">
+                                        <twig:Badge style="{{ doc_type_badge_style(dt.code) }}">{{ dt.code }}
+                                        </twig:Badge>
+                                    </td>
+                                    <td class="py-2">{{ dt.description }}</td>
+                                    <td class="py-2 text-right">
+                                        <form method="post" action="{{ path('admin_doctype_delete', {id: dt.id}) }}"
+                                            data-turbo-confirm="Delete document type {{ dt.code }}?">
+                                            <button type="submit"
+                                                class="text-destructive text-xs hover:underline">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% else %}<tr>
+                                    <td colspan="3" class="py-3 text-muted-foreground text-center">None yet.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <form method="post" action="{{ path('admin_doctype_new') }}" class="flex flex-wrap gap-2">
+                        <twig:Input name="code" placeholder="Code" maxlength="3" pattern="[A-Za-z]+"
+                            oninput="this.value=this.value.replace(/[^A-Za-z]/g,'')" class="w-28 h-9" />
+                        <twig:Input name="description" placeholder="Description" class="flex-1 w-auto h-9" />
+                        <button type="submit"
+                            class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
+                    </form>
+                </twig:Card:Content>
+            </twig:Card>
+
+            {# ── Sub categories ───────────────────────────────────────────────────── #}
+            <twig:Card class="xl:col-span-2">
+                <twig:Card:Header>
+                    <twig:Card:Title>Sub Categories</twig:Card:Title>
+                    <twig:Card:Description>Linked to a document type; three-digit codes</twig:Card:Description>
+                </twig:Card:Header>
+                <twig:Card:Content>
+                    <div class="overflow-x-auto">
+                        <table class="mb-4 w-full text-sm">
+                            <thead>
+                                <tr class="border-border border-b text-muted-foreground text-xs">
+                                    <th class="pb-2 text-left">Subsidiary</th>
+                                    <th class="pb-2 text-left">Main cat.</th>
+                                    <th class="pb-2 text-left">Type</th>
+                                    <th class="pb-2 text-left">Code</th>
+                                    <th class="pb-2 text-left">Description</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-border">
+                                {% for sc in subCategories %}
+                                {% if sc.id == editSubcatId %}
+                                <tr id="subcat-{{ sc.id }}" class="target:animate-row-flash scroll-mt-24">
+                                    <td class="py-1">
+                                        <form id="subcat-edit-{{ sc.id }}" data-turbo="false" method="post"
+                                            action="{{ path('admin_subcat_update', {id: sc.id}) }}"></form>
+                                        <twig:Select name="subsidiaryId" form="subcat-edit-{{ sc.id }}"
+                                            class="px-2 py-0 rounded w-auto h-8">
+                                            <option value="0">All</option>
+                                            {% for s in subsidiaries %}
+                                            <option value="{{ s.id }}" {% if sc.subsidiary and s.id==sc.subsidiary.id
+                                                %}selected{% endif %}>{{ s.code }}</option>
+                                            {% endfor %}
                                         </twig:Select>
-                                    </form>
-                                </td>
-                                {% if mc.id == editMaincatId %}
-                                <td class="py-1">
-                                    <form id="maincat-edit-{{ mc.id }}" data-turbo="false" method="post" action="{{ path('admin_maincat_update', {id: mc.id}) }}"></form>
-                                    <twig:Input name="description" value="{{ mc.description }}" form="maincat-edit-{{ mc.id }}" required autofocus
-                                        class="px-2 py-0 rounded h-8" />
-                                </td>
-                                <td class="py-1 text-right whitespace-nowrap">
-                                    <button type="submit" form="maincat-edit-{{ mc.id }}" class="mr-3 text-primary text-xs hover:underline">Save</button>
-                                    <a href="{{ path('admin_index', {_fragment: 'maincat-' ~ mc.id}) }}" class="text-muted-foreground text-xs hover:underline">Cancel</a>
-                                </td>
+                                    </td>
+                                    <td class="py-1">
+                                        <twig:Select name="mainCategoryId" form="subcat-edit-{{ sc.id }}"
+                                            class="px-2 py-0 rounded w-auto h-8">
+                                            <option value="0">All</option>
+                                            {% for mc in mainCategories %}
+                                            <option value="{{ mc.id }}" {% if sc.mainCategory and
+                                                mc.id==sc.mainCategory.id %}selected{% endif %}>{{ mc.code }}</option>
+                                            {% endfor %}
+                                        </twig:Select>
+                                    </td>
+                                    <td class="py-1">
+                                        <twig:Select name="docTypeId" form="subcat-edit-{{ sc.id }}"
+                                            class="px-2 py-0 rounded w-auto h-8">
+                                            {% for dt in docTypes %}
+                                            <option value="{{ dt.id }}" {% if dt.id==sc.docType.id %}selected{% endif
+                                                %}>{{ dt.code }}</option>
+                                            {% endfor %}
+                                        </twig:Select>
+                                    </td>
+                                    <td class="py-1">
+                                        <twig:Input name="code" type="number" min="0" max="999" value="{{ sc.code }}"
+                                            form="subcat-edit-{{ sc.id }}"
+                                            class="px-2 py-0 rounded w-24 h-8 font-mono" />
+                                    </td>
+                                    <td class="py-1">
+                                        <twig:Input name="description" value="{{ sc.description }}"
+                                            form="subcat-edit-{{ sc.id }}" class="px-2 py-0 rounded h-8" />
+                                    </td>
+                                    <td class="py-1 text-right whitespace-nowrap">
+                                        <button type="submit" form="subcat-edit-{{ sc.id }}"
+                                            class="mr-3 text-primary text-xs hover:underline">Save</button>
+                                        <a href="{{ path('admin_index', {_fragment: 'subcat-' ~ sc.id}) }}"
+                                            class="text-muted-foreground text-xs hover:underline">Cancel</a>
+                                    </td>
+                                </tr>
                                 {% else %}
-                                <td class="py-2">{{ mc.description }}</td>
-                                <td class="py-2 text-right whitespace-nowrap">
-                                    <a href="{{ path('admin_index', {editMaincat: mc.id, _fragment: 'maincat-' ~ mc.id}) }}" class="mr-3 text-xs hover:underline">Edit</a>
-                                    <form method="post" action="{{ path('admin_maincat_delete', {id: mc.id}) }}"
-                                        data-turbo-confirm="Delete main category {{ mc.code }}?" class="inline">
-                                        <button type="submit" class="text-destructive text-xs hover:underline">Delete</button>
-                                    </form>
-                                </td>
+                                <tr id="subcat-{{ sc.id }}" class="target:animate-row-flash scroll-mt-24">
+                                    <td class="py-2 font-mono text-muted-foreground">{{ sc.subsidiary ?
+                                        sc.subsidiary.code : 'All' }}</td>
+                                    <td class="py-2 font-mono text-muted-foreground">{{ sc.mainCategory ?
+                                        sc.mainCategory.code : 'All' }}</td>
+                                    <td class="py-2">
+                                        <twig:Badge style="{{ doc_type_badge_style(sc.docType.code) }}">{{
+                                            sc.docType.code }}</twig:Badge>
+                                    </td>
+                                    <td class="py-2 font-mono font-semibold">{{ sc.formattedCode }}</td>
+                                    <td class="py-2">{{ sc.description }}</td>
+                                    <td class="py-2 text-right whitespace-nowrap">
+                                        <a href="{{ path('admin_index', {editSubcat: sc.id, _fragment: 'subcat-' ~ sc.id}) }}"
+                                            class="mr-3 text-xs hover:underline">Edit</a>
+                                        <form method="post" action="{{ path('admin_subcat_delete', {id: sc.id}) }}"
+                                            data-turbo-confirm="Delete sub category {{ sc.formattedCode }}?"
+                                            class="inline">
+                                            <button type="submit"
+                                                class="text-destructive text-xs hover:underline">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
                                 {% endif %}
-                            </tr>
-                            {% else %}<tr><td colspan="4" class="py-3 text-muted-foreground text-center">None yet.</td></tr>
-                            {% endfor %}
+                                {% else %}<tr>
+                                    <td colspan="6" class="py-3 text-muted-foreground text-center">None yet.</td>
+                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
-                        </div>
-                        <form method="post" action="{{ path('admin_maincat_new') }}" class="flex flex-wrap gap-2">
-                            <twig:Input name="code" placeholder="Code" maxlength="1"
-                                class="w-20 h-9" />
-                            <twig:Select name="referenceCode"
-                                class="w-auto h-9 font-mono">
-                                <option value="000">000</option>
-                                <option value="AAA">AAA</option>
-                                <option value="PRO">PRO</option>
-                            </twig:Select>
-                            <twig:Input name="description" placeholder="Description"
-                                class="flex-1 w-auto h-9" />
-                            <button type="submit" class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
-                        </form>
-                    </twig:Card:Content>
-                </twig:Card>
-
-                {# ── Doc types ────────────────────────────────────────────────────────── #}
-                <twig:Card>
-                    <twig:Card:Header>
-                        <twig:Card:Title>Document Types</twig:Card:Title>
-                        <twig:Card:Description>Three-letter codes</twig:Card:Description>
-                    </twig:Card:Header>
-                    <twig:Card:Content>
-                        <div class="overflow-x-auto">
-                        <table class="mb-4 w-full text-sm">
-                            <thead><tr class="border-border border-b text-muted-foreground text-xs">
-                                <th class="pb-2 text-left">Code</th>
-                                <th class="pb-2 text-left">Description</th>
-                                <th></th>
-                            </tr></thead>
-                            <tbody class="divide-y divide-border">
+                    </div>
+                    <form method="post" action="{{ path('admin_subcat_new') }}" class="flex flex-wrap gap-2">
+                        <twig:Select name="subsidiaryId" class="w-auto h-9">
+                            <option value="0">All subsidiaries</option>
+                            {% for s in subsidiaries %}
+                            <option value="{{ s.id }}">{{ s.code }}</option>
+                            {% endfor %}
+                        </twig:Select>
+                        <twig:Select name="mainCategoryId" class="w-auto h-9">
+                            <option value="0">All main cats.</option>
+                            {% for mc in mainCategories %}
+                            <option value="{{ mc.id }}">{{ mc.code }} - {{ mc.description }}</option>
+                            {% endfor %}
+                        </twig:Select>
+                        <twig:Select name="docTypeId" required class="w-auto h-9">
+                            <option value="">Doc type…</option>
                             {% for dt in docTypes %}
-                            <tr>
-                                <td class="py-2"><twig:Badge style="{{ doc_type_badge_style(dt.code) }}">{{ dt.code }}</twig:Badge></td>
-                                <td class="py-2">{{ dt.description }}</td>
-                                <td class="py-2 text-right">
-                                    <form method="post" action="{{ path('admin_doctype_delete', {id: dt.id}) }}"
-                                        data-turbo-confirm="Delete document type {{ dt.code }}?">
-                                        <button type="submit" class="text-destructive text-xs hover:underline">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% else %}<tr><td colspan="3" class="py-3 text-muted-foreground text-center">None yet.</td></tr>
+                            <option value="{{ dt.id }}">{{ dt.code }}</option>
                             {% endfor %}
-                            </tbody>
-                        </table>
-                        </div>
-                        <form method="post" action="{{ path('admin_doctype_new') }}" class="flex flex-wrap gap-2">
-                            <twig:Input name="code" placeholder="Code" maxlength="3" pattern="[A-Za-z]+"
-                                oninput="this.value=this.value.replace(/[^A-Za-z]/g,'')"
-                                class="w-28 h-9" />
-                            <twig:Input name="description" placeholder="Description"
-                                class="flex-1 w-auto h-9" />
-                            <button type="submit" class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
-                        </form>
-                    </twig:Card:Content>
-                </twig:Card>
+                        </twig:Select>
+                        <twig:Input name="code" type="number" min="0" max="999" placeholder="Code (0–999)" required
+                            class="w-36 h-9" />
+                        <twig:Input name="description" placeholder="Description" required
+                            class="flex-1 w-auto min-w-48 h-9" />
+                        <button type="submit"
+                            class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
+                    </form>
+                </twig:Card:Content>
+            </twig:Card>
 
-                {# ── Sub categories ───────────────────────────────────────────────────── #}
-                <twig:Card class="xl:col-span-2">
-                    <twig:Card:Header>
-                        <twig:Card:Title>Sub Categories</twig:Card:Title>
-                        <twig:Card:Description>Linked to a document type; three-digit codes</twig:Card:Description>
-                    </twig:Card:Header>
-                    <twig:Card:Content>
-                        <div class="overflow-x-auto">
-                        <table class="mb-4 w-full text-sm">
-                            <thead><tr class="border-border border-b text-muted-foreground text-xs">
-                                <th class="pb-2 text-left">Subsidiary</th>
-                                <th class="pb-2 text-left">Main cat.</th>
-                                <th class="pb-2 text-left">Type</th>
+        </div>
+    </twig:Tabs:Content>
+
+    <twig:Tabs:Content value="title-casing">
+        <div class="gap-8 grid grid-cols-1 xl:grid-cols-2">
+            {# ── Title casing words ───────────────────────────────────────────────── #}
+            <twig:Card>
+                <twig:Card:Header>
+                    <twig:Card:Title>Lowercased</twig:Card:Title>
+                    <twig:Card:Description>Kept lowercase unless first or last word. Existing titles are updated on save
+                    </twig:Card:Description>
+                </twig:Card:Header>
+                <twig:Card:Content>
+                    <form method="post" action="{{ path('admin_title_words_update') }}" class="flex flex-col gap-2">
+                        <input type="hidden" name="type" value="minor" />
+                        <twig:Textarea name="words" rows="4">{{ minorWords|map(w => w.word)|join(', ') }}
+                        </twig:Textarea>
+                        <button type="submit"
+                            class="inline-flex items-center self-end bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Save</button>
+                    </form>
+                </twig:Card:Content>
+            </twig:Card>
+
+            <twig:Card>
+                <twig:Card:Header>
+                    <twig:Card:Title>Uppercased</twig:Card:Title>
+                    <twig:Card:Description>Always fully capitalised. Existing titles are updated on save
+                    </twig:Card:Description>
+                </twig:Card:Header>
+                <twig:Card:Content>
+                    <form method="post" action="{{ path('admin_title_words_update') }}" class="flex flex-col gap-2">
+                        <input type="hidden" name="type" value="uppercase" />
+                        <twig:Textarea name="words" rows="4">{{ uppercaseWords|map(w => w.word)|join(', ') }}
+                        </twig:Textarea>
+                        <button type="submit"
+                            class="inline-flex items-center self-end bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Save</button>
+                    </form>
+                </twig:Card:Content>
+            </twig:Card>
+
+        </div>
+    </twig:Tabs:Content>
+
+    <twig:Tabs:Content value="api">
+        {# ── Feasibility codes ────────────────────────────────────────────────── #}
+        <twig:Card class="xl:col-span-2">
+            <twig:Card:Header>
+                <div class="flex justify-between items-start">
+                    <div class="space-y-1.5">
+                        <twig:Card:Title>Feasibility Codes</twig:Card:Title>
+                        <twig:Card:Description>Requested via SharePoint, newest first</twig:Card:Description>
+                    </div>
+                    <a href="{{ path('admin_feasibility_codes_export') }}"
+                        class="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground text-xs transition-colors shrink-0">
+                        <twig:ux:icon name="material-symbols:download" class="size-3" />
+                        Export to XLSX
+                    </a>
+                </div>
+            </twig:Card:Header>
+            <twig:Card:Content>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-border border-b text-muted-foreground text-xs">
                                 <th class="pb-2 text-left">Code</th>
-                                <th class="pb-2 text-left">Description</th>
+                                <th class="pb-2 text-left">Title</th>
+                                <th class="hidden sm:table-cell pb-2 text-left">Requestor</th>
+                                <th class="pb-2 text-left">Subsidiary</th>
+                                <th class="hidden sm:table-cell pb-2 text-left">Created</th>
                                 <th></th>
-                            </tr></thead>
-                            <tbody class="divide-y divide-border">
-                            {% for sc in subCategories %}
-                            {% if sc.id == editSubcatId %}
-                            <tr id="subcat-{{ sc.id }}" class="target:animate-row-flash scroll-mt-24">
-                                <td class="py-1">
-                                    <form id="subcat-edit-{{ sc.id }}" data-turbo="false" method="post" action="{{ path('admin_subcat_update', {id: sc.id}) }}"></form>
-                                    <twig:Select name="subsidiaryId" form="subcat-edit-{{ sc.id }}"
-                                        class="px-2 py-0 rounded w-auto h-8">
-                                        <option value="0">All</option>
-                                        {% for s in subsidiaries %}
-                                        <option value="{{ s.id }}" {% if sc.subsidiary and s.id == sc.subsidiary.id %}selected{% endif %}>{{ s.code }}</option>
-                                        {% endfor %}
-                                    </twig:Select>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-border">
+                            {% for fc in feasibilityCodes %}
+                            {% if fc.id == editFeasibilityCodeId %}
+                            <tr id="fc-{{ fc.id }}" class="target:animate-row-flash scroll-mt-24">
+                                <td class="py-1 font-mono font-semibold">
+                                    {{ fc.code }}
+                                    <form id="fc-edit-{{ fc.id }}" data-turbo="false" method="post"
+                                        action="{{ path('admin_feasibility_code_update', {id: fc.id, fcPage: fcPage}) }}"></form>
                                 </td>
                                 <td class="py-1">
-                                    <twig:Select name="mainCategoryId" form="subcat-edit-{{ sc.id }}"
-                                        class="px-2 py-0 rounded w-auto h-8">
-                                        <option value="0">All</option>
-                                        {% for mc in mainCategories %}
-                                        <option value="{{ mc.id }}" {% if sc.mainCategory and mc.id == sc.mainCategory.id %}selected{% endif %}>{{ mc.code }}</option>
-                                        {% endfor %}
-                                    </twig:Select>
-                                </td>
-                                <td class="py-1">
-                                    <twig:Select name="docTypeId" form="subcat-edit-{{ sc.id }}"
-                                        class="px-2 py-0 rounded w-auto h-8">
-                                        {% for dt in docTypes %}
-                                        <option value="{{ dt.id }}" {% if dt.id == sc.docType.id %}selected{% endif %}>{{ dt.code }}</option>
-                                        {% endfor %}
-                                    </twig:Select>
-                                </td>
-                                <td class="py-1">
-                                    <twig:Input name="code" type="number" min="0" max="999" value="{{ sc.code }}" form="subcat-edit-{{ sc.id }}"
-                                        class="px-2 py-0 rounded w-24 h-8 font-mono" />
-                                </td>
-                                <td class="py-1">
-                                    <twig:Input name="description" value="{{ sc.description }}" form="subcat-edit-{{ sc.id }}"
+                                    <twig:Input name="title" value="{{ fc.title }}" form="fc-edit-{{ fc.id }}"
                                         class="px-2 py-0 rounded h-8" />
                                 </td>
+                                <td class="hidden sm:table-cell py-1">{{ fc.requestor }}</td>
+                                <td class="py-1 font-mono text-muted-foreground">{{ fc.subsidiary.code }}</td>
+                                <td class="py-1 text-muted-foreground text-xs">{{ fc.createdAt|date('d M Y H:i') }}</td>
                                 <td class="py-1 text-right whitespace-nowrap">
-                                    <button type="submit" form="subcat-edit-{{ sc.id }}" class="mr-3 text-primary text-xs hover:underline">Save</button>
-                                    <a href="{{ path('admin_index', {_fragment: 'subcat-' ~ sc.id}) }}" class="text-muted-foreground text-xs hover:underline">Cancel</a>
+                                    <button type="submit" form="fc-edit-{{ fc.id }}"
+                                        class="mr-3 text-primary text-xs hover:underline">Save</button>
+                                    <a href="{{ path('admin_index', {fcPage: fcPage, _fragment: 'fc-' ~ fc.id}) }}"
+                                        class="text-muted-foreground text-xs hover:underline">Cancel</a>
                                 </td>
                             </tr>
                             {% else %}
-                            <tr id="subcat-{{ sc.id }}" class="target:animate-row-flash scroll-mt-24">
-                                <td class="py-2 font-mono text-muted-foreground">{{ sc.subsidiary ? sc.subsidiary.code : 'All' }}</td>
-                                <td class="py-2 font-mono text-muted-foreground">{{ sc.mainCategory ? sc.mainCategory.code : 'All' }}</td>
-                                <td class="py-2"><twig:Badge style="{{ doc_type_badge_style(sc.docType.code) }}">{{ sc.docType.code }}</twig:Badge></td>
-                                <td class="py-2 font-mono font-semibold">{{ sc.formattedCode }}</td>
-                                <td class="py-2">{{ sc.description }}</td>
+                            <tr id="fc-{{ fc.id }}" class="target:animate-row-flash scroll-mt-24">
+                                <td class="py-2 font-mono font-semibold">{{ fc.code }}</td>
+                                <td class="py-2">{{ fc.title }}</td>
+                                <td class="hidden sm:table-cell py-2">{{ fc.requestor }}</td>
+                                <td class="py-2 font-mono text-muted-foreground">{{ fc.subsidiary.code }}</td>
+                                <td class="hidden sm:table-cell py-2 text-muted-foreground text-xs">{{
+                                    fc.createdAt|date('d M Y H:i') }}</td>
                                 <td class="py-2 text-right whitespace-nowrap">
-                                    <a href="{{ path('admin_index', {editSubcat: sc.id, _fragment: 'subcat-' ~ sc.id}) }}" class="mr-3 text-xs hover:underline">Edit</a>
-                                    <form method="post" action="{{ path('admin_subcat_delete', {id: sc.id}) }}"
-                                        data-turbo-confirm="Delete sub category {{ sc.formattedCode }}?" class="inline">
-                                        <button type="submit" class="text-destructive text-xs hover:underline">Delete</button>
+                                    <a href="{{ path('admin_index', {editFeasibilityCode: fc.id, fcPage: fcPage, _fragment: 'fc-' ~ fc.id}) }}"
+                                        class="mr-3 text-xs hover:underline">Edit</a>
+                                    <form method="post"
+                                        action="{{ path('admin_feasibility_code_delete', {id: fc.id, fcPage: fcPage}) }}"
+                                        data-turbo-confirm="Delete feasibility code {{ fc.code }}?" class="inline">
+                                        <button type="submit"
+                                            class="text-destructive text-xs hover:underline">Delete</button>
                                     </form>
                                 </td>
                             </tr>
                             {% endif %}
-                            {% else %}<tr><td colspan="6" class="py-3 text-muted-foreground text-center">None yet.</td></tr>
+                            {% else %}<tr>
+                                <td colspan="6" class="py-3 text-muted-foreground text-center">None yet.</td>
+                            </tr>
                             {% endfor %}
-                            </tbody>
-                        </table>
-                        </div>
-                        <form method="post" action="{{ path('admin_subcat_new') }}" class="flex flex-wrap gap-2">
-                            <twig:Select name="subsidiaryId"
-                                class="w-auto h-9">
-                                <option value="0">All subsidiaries</option>
-                                {% for s in subsidiaries %}
-                                <option value="{{ s.id }}">{{ s.code }}</option>
-                                {% endfor %}
-                            </twig:Select>
-                            <twig:Select name="mainCategoryId"
-                                class="w-auto h-9">
-                                <option value="0">All main cats.</option>
-                                {% for mc in mainCategories %}
-                                <option value="{{ mc.id }}">{{ mc.code }} - {{ mc.description }}</option>
-                                {% endfor %}
-                            </twig:Select>
-                            <twig:Select name="docTypeId" required
-                                class="w-auto h-9">
-                                <option value="">Doc type…</option>
-                                {% for dt in docTypes %}
-                                <option value="{{ dt.id }}">{{ dt.code }}</option>
-                                {% endfor %}
-                            </twig:Select>
-                            <twig:Input name="code" type="number" min="0" max="999" placeholder="Code (0–999)" required
-                                class="w-36 h-9" />
-                            <twig:Input name="description" placeholder="Description" required
-                                class="flex-1 w-auto min-w-48 h-9" />
-                            <button type="submit" class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
-                        </form>
-                    </twig:Card:Content>
-                </twig:Card>
-
-            </div>
-        </twig:Tabs:Content>
-
-        <twig:Tabs:Content value="title-casing">
-            <div class="gap-8 grid grid-cols-1 xl:grid-cols-2">
-                {# ── Title casing words ───────────────────────────────────────────────── #}
-                <twig:Card>
-                    <twig:Card:Header>
-                        <twig:Card:Title>Lowercased</twig:Card:Title>
-                        <twig:Card:Description>Kept lowercase unless first or last word. Note that entries need to be edited before changes take effect</twig:Card:Description>
-                    </twig:Card:Header>
-                    <twig:Card:Content>
-                        <form method="post" action="{{ path('admin_title_words_update') }}" class="flex flex-col gap-2">
-                            <input type="hidden" name="type" value="minor" />
-                            <twig:Textarea name="words" rows="4">{{ minorWords|map(w => w.word)|join(', ') }}</twig:Textarea>
-                            <button type="submit" class="inline-flex items-center self-end bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Save</button>
-                        </form>
-                    </twig:Card:Content>
-                </twig:Card>
-
-                <twig:Card>
-                    <twig:Card:Header>
-                        <twig:Card:Title>Uppercased</twig:Card:Title>
-                        <twig:Card:Description>Always fully capitalised. Note that entries need to be edited before changes take effect</twig:Card:Description>
-                    </twig:Card:Header>
-                    <twig:Card:Content>
-                        <form method="post" action="{{ path('admin_title_words_update') }}" class="flex flex-col gap-2">
-                            <input type="hidden" name="type" value="uppercase" />
-                            <twig:Textarea name="words" rows="4">{{ uppercaseWords|map(w => w.word)|join(', ') }}</twig:Textarea>
-                            <button type="submit" class="inline-flex items-center self-end bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Save</button>
-                        </form>
-                    </twig:Card:Content>
-                </twig:Card>
-
-            </div>
-        </twig:Tabs:Content>
-
-        <twig:Tabs:Content value="api">
-            {# ── Feasibility codes ────────────────────────────────────────────────── #}
-            <twig:Card class="xl:col-span-2">
-                <twig:Card:Header>
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <twig:Card:Title>Feasibility Codes</twig:Card:Title>
-                            <twig:Card:Description>Most recently created via the API</twig:Card:Description>
-                        </div>
-                        <a href="{{ path('admin_feasibility_codes_export') }}"
-                            class="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground text-xs transition-colors shrink-0">
-                            <twig:ux:icon name="material-symbols:download" class="size-3" />
-                            Export to XLSX
-                        </a>
-                    </div>
-                </twig:Card:Header>
-                <twig:Card:Content>
-                    <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead><tr class="border-border border-b text-muted-foreground text-xs">
-                            <th class="pb-2 text-left">Code</th>
-                            <th class="pb-2 text-left">Title</th>
-                            <th class="hidden sm:table-cell pb-2 text-left">Requestor</th>
-                            <th class="pb-2 text-left">Subsidiary</th>
-                            <th class="pb-2 text-left">Created</th>
-                            <th></th>
-                        </tr></thead>
-                        <tbody class="divide-y divide-border">
-                        {% for fc in recentFeasibilityCodes %}
-                        {% if fc.id == editFeasibilityCodeId %}
-                        <tr id="fc-{{ fc.id }}" class="target:animate-row-flash scroll-mt-24">
-                            <td class="py-1 font-mono font-semibold">
-                                {{ fc.code }}
-                                <form id="fc-edit-{{ fc.id }}" data-turbo="false" method="post" action="{{ path('admin_feasibility_code_update', {id: fc.id}) }}"></form>
-                            </td>
-                            <td class="py-1">
-                                <twig:Input name="title" value="{{ fc.title }}" form="fc-edit-{{ fc.id }}"
-                                    class="px-2 py-0 rounded h-8" />
-                            </td>
-                            <td class="hidden sm:table-cell py-1">{{ fc.requestor }}</td>
-                            <td class="py-1 font-mono text-muted-foreground">{{ fc.subsidiary.code }}</td>
-                            <td class="py-1 text-muted-foreground text-xs">{{ fc.createdAt|date('d M Y H:i') }}</td>
-                            <td class="py-1 text-right whitespace-nowrap">
-                                <button type="submit" form="fc-edit-{{ fc.id }}" class="mr-3 text-primary text-xs hover:underline">Save</button>
-                                <a href="{{ path('admin_index', {_fragment: 'fc-' ~ fc.id}) }}" class="text-muted-foreground text-xs hover:underline">Cancel</a>
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr id="fc-{{ fc.id }}" class="target:animate-row-flash scroll-mt-24">
-                            <td class="py-2 font-mono font-semibold">{{ fc.code }}</td>
-                            <td class="py-2">{{ fc.title }}</td>
-                            <td class="hidden sm:table-cell py-2">{{ fc.requestor }}</td>
-                            <td class="py-2 font-mono text-muted-foreground">{{ fc.subsidiary.code }}</td>
-                            <td class="py-2 text-muted-foreground text-xs">{{ fc.createdAt|date('d M Y H:i') }}</td>
-                            <td class="py-2 text-right whitespace-nowrap">
-                                <a href="{{ path('admin_index', {editFeasibilityCode: fc.id, _fragment: 'fc-' ~ fc.id}) }}" class="mr-3 text-xs hover:underline">Edit</a>
-                                <form method="post" action="{{ path('admin_feasibility_code_delete', {id: fc.id}) }}"
-                                    data-turbo-confirm="Delete feasibility code {{ fc.code }}?" class="inline">
-                                    <button type="submit" class="text-destructive text-xs hover:underline">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endif %}
-                        {% else %}<tr><td colspan="6" class="py-3 text-muted-foreground text-center">None yet.</td></tr>
-                        {% endfor %}
                         </tbody>
                     </table>
-                    </div>
-                </twig:Card:Content>
-            </twig:Card>
+                </div>
 
-        </twig:Tabs:Content>
+                {{ include('_pagination.html.twig', {route: 'admin_index', page: fcPage, totalPages: fcTotalPages, pageParam: 'fcPage', fragment: 'api'}) }}
+            </twig:Card:Content>
+        </twig:Card>
 
-        <twig:Tabs:Content value="users">
-            {# ── Users ─────────────────────────────────────────────────────────────── #}
-            <twig:Card class="xl:col-span-2">
-                <twig:Card:Header>
-                    <twig:Card:Title>Users</twig:Card:Title>
-                    <twig:Card:Description>All users who have logged in via Microsoft 365</twig:Card:Description>
-                </twig:Card:Header>
-                <twig:Card:Content>
-                    <div class="overflow-x-auto">
+    </twig:Tabs:Content>
+
+    <twig:Tabs:Content value="users">
+        {# ── Users ─────────────────────────────────────────────────────────────── #}
+        <twig:Card class="xl:col-span-2">
+            <twig:Card:Header>
+                <twig:Card:Title>Users</twig:Card:Title>
+                <twig:Card:Description>All users who have logged in via Microsoft 365</twig:Card:Description>
+            </twig:Card:Header>
+            <twig:Card:Content>
+                <div class="overflow-x-auto">
                     <table class="w-full text-sm">
-                        <thead><tr class="border-border border-b text-muted-foreground text-xs">
-                            <th class="pb-2 text-left">Email</th>
-                            <th class="pb-2 text-left">Roles</th>
-                            <th class="pb-2 text-left">Joined</th>
-                            <th></th>
-                        </tr></thead>
+                        <thead>
+                            <tr class="border-border border-b text-muted-foreground text-xs">
+                                <th class="pb-2 text-left">Email</th>
+                                <th class="pb-2 text-left">Roles</th>
+                                <th class="hidden sm:table-cell pb-2 text-left">Joined</th>
+                                <th></th>
+                            </tr>
+                        </thead>
                         <tbody class="divide-y divide-border">
-                        {% for user in users %}
-                        <tr>
-                            <td class="py-2">{{ user.email }}</td>
-                            <td class="py-2">
-                                {% set extraRoles = user.roles|filter(r => r != 'ROLE_USER') %}
-                                {% if extraRoles is empty %}
-                                <twig:Badge variant="outline">USER</twig:Badge>
-                                {% else %}
-                                {% for role in extraRoles %}
-                                <twig:Badge variant="{{ role == 'ROLE_ADMIN' or role == 'ROLE_SUPERADMIN' ? 'default' : 'secondary' }}">{{ role|replace({'ROLE_': ''}) }}</twig:Badge>
-                                {% endfor %}
-                                {% endif %}
-                            </td>
-                            <td class="py-2 text-muted-foreground text-xs">{{ user.createdAt|date('d M Y') }}</td>
-                            <td class="py-2 text-right">
-                                {% if 'ROLE_SUPERADMIN' in user.roles %}
-                                <span class="text-muted-foreground text-xs">Protected</span>
-                                {% elseif user != app.user %}
-                                <form method="post" action="{{ path('admin_user_toggle_admin', {id: user.id}) }}">
-                                    <button type="submit"
-                                        class="text-xs {% if 'ROLE_ADMIN' in user.roles %}text-destructive{% else %}text-primary{% endif %} hover:underline">
-                                        {{ 'ROLE_ADMIN' in user.roles ? 'Remove admin' : 'Make admin' }}
-                                    </button>
-                                </form>
-                                {% else %}
-                                <span class="text-muted-foreground text-xs">You</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
+                            {% for user in users %}
+                            <tr>
+                                <td class="py-2">{{ user.email }}</td>
+                                <td class="py-2">
+                                    {% set extraRoles = user.roles|filter(r => r != 'ROLE_USER') %}
+                                    {% if extraRoles is empty %}
+                                    <twig:Badge variant="outline">USER</twig:Badge>
+                                    {% else %}
+                                    {% for role in extraRoles %}
+                                    <twig:Badge
+                                        variant="{{ role == 'ROLE_ADMIN' or role == 'ROLE_SUPERADMIN' ? 'default' : 'secondary' }}">
+                                        {{ role|replace({'ROLE_': ''}) }}</twig:Badge>
+                                    {% endfor %}
+                                    {% endif %}
+                                </td>
+                                <td class="hidden sm:table-cell py-2 text-muted-foreground text-xs">{{
+                                    user.createdAt|date('d M Y') }}</td>
+                                <td class="py-2 text-right">
+                                    {% if 'ROLE_SUPERADMIN' in user.roles %}
+                                    <span class="text-muted-foreground text-xs">Protected</span>
+                                    {% elseif user != app.user %}
+                                    <form method="post" action="{{ path('admin_user_toggle_admin', {id: user.id}) }}">
+                                        <button type="submit"
+                                            class="text-xs {% if 'ROLE_ADMIN' in user.roles %}text-destructive{% else %}text-primary{% endif %} hover:underline">
+                                            {{ 'ROLE_ADMIN' in user.roles ? 'Remove admin' : 'Make admin' }}
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <span class="text-muted-foreground text-xs">You</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
-                    </div>
-                </twig:Card:Content>
-            </twig:Card>
+                </div>
+            </twig:Card:Content>
+        </twig:Card>
 
-        </twig:Tabs:Content>
-    </twig:Tabs>
+    </twig:Tabs:Content>
+</twig:Tabs>
 </div>
 {% endblock %}

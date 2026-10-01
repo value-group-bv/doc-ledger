@@ -77,14 +77,35 @@ class FeasibilityCodeRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    /** @return FeasibilityCode[] */
-    public function findRecent(int $limit): array
+    /** @return FeasibilityCode[] newest first; `id` breaks ties so pages never overlap */
+    public function findPage(int $page, int $pageSize): array
     {
         return $this->createQueryBuilder('f')
             ->orderBy('f.createdAt', 'DESC')
-            ->setMaxResults($limit)
+            ->addOrderBy('f.id', 'DESC')
+            ->setFirstResult(($page - 1) * $pageSize)
+            ->setMaxResults($pageSize)
             ->getQuery()
             ->getResult();
+    }
+
+    /** 1-based page that shows the given code in findPage(), or 1 if it doesn't exist */
+    public function findPageNumberOf(int $id, int $pageSize): int
+    {
+        $entry = $this->find($id);
+        if (!$entry) {
+            return 1;
+        }
+
+        $newer = (int) $this->createQueryBuilder('f')
+            ->select('COUNT(f.id)')
+            ->where('f.createdAt > :createdAt OR (f.createdAt = :createdAt AND f.id > :id)')
+            ->setParameter('createdAt', $entry->getCreatedAt())
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return intdiv($newer, $pageSize) + 1;
     }
 
     /** @return FeasibilityCode[] */

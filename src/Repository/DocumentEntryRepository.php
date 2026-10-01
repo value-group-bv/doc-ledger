@@ -130,4 +130,27 @@ class DocumentEntryRepository extends ServiceEntityRepository
 
         return $result !== null ? (int) $result : null;
     }
+
+    /**
+     * Entries whose title contains any of the given lowercase words (substring match, so callers
+     * must still check whole words)
+     *
+     * @param string[] $words
+     * @return DocumentEntry[]
+     */
+    public function findByTitleContainingAny(array $words): array
+    {
+        if (!$words) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('e');
+        $or = $qb->expr()->orX();
+        foreach (array_values($words) as $i => $word) {
+            $or->add("LOWER(e.title) LIKE :word$i");
+            $qb->setParameter("word$i", "%$word%");
+        }
+
+        return $qb->where($or)->getQuery()->getResult();
+    }
 }

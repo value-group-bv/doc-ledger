@@ -7,15 +7,19 @@ use App\Entity\DocSubCategory;
 use App\Entity\DocSubsidiary;
 use App\Entity\DocTitleWord;
 use App\Entity\DocType;
+use App\Entity\DocumentEntry;
+use App\Entity\FeasibilityCode;
 use App\Entity\User;
 use App\Repository\DocMainCategoryRepository;
 use App\Repository\DocSubCategoryRepository;
 use App\Repository\DocSubsidiaryRepository;
 use App\Repository\DocTitleWordRepository;
 use App\Repository\DocTypeRepository;
+use App\Repository\DocumentEntryRepository;
 use App\Repository\FeasibilityCodeRepository;
 use App\Repository\UserRepository;
 use App\Service\AuditLogger;
+use App\Service\TitleCaseFormatter;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -30,6 +34,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/admin', name: 'admin_')]
 class AdminController extends AbstractController
 {
+    private const FC_PAGE_SIZE = 25;
+
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly AuditLogger $auditLogger,
@@ -46,18 +52,28 @@ class AdminController extends AbstractController
         FeasibilityCodeRepository $feasibilityCodes,
         DocTitleWordRepository $titleWords,
     ): Response {
+        $editFeasibilityCodeId = (int) $request->query->get('editFeasibilityCode', 0);
+        $fcTotalPages = max(1, (int) ceil($feasibilityCodes->count([]) / self::FC_PAGE_SIZE));
+        $fcPage = $request->query->has('fcPage')
+            ? (int) $request->query->get('fcPage')
+            : ($editFeasibilityCodeId ? $feasibilityCodes->findPageNumberOf($editFeasibilityCodeId, self::FC_PAGE_SIZE) : 1);
+        // Clamped, so deleting the last code on the last page still lands on a page with codes
+        $fcPage = min(max(1, $fcPage), $fcTotalPages);
+
         return $this->render('admin/index.html.twig', [
             'subsidiaries' => $subsidiaries->findBy([], ['sortOrder' => 'ASC']),
             'mainCategories' => $mainCats->findBy([], ['code' => 'ASC']),
             'docTypes' => $docTypes->findBy([], ['sortOrder' => 'ASC']),
             'subCategories' => $subCats->findBy([], ['docType' => 'ASC', 'code' => 'ASC']),
             'users' => $users->findBy([], ['createdAt' => 'DESC']),
-            'recentFeasibilityCodes' => $feasibilityCodes->findRecent(10),
+            'feasibilityCodes' => $feasibilityCodes->findPage($fcPage, self::FC_PAGE_SIZE),
+            'fcPage' => $fcPage,
+            'fcTotalPages' => $fcTotalPages,
             'minorWords' => $titleWords->findBy(['type' => DocTitleWord::TYPE_MINOR], ['word' => 'ASC']),
             'uppercaseWords' => $titleWords->findBy(['type' => DocTitleWord::TYPE_UPPERCASE], ['word' => 'ASC']),
             'editMaincatId' => (int) $request->query->get('editMaincat', 0),
             'editSubcatId' => (int) $request->query->get('editSubcat', 0),
-            'editFeasibilityCodeId' => (int) $request->query->get('editFeasibilityCode', 0),
+            'editFeasibilityCodeId' => $editFeasibilityCodeId,
         ]);
     }
 
@@ -119,6 +135,7 @@ class AdminController extends AbstractController
     #[Route('/feasibility-code/{id}/update', name: 'feasibility_code_update', methods: ['POST'])]
     public function feasibilityCodeUpdate(int $id, Request $request, FeasibilityCodeRepository $feasibilityCodes): Response
     {
+        $fcPage = $request->query->getInt('fcPage', 1);
         $entity = $feasibilityCodes->find($id);
         $title = trim((string) $request->request->get('title', ''));
 
@@ -132,18 +149,19 @@ class AdminController extends AbstractController
             $this->addFlash('success', "Feasibility code '{$entity->getCode()}' updated.");
 
             // Back to the (highlighted) row; errors stay at the top where their message shows
-            return $this->redirectToRoute('admin_index', ['_fragment' => "fc-$id"]);
+            return $this->redirectToRoute('admin_index', ['fcPage' => $fcPage, '_fragment' => "fc-$id"]);
         }
 
-        return $this->redirectToRoute('admin_index');
+        return $this->redirectToRoute('admin_index', ['fcPage' => $fcPage]);
     }
 
     #[Route('/feasibility-code/{id}/delete', name: 'feasibility_code_delete', methods: ['POST'])]
-    public function feasibilityCodeDelete(int $id, FeasibilityCodeRepository $feasibilityCodes): Response
+    public function feasibilityCodeDelete(int $id, Request $request, FeasibilityCodeRepository $feasibilityCodes): Response
     {
+        $fcPage = $request->query->getInt('fcPage', 1);
         $entity = $feasibilityCodes->find($id);
         if (!$entity) {
-            return $this->redirectToRoute('admin_index');
+            return $this->redirectToRoute('admin_index', ['fcPage' => $fcPage]);
         }
 
         $code = $entity->getCode();
@@ -151,7 +169,7 @@ class AdminController extends AbstractController
         $this->em->flush();
         $this->addFlash('success', "Feasibility code '{$code}' deleted.");
 
-        return $this->redirectToRoute('admin_index');
+        return $this->redirectToRoute('admin_index', ['fcPage' => $fcPage]);
     }
 
     // ── Subsidiaries ──────────────────────────────────────────────────────────
@@ -211,8 +229,13 @@ class AdminController extends AbstractController
             return $this->redirectToRoute('admin_index');
         }
 
-        if ($entity->getDocumentEntries()->count() > 0) {
-            $this->addFlash('error', "Cannot delete subsidiary '{$entity->getCode()}' — it has {$entity->getDocumentEntries()->count()} linked document(s). Delete or reassign documents first.");
+        $usage = $this->describeUsage([
+            'document(s)' => $this->countWhere(DocumentEntry::class, 'x.subsidiary = :v', $entity),
+            'feasibility code(s)' => $this->countWhere(FeasibilityCode::class, 'x.subsidiary = :v', $entity),
+            'sub category(ies)' => $this->countWhere(DocSubCategory::class, 'x.subsidiary = :v', $entity),
+        ]);
+        if ($usage) {
+            $this->addFlash('error', "Cannot delete subsidiary '{$entity->getCode()}': it is still used by {$usage}.");
             return $this->redirectToRoute('admin_index');
         }
 
@@ -296,7 +319,14 @@ class AdminController extends AbstractController
     public function maincatDelete(int $id): Response
     {
         $entity = $this->em->find(DocMainCategory::class, $id);
-        if ($entity) {
+        $usage = $entity ? $this->describeUsage([
+            'document(s)' => $this->countWhere(DocumentEntry::class, 'x.mainCategory = :v', $entity),
+            'document(s) as alternate' => $this->countWhere(DocumentEntry::class, ':v MEMBER OF x.alternateMainCategories', $entity),
+            'sub category(ies)' => $this->countWhere(DocSubCategory::class, 'x.mainCategory = :v', $entity),
+        ]) : null;
+        if ($usage) {
+            $this->addFlash('error', "Cannot delete main category '{$entity->getCode()}': it is still used by {$usage}.");
+        } elseif ($entity) {
             $this->em->remove($entity);
             $this->em->flush();
             $this->addFlash('success', 'Main category deleted.');
@@ -334,7 +364,13 @@ class AdminController extends AbstractController
     public function doctypeDelete(int $id): Response
     {
         $entity = $this->em->find(DocType::class, $id);
-        if ($entity) {
+        $usage = $entity ? $this->describeUsage([
+            'document(s)' => $this->countWhere(DocumentEntry::class, 'x.docType = :v', $entity),
+            'sub category(ies)' => $this->countWhere(DocSubCategory::class, 'x.docType = :v', $entity),
+        ]) : null;
+        if ($usage) {
+            $this->addFlash('error', "Cannot delete doc type '{$entity->getCode()}': it is still used by {$usage}.");
+        } elseif ($entity) {
             $this->em->remove($entity);
             $this->em->flush();
             $this->addFlash('success', 'Doc type deleted.');
@@ -434,7 +470,12 @@ class AdminController extends AbstractController
     public function subcatDelete(int $id): Response
     {
         $entity = $this->em->find(DocSubCategory::class, $id);
-        if ($entity) {
+        $usage = $entity ? $this->describeUsage([
+            'document(s)' => $this->countWhere(DocumentEntry::class, 'x.subCategory = :v', $entity),
+        ]) : null;
+        if ($usage) {
+            $this->addFlash('error', "Cannot delete sub category {$entity->getFormattedCode()}: it is still used by {$usage}.");
+        } elseif ($entity) {
             $this->em->remove($entity);
             $this->em->flush();
             $this->addFlash('success', 'Sub category deleted.');
@@ -445,7 +486,12 @@ class AdminController extends AbstractController
     // ── Title casing words ───────────────────────────────────────────────────
 
     #[Route('/title-words/update', name: 'title_words_update', methods: ['POST'])]
-    public function titleWordsUpdate(Request $request, DocTitleWordRepository $titleWords): Response
+    public function titleWordsUpdate(
+        Request $request,
+        DocTitleWordRepository $titleWords,
+        DocumentEntryRepository $documentEntries,
+        TitleCaseFormatter $titleCaseFormatter,
+    ): Response
     {
         $type = $request->request->get('type');
         if (!\in_array($type, [DocTitleWord::TYPE_MINOR, DocTitleWord::TYPE_UPPERCASE], true)) {
@@ -484,7 +530,18 @@ class AdminController extends AbstractController
 
         $added = array_diff($words, $previousWords);
         $removed = array_diff($previousWords, $words);
+        $recased = 0;
         if ($added || $removed) {
+            $changedWords = [...$added, ...$removed];
+            foreach ($documentEntries->findByTitleContainingAny($changedWords) as $entry) {
+                $title = $titleCaseFormatter->recase($entry->getTitle(), $changedWords);
+                if ($title !== $entry->getTitle()) {
+                    $entry->setTitle($title);
+                    $recased++;
+                }
+            }
+            $this->em->flush();
+
             $detail = "Updated {$type} title words";
             if ($added) {
                 $detail .= ' (+' . implode(', ', $added) . ')';
@@ -492,6 +549,7 @@ class AdminController extends AbstractController
             if ($removed) {
                 $detail .= ' (-' . implode(', ', $removed) . ')';
             }
+            $detail .= ", recased {$recased} document title(s)";
             $user = $this->getUser();
             if ($user instanceof User) {
                 $this->auditLogger->log($user->getEmail(), 'setting.updated', $detail);
@@ -501,9 +559,35 @@ class AdminController extends AbstractController
         if ($skipped) {
             $this->addFlash('error', 'Skipped (already used in the other list): ' . implode(', ', $skipped));
         }
-        $this->addFlash('success', 'Word list updated.');
+        $this->addFlash('success', $recased
+            ? "Word list updated, {$recased} document title(s) recased."
+            : 'Word list updated.');
 
         return $this->redirectToRoute('admin_index');
+    }
+
+    // ── Delete guards ─────────────────────────────────────────────────────────
+    // SQLite doesn't enforce foreign keys here, so deleting a row that's still referenced would
+    // leave dangling IDs behind (and a broken ledger). Every delete checks its usages first.
+
+    private function countWhere(string $entityClass, string $condition, object $value): int
+    {
+        return (int) $this->em->createQuery("SELECT COUNT(x) FROM {$entityClass} x WHERE {$condition}")
+            ->setParameter('v', $value)
+            ->getSingleScalarResult();
+    }
+
+    /** @param array<string, int> $counts label => count; returns e.g. "3 document(s), 1 sub category(ies)", or null if unused */
+    private function describeUsage(array $counts): ?string
+    {
+        $parts = [];
+        foreach ($counts as $label => $count) {
+            if ($count > 0) {
+                $parts[] = "{$count} {$label}";
+            }
+        }
+
+        return $parts ? implode(', ', $parts) : null;
     }
 
     // ── Users ─────────────────────────────────────────────────────────────────

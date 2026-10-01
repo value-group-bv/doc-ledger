@@ -54,19 +54,7 @@
                 </table>
             </div>
 
-            {% if totalPages > 1 %}
-            <div class="flex justify-between items-center mt-4 text-muted-foreground text-sm">
-                <span>Page {{ page }} of {{ totalPages }}</span>
-                <div class="flex gap-2">
-                    {% if page > 1 %}
-                    <a href="{{ path('logs_index', {event: selectedEvent, page: page - 1}) }}" class="hover:text-foreground underline">Previous</a>
-                    {% endif %}
-                    {% if page < totalPages %}
-                    <a href="{{ path('logs_index', {event: selectedEvent, page: page + 1}) }}" class="hover:text-foreground underline">Next</a>
-                    {% endif %}
-                </div>
-            </div>
-            {% endif %}
+            {{ include('_pagination.html.twig', {route: 'logs_index', page: page, totalPages: totalPages, params: {event: selectedEvent}}) }}
         </twig:Card:Content>
     </twig:Card>
 {% endblock %}

@@ -1,6 +1,19 @@
 # Release Notes
 
-## Version 1.2.1 (xx 2026)
+## Version 1.3.0 (01 October 2026)
+
+- Changing the title casing (upper- and lowercase) word lists now also updates the casing of existing document titles.
+- Increased font size on login page to align more with the Value Wiki site.
+- Removed Users count balloon on `Admin` page.
+- Visual fixes on `Admin` page.
+- Hid some non-critical columns in `Admin` environment on smaller screen devices.
+- You can now find all created feasibility codes via API on `Admin` environment, rather than only latest 10.
+- The `Logs` page now uses the same pagination buttons as the `Ledger`.
+- Subsidiaries, main categories, document types and sub categories that are still in use can no longer be deleted (this could break the website).
+- Fixed a security issue where non-admin users could create ledger entries.
+- Updated dependencies.
+
+## Version 1.2.1 (30 September 2026)
 
 - Fixed bug where main category with number 0 wasn't possible to create.
 - It's now possible to modify names of main categories without deleting them.

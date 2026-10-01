@@ -1,0 +1,45 @@
+{#
+    Link-based pagination with the same look as the Ledger's (which uses live actions instead).
+    Expects: route, page, totalPages; optional: params (extra query params), pageParam (default 'page'), fragment
+#}
+{% set params = params|default({}) %}
+{% set pageParam = pageParam|default('page') %}
+{% set fragment = fragment|default(null) %}
+{% set params = params|merge(fragment ? {_fragment: fragment} : {}) %}
+{% set navClass = 'inline-flex justify-center items-center hover:bg-muted border border-border rounded w-8 h-8 transition-colors' %}
+{% if totalPages > 1 %}
+<div class="flex justify-between items-center mt-4">
+    <p class="text-muted-foreground text-xs">
+        Page {{ page }} of {{ totalPages }}
+    </p>
+    <div class="flex gap-1">
+        {% if page > 1 %}
+        <a href="{{ path(route, params|merge({(pageParam): page - 1})) }}" class="{{ navClass }}">
+            <twig:ux:icon name="material-symbols:chevron-left" class="size-4" />
+        </a>
+        {% else %}
+        <span class="{{ navClass }} opacity-40 cursor-not-allowed"><twig:ux:icon name="material-symbols:chevron-left" class="size-4" /></span>
+        {% endif %}
+
+        {% for p in 1..totalPages %}
+        {% if p == 1 or p == totalPages or (p >= page - 2 and p <= page + 2) %}
+        <a href="{{ path(route, params|merge({(pageParam): p})) }}"
+            class="inline-flex items-center justify-center h-8 min-w-8 px-2 rounded border text-sm transition-colors
+                {% if p == page %}bg-primary text-primary-foreground border-primary{% else %}border-border hover:bg-muted{% endif %}">
+            {{ p }}
+        </a>
+        {% elseif p == page - 3 or p == page + 3 %}
+        <span class="inline-flex justify-center items-center w-8 h-8 text-muted-foreground">…</span>
+        {% endif %}
+        {% endfor %}
+
+        {% if page < totalPages %}
+        <a href="{{ path(route, params|merge({(pageParam): page + 1})) }}" class="{{ navClass }}">
+            <twig:ux:icon name="material-symbols:chevron-right" class="size-4" />
+        </a>
+        {% else %}
+        <span class="{{ navClass }} opacity-40 cursor-not-allowed"><twig:ux:icon name="material-symbols:chevron-right" class="size-4" /></span>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
