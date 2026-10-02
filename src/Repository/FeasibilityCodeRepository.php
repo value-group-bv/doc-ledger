@@ -23,8 +23,8 @@ class FeasibilityCodeRepository extends ServiceEntityRepository
     }
 
     /**
-     * Allocates the lowest unused AAA–ZZZ code and persists a new feasibility
-     * project record for it. Deleting an entry frees its code for reuse.
+     * Allocates the lowest unused, unreserved AAA–ZZZ code and persists a new
+     * feasibility project record for it. Deleting an entry frees its code for reuse.
      * Uniqueness under concurrent requests is enforced by the DB's unique
      * index on `code`, with a retry on collision rather than extra locking.
      */
@@ -54,7 +54,7 @@ class FeasibilityCodeRepository extends ServiceEntityRepository
     private function findLowestFreeCode(): string
     {
         $usedCodes = array_flip($this->getEntityManager()->getConnection()->fetchFirstColumn(
-            'SELECT code FROM feasibility_code WHERE code IS NOT NULL'
+            'SELECT code FROM feasibility_code WHERE code IS NOT NULL UNION SELECT code FROM reserved_feasibility_code'
         ));
 
         for ($i = 1; $i <= self::POOL_SIZE; $i++) {

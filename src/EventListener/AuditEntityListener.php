@@ -8,6 +8,7 @@ use App\Entity\DocSubsidiary;
 use App\Entity\DocType;
 use App\Entity\DocumentEntry;
 use App\Entity\FeasibilityCode;
+use App\Entity\ReservedFeasibilityCode;
 use App\Entity\User;
 use App\Service\AuditLogger;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
@@ -38,6 +39,7 @@ class AuditEntityListener
         DocSubCategory::class,
         DocType::class,
         FeasibilityCode::class,
+        ReservedFeasibilityCode::class,
         User::class,
     ];
 

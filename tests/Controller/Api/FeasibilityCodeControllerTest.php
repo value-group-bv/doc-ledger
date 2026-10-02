@@ -3,6 +3,7 @@
 namespace App\Tests\Controller\Api;
 
 use App\Entity\DocSubsidiary;
+use App\Entity\ReservedFeasibilityCode;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -12,6 +13,9 @@ class FeasibilityCodeControllerTest extends WebTestCase
     {
         $em = static::getContainer()->get(EntityManagerInterface::class);
         $em->createQuery('DELETE FROM App\Entity\FeasibilityCode f')->execute();
+        $em->createQuery('DELETE FROM App\Entity\ReservedFeasibilityCode r WHERE r.code IN (:codes)')
+            ->setParameter('codes', ['AAA', 'AAB'])
+            ->execute();
         $em->createQuery('DELETE FROM App\Entity\DocSubsidiary s WHERE s.code IN (:codes)')
             ->setParameter('codes', ['VG', 'VH'])
             ->execute();
@@ -54,6 +58,31 @@ class FeasibilityCodeControllerTest extends WebTestCase
         self::assertSame('New Plant Feasibility', $data['title']);
         self::assertSame('jane@example.com', $data['requestor']);
         self::assertSame('VG', $data['subsidiary']);
+    }
+
+    public function testSkipsReservedCodes(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $this->createSubsidiaryWithKey($em, 'VG', 'test-secret-key');
+        foreach (['AAA', 'AAB'] as $code) {
+            $em->persist((new ReservedFeasibilityCode())->setCode($code)->setDescription('Test product'));
+        }
+        $em->flush();
+
+        $client->request(
+            'POST',
+            '/api/feasibility-codes',
+            server: [
+                'HTTP_AUTHORIZATION' => 'Bearer test-secret-key',
+                'CONTENT_TYPE' => 'application/json',
+            ],
+            content: json_encode(['title' => 'Reserved Skip Test', 'requestor' => 'jane@example.com']),
+        );
+
+        self::assertResponseStatusCodeSame(201);
+        $data = json_decode($client->getResponse()->getContent(), true);
+        self::assertNotContains($data['code'], ['AAA', 'AAB']);
     }
 
     public function testRejectsMissingApiKey(): void
