@@ -9,6 +9,7 @@ use App\Entity\DocTitleWord;
 use App\Entity\DocType;
 use App\Entity\DocumentEntry;
 use App\Entity\FeasibilityCode;
+use App\Entity\ReservedFeasibilityCode;
 use App\Entity\User;
 use App\Repository\DocMainCategoryRepository;
 use App\Repository\DocSubCategoryRepository;
@@ -17,6 +18,7 @@ use App\Repository\DocTitleWordRepository;
 use App\Repository\DocTypeRepository;
 use App\Repository\DocumentEntryRepository;
 use App\Repository\FeasibilityCodeRepository;
+use App\Repository\ReservedFeasibilityCodeRepository;
 use App\Repository\UserRepository;
 use App\Service\AuditLogger;
 use App\Service\TitleCaseFormatter;
@@ -51,6 +53,7 @@ class AdminController extends AbstractController
         UserRepository $users,
         FeasibilityCodeRepository $feasibilityCodes,
         DocTitleWordRepository $titleWords,
+        ReservedFeasibilityCodeRepository $reservedCodes,
     ): Response {
         $editFeasibilityCodeId = (int) $request->query->get('editFeasibilityCode', 0);
         $fcTotalPages = max(1, (int) ceil($feasibilityCodes->count([]) / self::FC_PAGE_SIZE));
@@ -69,6 +72,7 @@ class AdminController extends AbstractController
             'feasibilityCodes' => $feasibilityCodes->findPage($fcPage, self::FC_PAGE_SIZE),
             'fcPage' => $fcPage,
             'fcTotalPages' => $fcTotalPages,
+            'reservedCodes' => $reservedCodes->findBy([], ['code' => 'ASC']),
             'minorWords' => $titleWords->findBy(['type' => DocTitleWord::TYPE_MINOR], ['word' => 'ASC']),
             'uppercaseWords' => $titleWords->findBy(['type' => DocTitleWord::TYPE_UPPERCASE], ['word' => 'ASC']),
             'editMaincatId' => (int) $request->query->get('editMaincat', 0),
@@ -170,6 +174,49 @@ class AdminController extends AbstractController
         $this->addFlash('success', "Feasibility code '{$code}' deleted.");
 
         return $this->redirectToRoute('admin_index', ['fcPage' => $fcPage]);
+    }
+
+    // ── Reserved feasibility codes ────────────────────────────────────────────
+
+    #[Route('/reserved-code/new', name: 'reserved_code_new', methods: ['POST'])]
+    public function reservedCodeNew(Request $request, FeasibilityCodeRepository $feasibilityCodes): Response
+    {
+        $code = strtoupper(trim((string) $request->request->get('code', '')));
+        $description = trim((string) $request->request->get('description', ''));
+
+        if (!preg_match('/^[A-Z]{3}$/', $code)) {
+            $this->addFlash('error', 'Reserved code must be exactly 3 letters.');
+        } elseif (!$description) {
+            $this->addFlash('error', 'Description is required.');
+        } elseif ($taken = $feasibilityCodes->findOneBy(['code' => $code])) {
+            $this->addFlash('error', "Code '{$code}' is already in use by feasibility project '{$taken->getTitle()}'.");
+        } else {
+            $entity = new ReservedFeasibilityCode();
+            $entity->setCode($code)->setDescription($description);
+            $this->em->persist($entity);
+            try {
+                $this->em->flush();
+                $this->addFlash('success', "Code '{$code}' reserved.");
+            } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException) {
+                $this->em->clear();
+                $this->addFlash('error', "Code '{$code}' is already reserved.");
+            }
+        }
+
+        return $this->redirectToRoute('admin_index');
+    }
+
+    #[Route('/reserved-code/{id}/delete', name: 'reserved_code_delete', methods: ['POST'])]
+    public function reservedCodeDelete(int $id): Response
+    {
+        $entity = $this->em->find(ReservedFeasibilityCode::class, $id);
+        if ($entity) {
+            $this->em->remove($entity);
+            $this->em->flush();
+            $this->addFlash('success', "Code '{$entity->getCode()}' is no longer reserved.");
+        }
+
+        return $this->redirectToRoute('admin_index');
     }
 
     // ── Subsidiaries ──────────────────────────────────────────────────────────

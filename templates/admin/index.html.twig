@@ -396,6 +396,7 @@
     </twig:Tabs:Content>
 
     <twig:Tabs:Content value="api">
+        <div class="gap-8 grid grid-cols-1 xl:grid-cols-2">
         {# ── Feasibility codes ────────────────────────────────────────────────── #}
         <twig:Card class="xl:col-span-2">
             <twig:Card:Header>
@@ -478,6 +479,54 @@
                 {{ include('_pagination.html.twig', {route: 'admin_index', page: fcPage, totalPages: fcTotalPages, pageParam: 'fcPage', fragment: 'api'}) }}
             </twig:Card:Content>
         </twig:Card>
+
+        {# ── Reserved feasibility codes ───────────────────────────────────────── #}
+        <twig:Card>
+            <twig:Card:Header>
+                <twig:Card:Title>Reserved Codes</twig:Card:Title>
+                <twig:Card:Description>Never handed out as feasibility code, e.g. used as product (PRO) reference code
+                </twig:Card:Description>
+            </twig:Card:Header>
+            <twig:Card:Content>
+                <div class="overflow-x-auto">
+                    <table class="mb-4 w-full text-sm">
+                        <thead>
+                            <tr class="border-border border-b text-muted-foreground text-xs">
+                                <th class="pb-2 text-left">Code</th>
+                                <th class="pb-2 text-left">Description</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-border">
+                            {% for rc in reservedCodes %}
+                            <tr>
+                                <td class="py-2 font-mono font-semibold">{{ rc.code }}</td>
+                                <td class="py-2">{{ rc.description }}</td>
+                                <td class="py-2 text-right">
+                                    <form method="post" action="{{ path('admin_reserved_code_delete', {id: rc.id}) }}"
+                                        data-turbo-confirm="Release reserved code {{ rc.code }}?">
+                                        <button type="submit"
+                                            class="text-destructive text-xs hover:underline">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}<tr>
+                                <td colspan="3" class="py-3 text-muted-foreground text-center">None yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <form method="post" action="{{ path('admin_reserved_code_new') }}" class="flex flex-wrap gap-2">
+                    <twig:Input name="code" placeholder="Code" maxlength="3" pattern="[A-Za-z]{3}" required
+                        oninput="this.value=this.value.replace(/[^A-Za-z]/g,'').toUpperCase()" class="w-28 h-9 font-mono" />
+                    <twig:Input name="description" placeholder="Description" required class="flex-1 w-auto h-9" />
+                    <button type="submit"
+                        class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
+                </form>
+            </twig:Card:Content>
+        </twig:Card>
+        </div>
 
     </twig:Tabs:Content>
 
