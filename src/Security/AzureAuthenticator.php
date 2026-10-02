@@ -58,27 +58,38 @@ class AzureAuthenticator extends OAuth2Authenticator implements AuthenticationEn
 
                 $user = $this->users->findOneBy(['email' => $email]);
 
-                if ($user instanceof User) {
-                    return $user;
+                if (!$user instanceof User) {
+                    // Auto-create user on first login
+                    $user = new User();
+                    $user->setEmail($email);
+                    $user->setRoles(['ROLE_USER']);
+                    $this->em->persist($user);
                 }
 
-                // Auto-create user on first login
-                $user = new User();
-                $user->setEmail($email);
-                $user->setRoles(['ROLE_USER']);
-
-                $firstName = $azureUser->getFirstName();
-                $lastName  = $azureUser->getLastName();
-                if ($firstName || $lastName) {
-                    $user->setDisplayName(trim("$firstName $lastName"));
+                // Only fills an empty name, so a name set by an admin is kept
+                if (!$user->getDisplayName()) {
+                    $user->setDisplayName(self::firstNameOf($azureUser));
                 }
 
-                $this->em->persist($user);
                 $this->em->flush();
 
                 return $user;
             })
         );
+    }
+
+    /**
+     * given_name is an optional claim that v2.0 ID tokens usually leave out, so fall back
+     * to the full `name` claim (included with the profile scope) up to the first space.
+     */
+    private static function firstNameOf(AzureResourceOwner $azureUser): ?string
+    {
+        $firstName = trim((string) $azureUser->getFirstName());
+        if ($firstName === '') {
+            $firstName = strtok(trim((string) $azureUser->claim('name')), ' ') ?: '';
+        }
+
+        return $firstName !== '' ? mb_substr($firstName, 0, 255) : null;
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
