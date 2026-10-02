@@ -14,7 +14,7 @@
 {{ include('_flashes.html.twig') }}
 
 {# Editing a row forces the tab it lives on; otherwise the browser reopens the last used tab #}
-{% set forcedTab = (editSubcatId or editMaincatId) ? 'numbering' : (editFeasibilityCodeId ? 'api' : '') %}
+{% set forcedTab = (editSubcatId or editMaincatId) ? 'numbering' : (editFeasibilityCodeId ? 'api' : (editUserId ? 'users' : '')) %}
 <twig:Tabs defaultValue="{{ forcedTab ?: 'numbering' }}" data-tabs-remember-value="admin"
     data-tabs-forced-value="{{ forcedTab ? 'true' : 'false' }}" class="gap-6">
     <twig:Tabs:List class="flex-wrap py-1 group-data-[orientation=horizontal]/tabs:h-auto">
@@ -542,6 +542,7 @@
                     <table class="w-full text-sm">
                         <thead>
                             <tr class="border-border border-b text-muted-foreground text-xs">
+                                <th class="pb-2 text-left">Name</th>
                                 <th class="pb-2 text-left">Email</th>
                                 <th class="pb-2 text-left">Roles</th>
                                 <th class="hidden sm:table-cell pb-2 text-left">Joined</th>
@@ -550,7 +551,19 @@
                         </thead>
                         <tbody class="divide-y divide-border">
                             {% for user in users %}
-                            <tr>
+                            {% set isEditing = user.id ~ '' == editUserId %}
+                            <tr id="user-{{ user.id }}" class="target:animate-row-flash scroll-mt-24">
+                                {% if isEditing %}
+                                <td class="py-1">
+                                    <form id="user-edit-{{ user.id }}" data-turbo="false" method="post"
+                                        action="{{ path('admin_user_update', {id: user.id}) }}"></form>
+                                    <twig:Input name="displayName" value="{{ user.displayName }}" maxlength="255"
+                                        placeholder="From Microsoft 365" form="user-edit-{{ user.id }}"
+                                        class="px-2 py-0 rounded h-8" />
+                                </td>
+                                {% else %}
+                                <td class="py-2">{{ user.displayName ?? '–' }}</td>
+                                {% endif %}
                                 <td class="py-2">{{ user.email }}</td>
                                 <td class="py-2">
                                     {% set extraRoles = user.roles|filter(r => r != 'ROLE_USER') %}
@@ -566,11 +579,20 @@
                                 </td>
                                 <td class="hidden sm:table-cell py-2 text-muted-foreground text-xs">{{
                                     user.createdAt|date('d M Y') }}</td>
-                                <td class="py-2 text-right">
+                                <td class="py-2 text-right whitespace-nowrap">
+                                    {% if isEditing %}
+                                    <button type="submit" form="user-edit-{{ user.id }}"
+                                        class="mr-3 text-primary text-xs hover:underline">Save</button>
+                                    <a href="{{ path('admin_index', {_fragment: 'user-' ~ user.id}) }}"
+                                        class="text-muted-foreground text-xs hover:underline">Cancel</a>
+                                    {% else %}
+                                    <a href="{{ path('admin_index', {editUser: user.id, _fragment: 'user-' ~ user.id}) }}"
+                                        class="mr-3 text-xs hover:underline">Edit</a>
                                     {% if 'ROLE_SUPERADMIN' in user.roles %}
                                     <span class="text-muted-foreground text-xs">Protected</span>
                                     {% elseif user != app.user %}
-                                    <form method="post" action="{{ path('admin_user_toggle_admin', {id: user.id}) }}">
+                                    <form method="post" action="{{ path('admin_user_toggle_admin', {id: user.id}) }}"
+                                        class="inline">
                                         <button type="submit"
                                             class="text-xs {% if 'ROLE_ADMIN' in user.roles %}text-destructive{% else %}text-primary{% endif %} hover:underline">
                                             {{ 'ROLE_ADMIN' in user.roles ? 'Remove admin' : 'Make admin' }}
@@ -578,6 +600,7 @@
                                     </form>
                                     {% else %}
                                     <span class="text-muted-foreground text-xs">You</span>
+                                    {% endif %}
                                     {% endif %}
                                 </td>
                             </tr>

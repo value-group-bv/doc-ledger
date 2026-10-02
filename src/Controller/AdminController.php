@@ -78,6 +78,7 @@ class AdminController extends AbstractController
             'editMaincatId' => (int) $request->query->get('editMaincat', 0),
             'editSubcatId' => (int) $request->query->get('editSubcat', 0),
             'editFeasibilityCodeId' => $editFeasibilityCodeId,
+            'editUserId' => (string) $request->query->get('editUser', ''),
         ]);
     }
 
@@ -638,6 +639,24 @@ class AdminController extends AbstractController
     }
 
     // ── Users ─────────────────────────────────────────────────────────────────
+
+    /** An empty name falls back to the email, and is refilled from Microsoft 365 on the next login */
+    #[Route('/user/{id}/update', name: 'user_update', methods: ['POST'])]
+    public function userUpdate(string $id, Request $request, UserRepository $users): Response
+    {
+        $user = $users->find($id);
+        if (!$user) {
+            $this->addFlash('error', 'User not found.');
+            return $this->redirectToRoute('admin_index');
+        }
+
+        $displayName = mb_substr(trim((string) $request->request->get('displayName', '')), 0, 255);
+        $user->setDisplayName($displayName !== '' ? $displayName : null);
+        $this->em->flush();
+        $this->addFlash('success', "Name of {$user->getEmail()} updated.");
+
+        return $this->redirectToRoute('admin_index', ['_fragment' => "user-$id"]);
+    }
 
     #[Route('/user/{id}/toggle-admin', name: 'user_toggle_admin', methods: ['POST'])]
     public function userToggleAdmin(string $id, UserRepository $users): Response
