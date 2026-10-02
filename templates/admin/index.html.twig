@@ -14,7 +14,8 @@
 {{ include('_flashes.html.twig') }}
 
 {# Editing a row forces the tab it lives on; otherwise the browser reopens the last used tab #}
-{% set forcedTab = (editSubcatId or editMaincatId) ? 'numbering' : (editFeasibilityCodeId ? 'api' : (editUserId ? 'users' : '')) %}
+{% set forcedTab = (editSubcatId or editMaincatId) ? 'numbering' : (editFeasibilityCodeId ? 'api' : (editUserId ?
+'users' : '')) %}
 <twig:Tabs defaultValue="{{ forcedTab ?: 'numbering' }}" data-tabs-remember-value="admin"
     data-tabs-forced-value="{{ forcedTab ? 'true' : 'false' }}" class="gap-6">
     <twig:Tabs:List class="flex-wrap py-1 group-data-[orientation=horizontal]/tabs:h-auto">
@@ -397,135 +398,140 @@
 
     <twig:Tabs:Content value="api">
         <div class="gap-8 grid grid-cols-1 xl:grid-cols-2">
-        {# ── Feasibility codes ────────────────────────────────────────────────── #}
-        <twig:Card class="xl:col-span-2">
-            <twig:Card:Header>
-                <div class="flex justify-between items-start">
-                    <div class="space-y-1.5">
-                        <twig:Card:Title>Feasibility Codes</twig:Card:Title>
-                        <twig:Card:Description>Requested via SharePoint, newest first</twig:Card:Description>
+            {# ── Feasibility codes ────────────────────────────────────────────────── #}
+            <twig:Card class="xl:col-span-2">
+                <twig:Card:Header>
+                    <div class="flex justify-between items-start">
+                        <div class="space-y-1.5">
+                            <twig:Card:Title>Feasibility Codes</twig:Card:Title>
+                            <twig:Card:Description>Requested via SharePoint, newest first</twig:Card:Description>
+                        </div>
+                        <a href="{{ path('admin_feasibility_codes_export') }}"
+                            class="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground text-xs transition-colors shrink-0">
+                            <twig:ux:icon name="material-symbols:download" class="size-3" />
+                            Export to XLSX
+                        </a>
                     </div>
-                    <a href="{{ path('admin_feasibility_codes_export') }}"
-                        class="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground text-xs transition-colors shrink-0">
-                        <twig:ux:icon name="material-symbols:download" class="size-3" />
-                        Export to XLSX
-                    </a>
-                </div>
-            </twig:Card:Header>
-            <twig:Card:Content>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-border border-b text-muted-foreground text-xs">
-                                <th class="pb-2 text-left">Code</th>
-                                <th class="pb-2 text-left">Title</th>
-                                <th class="hidden sm:table-cell pb-2 text-left">Requestor</th>
-                                <th class="pb-2 text-left">Subsidiary</th>
-                                <th class="hidden sm:table-cell pb-2 text-left">Created</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-border">
-                            {% for fc in feasibilityCodes %}
-                            {% if fc.id == editFeasibilityCodeId %}
-                            <tr id="fc-{{ fc.id }}" class="target:animate-row-flash scroll-mt-24">
-                                <td class="py-1 font-mono font-semibold">
-                                    {{ fc.code }}
-                                    <form id="fc-edit-{{ fc.id }}" data-turbo="false" method="post"
-                                        action="{{ path('admin_feasibility_code_update', {id: fc.id, fcPage: fcPage}) }}"></form>
-                                </td>
-                                <td class="py-1">
-                                    <twig:Input name="title" value="{{ fc.title }}" form="fc-edit-{{ fc.id }}"
-                                        class="px-2 py-0 rounded h-8" />
-                                </td>
-                                <td class="hidden sm:table-cell py-1">{{ fc.requestor }}</td>
-                                <td class="py-1 font-mono text-muted-foreground">{{ fc.subsidiary.code }}</td>
-                                <td class="py-1 text-muted-foreground text-xs">{{ fc.createdAt|date('d M Y H:i') }}</td>
-                                <td class="py-1 text-right whitespace-nowrap">
-                                    <button type="submit" form="fc-edit-{{ fc.id }}"
-                                        class="mr-3 text-primary text-xs hover:underline">Save</button>
-                                    <a href="{{ path('admin_index', {fcPage: fcPage, _fragment: 'fc-' ~ fc.id}) }}"
-                                        class="text-muted-foreground text-xs hover:underline">Cancel</a>
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr id="fc-{{ fc.id }}" class="target:animate-row-flash scroll-mt-24">
-                                <td class="py-2 font-mono font-semibold">{{ fc.code }}</td>
-                                <td class="py-2">{{ fc.title }}</td>
-                                <td class="hidden sm:table-cell py-2">{{ fc.requestor }}</td>
-                                <td class="py-2 font-mono text-muted-foreground">{{ fc.subsidiary.code }}</td>
-                                <td class="hidden sm:table-cell py-2 text-muted-foreground text-xs">{{
-                                    fc.createdAt|date('d M Y H:i') }}</td>
-                                <td class="py-2 text-right whitespace-nowrap">
-                                    <a href="{{ path('admin_index', {editFeasibilityCode: fc.id, fcPage: fcPage, _fragment: 'fc-' ~ fc.id}) }}"
-                                        class="mr-3 text-xs hover:underline">Edit</a>
-                                    <form method="post"
-                                        action="{{ path('admin_feasibility_code_delete', {id: fc.id, fcPage: fcPage}) }}"
-                                        data-turbo-confirm="Delete feasibility code {{ fc.code }}?" class="inline">
-                                        <button type="submit"
-                                            class="text-destructive text-xs hover:underline">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% endif %}
-                            {% else %}<tr>
-                                <td colspan="6" class="py-3 text-muted-foreground text-center">None yet.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                </twig:Card:Header>
+                <twig:Card:Content>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-border border-b text-muted-foreground text-xs">
+                                    <th class="pb-2 text-left">Code</th>
+                                    <th class="pb-2 text-left">Title</th>
+                                    <th class="hidden sm:table-cell pb-2 text-left">Requestor</th>
+                                    <th class="pb-2 text-left">Subsidiary</th>
+                                    <th class="hidden sm:table-cell pb-2 text-left">Created</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-border">
+                                {% for fc in feasibilityCodes %}
+                                {% if fc.id == editFeasibilityCodeId %}
+                                <tr id="fc-{{ fc.id }}" class="target:animate-row-flash scroll-mt-24">
+                                    <td class="py-1 font-mono font-semibold">
+                                        {{ fc.code }}
+                                        <form id="fc-edit-{{ fc.id }}" data-turbo="false" method="post"
+                                            action="{{ path('admin_feasibility_code_update', {id: fc.id, fcPage: fcPage}) }}">
+                                        </form>
+                                    </td>
+                                    <td class="py-1">
+                                        <twig:Input name="title" value="{{ fc.title }}" form="fc-edit-{{ fc.id }}"
+                                            class="px-2 py-0 rounded h-8" />
+                                    </td>
+                                    <td class="hidden sm:table-cell py-1">{{ fc.requestor }}</td>
+                                    <td class="py-1 font-mono text-muted-foreground">{{ fc.subsidiary.code }}</td>
+                                    <td class="py-1 text-muted-foreground text-xs">{{ fc.createdAt|date('d M Y H:i') }}
+                                    </td>
+                                    <td class="py-1 text-right whitespace-nowrap">
+                                        <button type="submit" form="fc-edit-{{ fc.id }}"
+                                            class="mr-3 text-primary text-xs hover:underline">Save</button>
+                                        <a href="{{ path('admin_index', {fcPage: fcPage, _fragment: 'fc-' ~ fc.id}) }}"
+                                            class="text-muted-foreground text-xs hover:underline">Cancel</a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr id="fc-{{ fc.id }}" class="target:animate-row-flash scroll-mt-24">
+                                    <td class="py-2 font-mono font-semibold">{{ fc.code }}</td>
+                                    <td class="py-2">{{ fc.title }}</td>
+                                    <td class="hidden sm:table-cell py-2">{{ fc.requestor }}</td>
+                                    <td class="py-2 font-mono text-muted-foreground">{{ fc.subsidiary.code }}</td>
+                                    <td class="hidden sm:table-cell py-2 text-muted-foreground text-xs">{{
+                                        fc.createdAt|date('d M Y H:i') }}</td>
+                                    <td class="py-2 text-right whitespace-nowrap">
+                                        <a href="{{ path('admin_index', {editFeasibilityCode: fc.id, fcPage: fcPage, _fragment: 'fc-' ~ fc.id}) }}"
+                                            class="mr-3 text-xs hover:underline">Edit</a>
+                                        <form method="post"
+                                            action="{{ path('admin_feasibility_code_delete', {id: fc.id, fcPage: fcPage}) }}"
+                                            data-turbo-confirm="Delete feasibility code {{ fc.code }}?" class="inline">
+                                            <button type="submit"
+                                                class="text-destructive text-xs hover:underline">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% else %}<tr>
+                                    <td colspan="6" class="py-3 text-muted-foreground text-center">None yet.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
 
-                {{ include('_pagination.html.twig', {route: 'admin_index', page: fcPage, totalPages: fcTotalPages, pageParam: 'fcPage', fragment: 'api'}) }}
-            </twig:Card:Content>
-        </twig:Card>
+                    {{ include('_pagination.html.twig', {route: 'admin_index', page: fcPage, totalPages: fcTotalPages,
+                    pageParam: 'fcPage', fragment: 'api'}) }}
+                </twig:Card:Content>
+            </twig:Card>
 
-        {# ── Reserved feasibility codes ───────────────────────────────────────── #}
-        <twig:Card>
-            <twig:Card:Header>
-                <twig:Card:Title>Reserved Codes</twig:Card:Title>
-                <twig:Card:Description>Skipped alphabetic codes, e.g. reserved for products
-                </twig:Card:Description>
-            </twig:Card:Header>
-            <twig:Card:Content>
-                <div class="overflow-x-auto">
-                    <table class="mb-4 w-full text-sm">
-                        <thead>
-                            <tr class="border-border border-b text-muted-foreground text-xs">
-                                <th class="pb-2 text-left">Code</th>
-                                <th class="pb-2 text-left">Description</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-border">
-                            {% for rc in reservedCodes %}
-                            <tr>
-                                <td class="py-2 font-mono font-semibold">{{ rc.code }}</td>
-                                <td class="py-2">{{ rc.description }}</td>
-                                <td class="py-2 text-right">
-                                    <form method="post" action="{{ path('admin_reserved_code_delete', {id: rc.id}) }}"
-                                        data-turbo-confirm="Release reserved code {{ rc.code }}?">
-                                        <button type="submit"
-                                            class="text-destructive text-xs hover:underline">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% else %}<tr>
-                                <td colspan="3" class="py-3 text-muted-foreground text-center">None yet.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                <form method="post" action="{{ path('admin_reserved_code_new') }}" class="flex flex-wrap gap-2">
-                    <twig:Input name="code" placeholder="Code" maxlength="3" pattern="[A-Za-z]{3}" required
-                        oninput="this.value=this.value.replace(/[^A-Za-z]/g,'').toUpperCase()" class="w-28 h-9 font-mono" />
-                    <twig:Input name="description" placeholder="Description" required class="flex-1 w-auto h-9" />
-                    <button type="submit"
-                        class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
-                </form>
-            </twig:Card:Content>
-        </twig:Card>
+            {# ── Reserved feasibility codes ───────────────────────────────────────── #}
+            <twig:Card>
+                <twig:Card:Header>
+                    <twig:Card:Title>Reserved Codes</twig:Card:Title>
+                    <twig:Card:Description>Skipped alphabetic codes, e.g. reserved for products
+                    </twig:Card:Description>
+                </twig:Card:Header>
+                <twig:Card:Content>
+                    <div class="overflow-x-auto">
+                        <table class="mb-4 w-full text-sm">
+                            <thead>
+                                <tr class="border-border border-b text-muted-foreground text-xs">
+                                    <th class="pb-2 text-left">Code</th>
+                                    <th class="pb-2 text-left">Description</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-border">
+                                {% for rc in reservedCodes %}
+                                <tr>
+                                    <td class="py-2 font-mono font-semibold">{{ rc.code }}</td>
+                                    <td class="py-2">{{ rc.description }}</td>
+                                    <td class="py-2 text-right">
+                                        <form method="post"
+                                            action="{{ path('admin_reserved_code_delete', {id: rc.id}) }}"
+                                            data-turbo-confirm="Release reserved code {{ rc.code }}?">
+                                            <button type="submit"
+                                                class="text-destructive text-xs hover:underline">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% else %}<tr>
+                                    <td colspan="3" class="py-3 text-muted-foreground text-center">None yet.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <form method="post" action="{{ path('admin_reserved_code_new') }}" class="flex flex-wrap gap-2">
+                        <twig:Input name="code" placeholder="Code" maxlength="3" pattern="[A-Za-z]{3}" required
+                            oninput="this.value=this.value.replace(/[^A-Za-z]/g,'').toUpperCase()"
+                            class="w-28 h-9 font-mono" />
+                        <twig:Input name="description" placeholder="Description" required class="flex-1 w-auto h-9" />
+                        <button type="submit"
+                            class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
+                    </form>
+                </twig:Card:Content>
+            </twig:Card>
         </div>
 
     </twig:Tabs:Content>
@@ -543,7 +549,7 @@
                         <thead>
                             <tr class="border-border border-b text-muted-foreground text-xs">
                                 <th class="pb-2 text-left">Name</th>
-                                <th class="pb-2 text-left">Email</th>
+                                <th class="hidden sm:table-cell pb-2 text-left">Email</th>
                                 <th class="pb-2 text-left">Roles</th>
                                 <th class="hidden sm:table-cell pb-2 text-left">Joined</th>
                                 <th></th>
@@ -564,7 +570,7 @@
                                 {% else %}
                                 <td class="py-2">{{ user.displayName ?? '–' }}</td>
                                 {% endif %}
-                                <td class="py-2">{{ user.email }}</td>
+                                <td class="hidden sm:table-cell py-2">{{ user.email }}</td>
                                 <td class="py-2">
                                     {% set extraRoles = user.roles|filter(r => r != 'ROLE_USER') %}
                                     {% if extraRoles is empty %}
