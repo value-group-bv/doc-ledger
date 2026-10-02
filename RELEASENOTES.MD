@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 1.4.0 (02 October 2026)
+
+- Admins can reserve reference codes (e.g. ones used by products) on the Admin API tab; the feasibility code API skips them.
+
 ## Version 1.3.0 (01 October 2026)
 
 - Changing the title casing (upper- and lowercase) word lists now also updates the casing of existing document titles.
