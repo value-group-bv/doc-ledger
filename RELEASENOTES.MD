@@ -3,6 +3,8 @@
 ## Version 1.4.0 (02 October 2026)
 
 - Admins can reserve reference codes (e.g. ones used by products) on the Admin API tab; the feasibility code API skips them.
+- Users now get their first name from Microsoft 365 as display name, shown in the top right corner.
+- Admins can change user display names on the `Admin` page.
 
 ## Version 1.3.0 (01 October 2026)
 
