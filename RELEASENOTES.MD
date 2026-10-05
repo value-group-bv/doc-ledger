@@ -3,6 +3,7 @@
 ## Version 1.4.1 (05 October 2026)
 
 - FIX: Two sub categories with the same code (e.g. 000) could get the same document ID without an 'already exists' warning.
+- FIX: Ticking one 'Also valid under' main category on the New page ticked all of them.
 
 ## Version 1.4.0 (02 October 2026)
 

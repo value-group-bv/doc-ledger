@@ -122,8 +122,9 @@
             <div class="flex flex-wrap gap-x-4 gap-y-2">
                 {% for mc in alternateOptions %}
                 <label class="flex items-center gap-2 text-sm cursor-pointer">
-                    <twig:Checkbox data-model="alternateMainCategoryIds" value="{{ mc.id }}"
-                        :checked="mc.id in alternateMainCategoryIds" />
+                    {# Plain input: data-model on a component tag binds the prop to the child's value, giving every box the same value #}
+                    <input type="checkbox" data-model="alternateMainCategoryIds" value="{{ mc.id }}"
+                        class="inline-block size-4 align-middle accent-primary" {% if mc.id in alternateMainCategoryIds %}checked{% endif %} />
                     {{ mc.code }} - {{ mc.description }}
                 </label>
                 {% endfor %}
