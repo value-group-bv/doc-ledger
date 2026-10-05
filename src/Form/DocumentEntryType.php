@@ -87,19 +87,22 @@ class DocumentEntryType extends AbstractType
                 'attr'     => ['rows' => 3, 'placeholder' => 'Internal notes or keywords for improved searching'],
             ]);
 
-        // Sub categories follow the chosen subsidiary, so rebuild the field from the submitted one
-        $addSubCategory = function (FormInterface $form, ?int $subsidiaryId) use ($savedSubsidiary, $savedSubCategory, $unlessEmpty): void {
+        // Sub categories follow the chosen subsidiary and doc type, so rebuild the field from the submitted ones
+        $addSubCategory = function (FormInterface $form, ?int $subsidiaryId, ?int $docTypeId) use ($savedSubsidiary, $savedSubCategory, $unlessEmpty): void {
             $form->add('subCategory', EntityType::class, [
                 'class'        => DocSubCategory::class,
                 'choice_label' => fn(DocSubCategory $sc) => "{$sc->getFormattedCode()} - {$sc->getDescription()}",
                 // All main categories (for the alternates); the saved one stays selectable under its own subsidiary
-                'query_builder' => function (EntityRepository $r) use ($subsidiaryId, $savedSubsidiary, $savedSubCategory) {
+                'query_builder' => function (EntityRepository $r) use ($subsidiaryId, $docTypeId, $savedSubsidiary, $savedSubCategory) {
                     $qb = $r->createQueryBuilder('sc')
-                        ->where('sc.subsidiary = :subsidiary OR sc.subsidiary IS NULL')
+                        ->where('sc.docType = :docType')
+                        ->setParameter('docType', $docTypeId)
                         ->setParameter('subsidiary', $subsidiaryId)
                         ->orderBy('sc.code', 'ASC');
                     if ($subsidiaryId === $savedSubsidiary->getId()) {
-                        $qb->orWhere('sc = :saved')->setParameter('saved', $savedSubCategory);
+                        $qb->andWhere('sc.subsidiary = :subsidiary OR sc.subsidiary IS NULL OR sc = :saved')->setParameter('saved', $savedSubCategory);
+                    } else {
+                        $qb->andWhere('sc.subsidiary = :subsidiary OR sc.subsidiary IS NULL');
                     }
                     return $qb;
                 },
@@ -109,8 +112,12 @@ class DocumentEntryType extends AbstractType
             ]);
         };
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, fn(FormEvent $e) => $addSubCategory($e->getForm(), $savedSubsidiary->getId()));
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, fn(FormEvent $e) => $addSubCategory($e->getForm(), (int) ($e->getData()['subsidiary'] ?? 0) ?: null));
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, fn(FormEvent $e) => $addSubCategory(
+            $e->getForm(), $savedSubsidiary->getId(), $entry->getDocType()->getId(),
+        ));
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, fn(FormEvent $e) => $addSubCategory(
+            $e->getForm(), (int) ($e->getData()['subsidiary'] ?? 0) ?: null, (int) ($e->getData()['docType'] ?? 0) ?: null,
+        ));
     }
 
     public function configureOptions(OptionsResolver $resolver): void

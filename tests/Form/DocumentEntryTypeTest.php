@@ -30,6 +30,8 @@ class DocumentEntryTypeTest extends WebTestCase
     private DocSubCategory $ownOnly;
     private DocSubCategory $otherOnly;
     private DocSubCategory $saved;
+    private DocType $otherDocType;
+    private DocSubCategory $otherDocTypeOnly;
     private DocumentEntry $entry;
 
     protected function setUp(): void
@@ -41,6 +43,7 @@ class DocumentEntryTypeTest extends WebTestCase
         $this->own = (new DocSubsidiary())->setCode('ZT')->setDescription('Test subsidiary');
         $this->other = (new DocSubsidiary())->setCode('ZU')->setDescription('Other subsidiary');
         $docType = (new DocType())->setCode('TST')->setDescription('Test type');
+        $this->otherDocType = (new DocType())->setCode('TSU')->setDescription('Other test type');
         $taken = array_map(fn(DocMainCategory $mc) => $mc->getCode(), $this->em->getRepository(DocMainCategory::class)->findAll());
         $mainCategory = (new DocMainCategory())->setCode((string) array_values(array_diff(range(0, 9), $taken))[0])->setDescription('Test');
 
@@ -49,13 +52,14 @@ class DocumentEntryTypeTest extends WebTestCase
         $this->otherOnly = (new DocSubCategory())->setCode(300)->setDescription('Other')->setDocType($docType)->setSubsidiary($this->other);
         // Saved before sub categories were limited per subsidiary: belongs to the other one
         $this->saved = (new DocSubCategory())->setCode(400)->setDescription('Saved')->setDocType($docType)->setSubsidiary($this->other);
+        $this->otherDocTypeOnly = (new DocSubCategory())->setCode(500)->setDescription('Other doc type')->setDocType($this->otherDocType);
 
         $this->entry = (new DocumentEntry())->setSubsidiary($this->own)->setMainCategory($mainCategory)->setReferenceCode('000')
             ->setDocType($docType)->setSubCategory($this->saved)->setDocNumber(1)->setTitle('Test document');
 
         $admin = (new User())->setEmail('entry-form-test@example.com')->setRoles(['ROLE_ADMIN']);
 
-        foreach ([$this->own, $this->other, $docType, $mainCategory, $this->global, $this->ownOnly, $this->otherOnly, $this->saved, $this->entry, $admin] as $entity) {
+        foreach ([$this->own, $this->other, $docType, $mainCategory, $this->global, $this->ownOnly, $this->otherOnly, $this->saved, $this->otherDocType, $this->otherDocTypeOnly, $this->entry, $admin] as $entity) {
             $this->em->persist($entity);
         }
         $this->em->flush();
@@ -76,18 +80,45 @@ class DocumentEntryTypeTest extends WebTestCase
         $this->assertContains($this->ownOnly, $offered);
         $this->assertContains($this->saved, $offered, 'The saved sub category stays selectable');
         $this->assertNotContains($this->otherOnly, $offered);
+        $this->assertNotContains($this->otherDocTypeOnly, $offered);
     }
 
     public function testSubCategoriesFollowTheSubmittedSubsidiary(): void
     {
         $form = $this->form();
-        $form->submit(['subsidiary' => (string) $this->other->getId()], false);
+        $form->submit(['subsidiary' => (string) $this->other->getId(), 'docType' => (string) $this->entry->getDocType()->getId()], false);
 
         $offered = $this->offeredSubCategories($form);
 
         $this->assertContains($this->global, $offered);
         $this->assertContains($this->otherOnly, $offered);
         $this->assertNotContains($this->ownOnly, $offered);
+    }
+
+    public function testSubCategoriesFollowTheSubmittedDocType(): void
+    {
+        $form = $this->form();
+        $form->submit(['subsidiary' => (string) $this->own->getId(), 'docType' => (string) $this->otherDocType->getId()], false);
+
+        $this->assertSame([$this->otherDocTypeOnly], array_values($this->offeredSubCategories($form)));
+    }
+
+    public function testSavedSubCategoryOfAnotherDocTypeIsNotOffered(): void
+    {
+        $this->entry->setDocType($this->otherDocType);
+        $this->em->flush();
+
+        $this->assertNotContains($this->saved, $this->offeredSubCategories($this->form()));
+    }
+
+    public function testLiveFormUpdatesSubCategoriesWhenTheDocTypeChanges(): void
+    {
+        $component = $this->createLiveComponent('DocumentEntryForm', ['entry' => $this->entry], static::getClient());
+
+        $html = (string) $component->set('document_entry.docType', (string) $this->otherDocType->getId())->render();
+
+        $this->assertStringContainsString('500 - Other doc type', $html);
+        $this->assertStringNotContainsString('200 - Own', $html);
     }
 
     public function testLiveFormUpdatesSubCategoriesWhenTheSubsidiaryChanges(): void
