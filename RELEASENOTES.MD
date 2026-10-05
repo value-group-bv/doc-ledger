@@ -1,6 +1,6 @@
 # Release Notes
 
-## Version 1.4.2
+## Version 1.4.2 (05 October 2026)
 
 - The sub category list when editing an entry now only shows sub categories for the selected document type.
 - FIX: Editing an entry could crash with an error when a required field (e.g. sub category) became empty.
