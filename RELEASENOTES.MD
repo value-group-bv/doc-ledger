@@ -2,6 +2,7 @@
 
 ## Version 1.4.1 (05 October 2026)
 
+- The sub category list when editing an entry now only shows sub categories for that entry's subsidiary.
 - FIX: Two sub categories with the same code (e.g. 000) could get the same document ID without an 'already exists' warning.
 - FIX: Ticking one 'Also valid under' main category on the New page ticked all of them.
 

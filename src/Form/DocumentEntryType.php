@@ -23,6 +23,9 @@ class DocumentEntryType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $_options): void
     {
+        /** @var DocumentEntry $entry */
+        $entry = $builder->getData();
+
         $builder
             ->add('subsidiary', EntityType::class, [
                 'class'        => DocSubsidiary::class,
@@ -55,6 +58,12 @@ class DocumentEntryType extends AbstractType
             ->add('subCategory', EntityType::class, [
                 'class'        => DocSubCategory::class,
                 'choice_label' => fn(DocSubCategory $sc) => "{$sc->getFormattedCode()} - {$sc->getDescription()}",
+                // Only the entry's subsidiary (all main categories, for the alternates); keep the current one regardless
+                'query_builder' => fn(EntityRepository $r) => $r->createQueryBuilder('sc')
+                    ->where('sc.subsidiary = :subsidiary OR sc.subsidiary IS NULL OR sc = :current')
+                    ->setParameter('subsidiary', $entry->getSubsidiary())
+                    ->setParameter('current', $entry->getSubCategory())
+                    ->orderBy('sc.code', 'ASC'),
                 'placeholder'  => 'select',
                 'constraints'  => [new NotBlank()],
             ])
