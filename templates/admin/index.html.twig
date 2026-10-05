@@ -239,7 +239,7 @@
                                     <th class="pb-2 text-left">Doc types</th>
                                     <th class="pb-2 text-left">Subsidiary</th>
                                     <th class="pb-2 text-left">Main cat.</th>
-                                    <th class="pb-2 text-right">Docs</th>
+                                    <th class="hidden sm:table-cell pb-2 text-right">Count</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -282,7 +282,7 @@
                                             {% endfor %}
                                         </twig:Select>
                                     </td>
-                                    <td class="py-1 text-muted-foreground text-right tabular-nums">{{ usage ?: '' }}</td>
+                                    <td class="hidden sm:table-cell py-1 tabular-nums text-muted-foreground text-right">{{ usage ?: '' }}</td>
                                     <td class="py-1 pl-3 text-right whitespace-nowrap">
                                         <button type="submit" form="subcat-edit-{{ sc.id }}"
                                             class="mr-3 text-primary text-xs hover:underline">Save</button>
@@ -304,7 +304,7 @@
                                     {# Only a restriction stands out; "All" is the usual case #}
                                     <td class="py-2 font-mono {{ sc.subsidiary ? 'font-semibold' : 'text-muted-foreground' }}">{{ sc.subsidiary ? sc.subsidiary.code : 'All' }}</td>
                                     <td class="py-2 font-mono {{ sc.mainCategory ? 'font-semibold' : 'text-muted-foreground' }}">{{ sc.mainCategory ? sc.mainCategory.code : 'All' }}</td>
-                                    <td class="py-2 text-muted-foreground text-right tabular-nums">{{ usage ?: '' }}</td>
+                                    <td class="hidden sm:table-cell py-2 tabular-nums text-muted-foreground text-right">{{ usage ?: '' }}</td>
                                     <td class="py-2 pl-3 text-right whitespace-nowrap">
                                         <a href="{{ path('admin_index', {editSubcat: sc.id, _fragment: 'subcat-' ~ sc.id}) }}"
                                             class="text-xs hover:underline">Edit</a>
