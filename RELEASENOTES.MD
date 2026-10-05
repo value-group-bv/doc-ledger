@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 1.4.1 (05 October 2026)
+
+- FIX: Two sub categories with the same code (e.g. 000) could get the same document ID without an 'already exists' warning.
+
 ## Version 1.4.0 (02 October 2026)
 
 - Admins can reserve reference codes (e.g. ones used by products) on the Admin API tab; the feasibility code API skips them.

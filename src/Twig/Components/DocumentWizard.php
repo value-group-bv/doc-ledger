@@ -145,7 +145,9 @@ class DocumentWizard
     public function getSuggestedDocNumber(): int
     {
         if (!$this->docTypeId || !$this->subCategoryId) return 0;
-        $max = $this->entries->findMaxDocNumber($this->docTypeId, $this->subCategoryId);
+        $subCategory = $this->em->find(DocSubCategory::class, $this->subCategoryId);
+        if (!$subCategory) return 0;
+        $max = $this->entries->findMaxDocNumber($this->docTypeId, $subCategory->getCode());
         return ($max ?? -1) + 1;
     }
 

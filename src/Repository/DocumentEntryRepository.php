@@ -77,7 +77,7 @@ class DocumentEntryRepository extends ServiceEntityRepository
 
     /**
      * Returns the document IDs that would be claimed twice if the given entry were saved:
-     * other entries with the same subsidiary, doc type, sub category, number and revision
+     * other entries with the same subsidiary, doc type, sub category code, number and revision
      * whose allowed main categories (default + alternates) overlap with the given entry's.
      *
      * @return string[]
@@ -89,14 +89,16 @@ class DocumentEntryRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('e')
             ->leftJoin('e.alternateMainCategories', 'amc')
             ->addSelect('amc')
+            ->join('e.subCategory', 'sc')
             ->where('e.subsidiary = :subsidiary')
             ->andWhere('e.docType = :docType')
-            ->andWhere('e.subCategory = :subCategory')
+            // Compare by code: different sub categories (e.g. scoped to other main categories) can share one
+            ->andWhere('sc.code = :subCategoryCode')
             ->andWhere('e.docNumber = :docNumber')
             ->andWhere('e.revision = :revision')
             ->setParameter('subsidiary', $entry->getSubsidiary())
             ->setParameter('docType', $entry->getDocType())
-            ->setParameter('subCategory', $entry->getSubCategory())
+            ->setParameter('subCategoryCode', $entry->getSubCategory()->getCode())
             ->setParameter('docNumber', $entry->getDocNumber())
             ->setParameter('revision', $entry->getRevision());
 
@@ -116,15 +118,19 @@ class DocumentEntryRepository extends ServiceEntityRepository
         return $conflicts;
     }
 
-    /** Returns the highest docNumber used for a given docType + subCategory combination, or null if none exist */
-    public function findMaxDocNumber(int $docTypeId, int $subCategoryId): ?int
+    /**
+     * Returns the highest docNumber used for a given docType + subCategory code, or null if none exist.
+     * Matches on the code so sub categories sharing one don't get the same number suggested.
+     */
+    public function findMaxDocNumber(int $docTypeId, int $subCategoryCode): ?int
     {
         $result = $this->createQueryBuilder('e')
             ->select('MAX(e.docNumber)')
+            ->join('e.subCategory', 'sc')
             ->where('e.docType = :docTypeId')
-            ->andWhere('e.subCategory = :subCategoryId')
+            ->andWhere('sc.code = :subCategoryCode')
             ->setParameter('docTypeId', $docTypeId)
-            ->setParameter('subCategoryId', $subCategoryId)
+            ->setParameter('subCategoryCode', $subCategoryCode)
             ->getQuery()
             ->getSingleScalarResult();
 

@@ -90,6 +90,18 @@ class UniqueDocumentIdValidatorTest extends KernelTestCase
         $this->assertViolations([], $this->entry($this->installation, 1));
     }
 
+    public function testDifferentSubCategoriesWithTheSameCodeClash(): void
+    {
+        $this->save($this->entry($this->feasibility, 1));
+
+        $sameCode = (new DocSubCategory())->setCode(100)->setDescription('Structural (feasibility)')
+            ->setDocType($this->docType)->setMainCategory($this->feasibility);
+        $this->em->persist($sameCode);
+        $this->em->flush();
+
+        $this->assertViolations([$this->id($this->feasibility, 'AAA', 1)], $this->entry($this->feasibility, 1)->setSubCategory($sameCode));
+    }
+
     public function testEditingAnEntryDoesNotClashWithItself(): void
     {
         $entry = $this->entry($this->feasibility, 1);
