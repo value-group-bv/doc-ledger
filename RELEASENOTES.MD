@@ -1,5 +1,10 @@
 # Release Notes
 
+## Version 1.5.0 (05 October 2026)
+
+- Sub categories can now be assigned to multiple document types.
+- The Sub Categories admin list now shows how many documents use each sub category, and existing duplicates per document type have been merged.
+
 ## Version 1.4.2 (05 October 2026)
 
 - The sub category list when editing an entry now only shows sub categories for the selected document type.
