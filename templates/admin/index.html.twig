@@ -302,7 +302,13 @@
                                         </div>
                                     </td>
                                     {# Only a restriction stands out; "All" is the usual case #}
-                                    <td class="py-2 font-mono {{ sc.subsidiary ? 'font-semibold' : 'text-muted-foreground' }}">{{ sc.subsidiary ? sc.subsidiary.code : 'All' }}</td>
+                                    <td class="py-2">
+                                        {% if sc.subsidiary %}
+                                        <twig:Badge class="font-mono" style="{{ subsidiary_doc_number_style(sc.subsidiary.code) }}" title="{{ sc.subsidiary.description }}">{{ sc.subsidiary.code }}</twig:Badge>
+                                        {% else %}
+                                        <span class="font-mono text-muted-foreground">All</span>
+                                        {% endif %}
+                                    </td>
                                     <td class="py-2 font-mono {{ sc.mainCategory ? 'font-semibold' : 'text-muted-foreground' }}">{{ sc.mainCategory ? sc.mainCategory.code : 'All' }}</td>
                                     <td class="hidden sm:table-cell py-2 tabular-nums text-muted-foreground text-right">{{ usage ?: '' }}</td>
                                     <td class="py-2 pl-3 text-right whitespace-nowrap">
