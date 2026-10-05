@@ -26,7 +26,7 @@ class DocType
     #[ORM\Column(options: ['default' => 0])]
     private int $sortOrder = 0;
 
-    #[ORM\OneToMany(targetEntity: DocSubCategory::class, mappedBy: 'docType', cascade: ['persist'])]
+    #[ORM\ManyToMany(targetEntity: DocSubCategory::class, mappedBy: 'docTypes')]
     #[ORM\OrderBy(['code' => 'ASC'])]
     private Collection $subCategories;
 

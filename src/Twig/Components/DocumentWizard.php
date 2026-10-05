@@ -168,7 +168,8 @@ class DocumentWizard
         $docType      = $this->em->find(DocType::class, $this->docTypeId);
         $subCategory  = $this->em->find(DocSubCategory::class, $this->subCategoryId);
 
-        if (!$subsidiary || !$mainCategory || !$docType || !$subCategory) return null;
+        // A sub category left selected after switching to a doc type it doesn't belong to
+        if (!$subsidiary || !$mainCategory || !$docType || !$subCategory || !$subCategory->hasDocType($docType)) return null;
 
         $entry = new DocumentEntry();
         $entry->setSubsidiary($subsidiary);

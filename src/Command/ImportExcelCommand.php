@@ -183,11 +183,17 @@ class ImportExcelCommand extends Command
             $docType = $this->em->getRepository(DocType::class)->findOneBy(['code' => $docTypeCode]);
             if (!$docType) continue;
 
-            $existing = $this->em->getRepository(DocSubCategory::class)->findOneBy(['code' => $code, 'docType' => $docType]);
-            if ($existing) continue;
+            $sameCode = $this->em->getRepository(DocSubCategory::class)->findBy(['code' => $code, 'mainCategory' => null, 'subsidiary' => null]);
+            if (array_filter($sameCode, fn(DocSubCategory $sc) => $sc->hasDocType($docType))) continue;
 
-            $entity = (new DocSubCategory())->setCode($code)->setDescription($description)->setDocType($docType);
-            $this->em->persist($entity);
+            // A row repeating a code and description for another doc type adds that type to the existing one
+            $existing = array_values(array_filter($sameCode, fn(DocSubCategory $sc) => strcasecmp($sc->getDescription(), $description) === 0))[0] ?? null;
+            if ($existing) {
+                $existing->addDocType($docType);
+            } else {
+                $this->em->persist((new DocSubCategory())->setCode($code)->setDescription($description)->addDocType($docType));
+            }
+            $this->em->flush();
             $count++;
         }
 

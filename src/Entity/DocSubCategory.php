@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DocSubCategoryRepository::class)]
 #[ORM\Table(name: 'doc_sub_category')]
-#[ORM\UniqueConstraint(fields: ['code', 'docType', 'mainCategory', 'subsidiary'])]
 class DocSubCategory
 {
     #[ORM\Id]
@@ -24,9 +23,11 @@ class DocSubCategory
     #[ORM\Column(length: 150)]
     private string $description;
 
-    #[ORM\ManyToOne(targetEntity: DocType::class, inversedBy: 'subCategories')]
-    #[ORM\JoinColumn(nullable: false)]
-    private DocType $docType;
+    /** At least one; a code may be shared by several doc types without repeating it per type */
+    #[ORM\ManyToMany(targetEntity: DocType::class, inversedBy: 'subCategories')]
+    #[ORM\JoinTable(name: 'doc_sub_category_doc_type')]
+    #[ORM\OrderBy(['sortOrder' => 'ASC', 'code' => 'ASC'])]
+    private Collection $docTypes;
 
     /** Null means this sub category applies to all main categories */
     #[ORM\ManyToOne(targetEntity: DocMainCategory::class)]
@@ -43,6 +44,7 @@ class DocSubCategory
 
     public function __construct()
     {
+        $this->docTypes = new ArrayCollection();
         $this->documentEntries = new ArrayCollection();
     }
 
@@ -51,8 +53,39 @@ class DocSubCategory
     public function setCode(int $code): static { $this->code = $code; return $this; }
     public function getDescription(): string { return $this->description; }
     public function setDescription(string $description): static { $this->description = $description; return $this; }
-    public function getDocType(): DocType { return $this->docType; }
-    public function setDocType(DocType $docType): static { $this->docType = $docType; return $this; }
+
+    /** @return Collection<int, DocType> */
+    public function getDocTypes(): Collection { return $this->docTypes; }
+
+    public function hasDocType(DocType $docType): bool { return $this->docTypes->contains($docType); }
+
+    public function addDocType(DocType $docType): static
+    {
+        if (!$this->docTypes->contains($docType)) {
+            $this->docTypes->add($docType);
+        }
+        return $this;
+    }
+
+    public function removeDocType(DocType $docType): static
+    {
+        $this->docTypes->removeElement($docType);
+        return $this;
+    }
+
+    /** Replaces the doc types, only touching the ones that actually change. @param DocType[] $docTypes */
+    public function setDocTypes(array $docTypes): static
+    {
+        foreach ($this->docTypes->toArray() as $docType) {
+            if (!\in_array($docType, $docTypes, true)) {
+                $this->docTypes->removeElement($docType);
+            }
+        }
+        foreach ($docTypes as $docType) {
+            $this->addDocType($docType);
+        }
+        return $this;
+    }
 
     public function getMainCategory(): ?DocMainCategory { return $this->mainCategory; }
     public function setMainCategory(?DocMainCategory $mainCategory): static { $this->mainCategory = $mainCategory; return $this; }

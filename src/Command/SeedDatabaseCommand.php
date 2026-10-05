@@ -158,7 +158,7 @@ class SeedDatabaseCommand extends Command
             $subCategory = new DocSubCategory();
             $subCategory->setCode($data['code']);
             $subCategory->setDescription($data['description']);
-            $subCategory->setDocType($docTypes[$data['docType']]);
+            $subCategory->addDocType($docTypes[$data['docType']]);
             $this->entityManager->persist($subCategory);
             $result[$data['code']] = $subCategory;
         }

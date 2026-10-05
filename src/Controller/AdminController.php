@@ -67,7 +67,7 @@ class AdminController extends AbstractController
             'subsidiaries' => $subsidiaries->findBy([], ['sortOrder' => 'ASC']),
             'mainCategories' => $mainCats->findBy([], ['code' => 'ASC']),
             'docTypes' => $docTypes->findBy([], ['sortOrder' => 'ASC']),
-            'subCategories' => $subCats->findBy([], ['docType' => 'ASC', 'code' => 'ASC']),
+            'subCategories' => $subCats->findAllForAdmin(),
             'users' => $users->findBy([], ['createdAt' => 'DESC']),
             'feasibilityCodes' => $feasibilityCodes->findPage($fcPage, self::FC_PAGE_SIZE),
             'fcPage' => $fcPage,
@@ -414,7 +414,7 @@ class AdminController extends AbstractController
         $entity = $this->em->find(DocType::class, $id);
         $usage = $entity ? $this->describeUsage([
             'document(s)' => $this->countWhere(DocumentEntry::class, 'x.docType = :v', $entity),
-            'sub category(ies)' => $this->countWhere(DocSubCategory::class, 'x.docType = :v', $entity),
+            'sub category(ies)' => $this->countWhere(DocSubCategory::class, ':v MEMBER OF x.docTypes', $entity),
         ]) : null;
         if ($usage) {
             $this->addFlash('error', "Cannot delete doc type '{$entity->getCode()}': it is still used by {$usage}.");
@@ -429,38 +429,16 @@ class AdminController extends AbstractController
     // ── Sub categories ────────────────────────────────────────────────────────
 
     #[Route('/subcat/new', name: 'subcat_new', methods: ['POST'])]
-    public function subcatNew(Request $request, DocTypeRepository $docTypes, DocMainCategoryRepository $mainCats, DocSubsidiaryRepository $subsidiaries): Response
+    public function subcatNew(Request $request, DocTypeRepository $docTypes, DocMainCategoryRepository $mainCats, DocSubsidiaryRepository $subsidiaries, DocSubCategoryRepository $subCats): Response
     {
-        $docTypeId = (int) $request->request->get('docTypeId', 0);
-        $mainCategoryId = (int) $request->request->get('mainCategoryId', 0);
-        $subsidiaryId = (int) $request->request->get('subsidiaryId', 0);
-        $code = (int) $request->request->get('code', -1);
-        $description = trim((string) $request->request->get('description', ''));
-        $docType = $docTypes->find($docTypeId);
-        $mainCategory = $mainCategoryId ? $mainCats->find($mainCategoryId) : null;
-        $subsidiary = $subsidiaryId ? $subsidiaries->find($subsidiaryId) : null;
-
-        if (!$docType) {
-            $this->addFlash('error', 'Document type is required.');
-        } elseif ($code < 0 || $code > 999) {
-            $this->addFlash('error', 'Code is required and must be between 0 and 999.');
-        } elseif (!$description) {
-            $this->addFlash('error', 'Description is required.');
+        $entity = new DocSubCategory();
+        $error = $this->applySubcat($entity, $request, $docTypes, $mainCats, $subsidiaries, $subCats);
+        if ($error) {
+            $this->addFlash('error', $error);
         } else {
-            $entity = new DocSubCategory();
-            $entity->setCode($code)->setDescription($description)->setDocType($docType)->setMainCategory($mainCategory)->setSubsidiary($subsidiary);
             $this->em->persist($entity);
-            try {
-                $this->em->flush();
-                $this->addFlash('success', "Sub category {$code} added.");
-            } catch (\Exception $e) {
-                $this->em->clear();
-                if ($e instanceof \Doctrine\DBAL\Exception\UniqueConstraintViolationException) {
-                    $this->addFlash('error', "Sub category {$code} already exists for this document type, main category and subsidiary.");
-                } else {
-                    $this->addFlash('error', "Error creating sub category: " . $e->getMessage());
-                }
-            }
+            $this->em->flush();
+            $this->addFlash('success', "Sub category {$entity->getFormattedCode()} added.");
         }
 
         return $this->redirectToRoute('admin_index');
@@ -473,45 +451,77 @@ class AdminController extends AbstractController
     }
 
     #[Route('/subcat/{id}/update', name: 'subcat_update', methods: ['POST'])]
-    public function subcatUpdate(int $id, Request $request, DocTypeRepository $docTypes, DocMainCategoryRepository $mainCats, DocSubsidiaryRepository $subsidiaries): Response
+    public function subcatUpdate(int $id, Request $request, DocTypeRepository $docTypes, DocMainCategoryRepository $mainCats, DocSubsidiaryRepository $subsidiaries, DocSubCategoryRepository $subCats): Response
     {
         $entity = $this->em->find(DocSubCategory::class, $id);
+        $error = $entity ? $this->applySubcat($entity, $request, $docTypes, $mainCats, $subsidiaries, $subCats) : 'Sub category not found.';
+        if ($error) {
+            $this->em->clear();
+            $this->addFlash('error', $error);
+            return $this->redirectToRoute('admin_index');
+        }
+
+        $this->em->flush();
+        $this->addFlash('success', "Sub category {$entity->getFormattedCode()} updated.");
+
+        // Back to the (highlighted) row; errors stay at the top where their message shows
+        return $this->redirectToRoute('admin_index', ['_fragment' => "subcat-$id"]);
+    }
+
+    /** Copies the submitted fields onto the sub category; returns an error message if they're not valid. */
+    private function applySubcat(DocSubCategory $entity, Request $request, DocTypeRepository $docTypes, DocMainCategoryRepository $mainCats, DocSubsidiaryRepository $subsidiaries, DocSubCategoryRepository $subCats): ?string
+    {
         $code = (int) $request->request->get('code', -1);
         $description = trim((string) $request->request->get('description', ''));
-        $docTypeId = (int) $request->request->get('docTypeId', 0);
+        $docTypeIds = array_filter(array_map('intval', $request->request->all('docTypeIds')));
+        $selectedDocTypes = $docTypeIds ? $docTypes->findBy(['id' => $docTypeIds], ['sortOrder' => 'ASC']) : [];
         $mainCategoryId = (int) $request->request->get('mainCategoryId', 0);
         $subsidiaryId = (int) $request->request->get('subsidiaryId', 0);
-        $docType = $docTypes->find($docTypeId);
-        $mainCategory = $mainCategoryId ? $mainCats->find($mainCategoryId) : null;
-        $subsidiary = $subsidiaryId ? $subsidiaries->find($subsidiaryId) : null;
 
-        if (!$entity) {
-            $this->addFlash('error', 'Sub category not found.');
-        } elseif ($code < 0 || $code > 999) {
-            $this->addFlash('error', 'Code is required and must be between 0 and 999.');
-        } elseif (!$description) {
-            $this->addFlash('error', 'Description is required.');
-        } elseif (!$docType) {
-            $this->addFlash('error', 'Document type is required.');
-        } else {
-            $entity->setCode($code)->setDescription($description)->setDocType($docType)->setMainCategory($mainCategory)->setSubsidiary($subsidiary);
-            try {
-                $this->em->flush();
-                $this->addFlash('success', "Sub category {$entity->getFormattedCode()} updated.");
+        if (!$selectedDocTypes) {
+            return 'Select at least one document type.';
+        }
+        if ($code < 0 || $code > 999) {
+            return 'Code is required and must be between 0 and 999.';
+        }
+        if (!$description) {
+            return 'Description is required.';
+        }
 
-                // Back to the (highlighted) row; errors stay at the top where their message shows
-                return $this->redirectToRoute('admin_index', ['_fragment' => "subcat-$id"]);
-            } catch (\Exception $e) {
-                $this->em->clear();
-                if ($e instanceof \Doctrine\DBAL\Exception\UniqueConstraintViolationException) {
-                    $this->addFlash('error', "Sub category {$code} already exists for this document type, main category and subsidiary.");
-                } else {
-                    $this->addFlash('error', "Error updating sub category: " . $e->getMessage());
+        // Documents keep their doc type, so it can't be taken away from the sub category they use
+        if ($entity->getId() !== null) {
+            foreach ($entity->getDocTypes() as $docType) {
+                if (\in_array($docType, $selectedDocTypes, true)) {
+                    continue;
+                }
+                $used = (int) $this->em->createQuery('SELECT COUNT(e) FROM ' . DocumentEntry::class . ' e WHERE e.subCategory = :sc AND e.docType = :dt')
+                    ->setParameters(['sc' => $entity, 'dt' => $docType])
+                    ->getSingleScalarResult();
+                if ($used) {
+                    return "Cannot remove doc type {$docType->getCode()} from sub category {$entity->getFormattedCode()}: it is still used by {$used} {$docType->getCode()} document(s).";
                 }
             }
         }
 
-        return $this->redirectToRoute('admin_index');
+        $entity->setCode($code)
+            ->setDescription($description)
+            ->setMainCategory($mainCategoryId ? $mainCats->find($mainCategoryId) : null)
+            ->setSubsidiary($subsidiaryId ? $subsidiaries->find($subsidiaryId) : null);
+
+        $overlap = [];
+        foreach ($subCats->findOverlapping($entity, $selectedDocTypes) as $other) {
+            foreach ($other->getDocTypes() as $docType) {
+                if (\in_array($docType, $selectedDocTypes, true)) {
+                    $overlap[$docType->getCode()] = true;
+                }
+            }
+        }
+        if ($overlap) {
+            return \sprintf('Sub category %s already exists for %s with this main category and subsidiary.', $entity->getFormattedCode(), implode(', ', array_keys($overlap)));
+        }
+
+        $entity->setDocTypes($selectedDocTypes);
+        return null;
     }
 
     #[Route('/subcat/{id}/delete', name: 'subcat_delete', methods: ['POST'])]

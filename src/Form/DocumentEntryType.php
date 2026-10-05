@@ -95,7 +95,7 @@ class DocumentEntryType extends AbstractType
                 // All main categories (for the alternates); the saved one stays selectable under its own subsidiary
                 'query_builder' => function (EntityRepository $r) use ($subsidiaryId, $docTypeId, $savedSubsidiary, $savedSubCategory) {
                     $qb = $r->createQueryBuilder('sc')
-                        ->where('sc.docType = :docType')
+                        ->where(':docType MEMBER OF sc.docTypes')
                         ->setParameter('docType', $docTypeId)
                         ->setParameter('subsidiary', $subsidiaryId)
                         ->orderBy('sc.code', 'ASC');

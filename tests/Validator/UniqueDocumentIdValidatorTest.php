@@ -41,7 +41,7 @@ class UniqueDocumentIdValidatorTest extends KernelTestCase
         $this->docType = (new DocType())->setCode('TST')->setDescription('Test type');
         $this->feasibility = (new DocMainCategory())->setCode((string) $feasibilityCode)->setDescription('Feasibility')->setReferenceCode('AAA');
         $this->installation = (new DocMainCategory())->setCode((string) $installationCode)->setDescription('Installation');
-        $this->subCategory = (new DocSubCategory())->setCode(100)->setDescription('Structural')->setDocType($this->docType);
+        $this->subCategory = (new DocSubCategory())->setCode(100)->setDescription('Structural')->addDocType($this->docType);
 
         foreach ([$this->subsidiary, $this->docType, $this->feasibility, $this->installation, $this->subCategory] as $entity) {
             $this->em->persist($entity);
@@ -95,7 +95,7 @@ class UniqueDocumentIdValidatorTest extends KernelTestCase
         $this->save($this->entry($this->feasibility, 1));
 
         $sameCode = (new DocSubCategory())->setCode(100)->setDescription('Structural (feasibility)')
-            ->setDocType($this->docType)->setMainCategory($this->feasibility);
+            ->addDocType($this->docType)->setMainCategory($this->feasibility);
         $this->em->persist($sameCode);
         $this->em->flush();
 

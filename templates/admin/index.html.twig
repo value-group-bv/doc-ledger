@@ -227,7 +227,7 @@
             <twig:Card class="xl:col-span-2">
                 <twig:Card:Header>
                     <twig:Card:Title>Sub Categories</twig:Card:Title>
-                    <twig:Card:Description>Linked to a document type; three-digit codes</twig:Card:Description>
+                    <twig:Card:Description>Three-digit codes, shared by one or more document types</twig:Card:Description>
                 </twig:Card:Header>
                 <twig:Card:Content>
                     <div class="overflow-x-auto">
@@ -269,13 +269,7 @@
                                         </twig:Select>
                                     </td>
                                     <td class="py-1">
-                                        <twig:Select name="docTypeId" form="subcat-edit-{{ sc.id }}"
-                                            class="px-2 py-0 rounded w-auto h-8">
-                                            {% for dt in docTypes %}
-                                            <option value="{{ dt.id }}" {% if dt.id==sc.docType.id %}selected{% endif
-                                                %}>{{ dt.code }}</option>
-                                            {% endfor %}
-                                        </twig:Select>
+                                        {% include 'admin/_doc_type_chips.html.twig' with {selected: sc.docTypes, formId: 'subcat-edit-' ~ sc.id, size: 'sm'} %}
                                     </td>
                                     <td class="py-1">
                                         <twig:Input name="code" type="number" min="0" max="999" value="{{ sc.code }}"
@@ -300,8 +294,11 @@
                                     <td class="py-2 font-mono text-muted-foreground">{{ sc.mainCategory ?
                                         sc.mainCategory.code : 'All' }}</td>
                                     <td class="py-2">
-                                        <twig:Badge style="{{ doc_type_badge_style(sc.docType.code) }}">{{
-                                            sc.docType.code }}</twig:Badge>
+                                        <div class="flex flex-wrap gap-1">
+                                            {% for dt in sc.docTypes %}
+                                            <twig:Badge style="{{ doc_type_badge_style(dt.code) }}" title="{{ dt.description }}">{{ dt.code }}</twig:Badge>
+                                            {% endfor %}
+                                        </div>
                                     </td>
                                     <td class="py-2 font-mono font-semibold">{{ sc.formattedCode }}</td>
                                     <td class="py-2">{{ sc.description }}</td>
@@ -337,12 +334,7 @@
                             <option value="{{ mc.id }}">{{ mc.code }} - {{ mc.description }}</option>
                             {% endfor %}
                         </twig:Select>
-                        <twig:Select name="docTypeId" required class="w-auto h-9">
-                            <option value="">Doc type…</option>
-                            {% for dt in docTypes %}
-                            <option value="{{ dt.id }}">{{ dt.code }}</option>
-                            {% endfor %}
-                        </twig:Select>
+                        {% include 'admin/_doc_type_chips.html.twig' with {selected: []} %}
                         <twig:Input name="code" type="number" min="0" max="999" placeholder="Code (0–999)" required
                             class="w-36 h-9" />
                         <twig:Input name="description" placeholder="Description" required

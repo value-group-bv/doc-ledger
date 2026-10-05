@@ -1,0 +1,11 @@
+{# Doc type checkboxes styled as toggle chips. Expects: docTypes, selected (DocType[]), optional formId, size ('sm'|'default') #}
+{% set selectedIds = (selected ?? [])|map(dt => dt.id) %}
+<div class="inline-flex flex-wrap gap-1" role="group" aria-label="Document types">
+    {% for dt in docTypes %}
+    <label title="{{ dt.description }}" class="cursor-pointer">
+        <input type="checkbox" name="docTypeIds[]" value="{{ dt.id }}" class="sr-only peer"
+            {% if formId ?? false %}form="{{ formId }}"{% endif %} {% if dt.id in selectedIds %}checked{% endif %}>
+        <span class="inline-flex items-center px-2 border border-input peer-checked:border-primary rounded-md peer-focus-visible:ring-[3px] peer-focus-visible:ring-ring/50 font-mono text-muted-foreground text-xs peer-checked:text-primary-foreground hover:bg-accent peer-checked:bg-primary transition-colors {{ (size ?? 'default') == 'sm' ? 'h-8' : 'h-9' }}">{{ dt.code }}</span>
+    </label>
+    {% endfor %}
+</div>

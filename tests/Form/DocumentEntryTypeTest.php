@@ -47,12 +47,12 @@ class DocumentEntryTypeTest extends WebTestCase
         $taken = array_map(fn(DocMainCategory $mc) => $mc->getCode(), $this->em->getRepository(DocMainCategory::class)->findAll());
         $mainCategory = (new DocMainCategory())->setCode((string) array_values(array_diff(range(0, 9), $taken))[0])->setDescription('Test');
 
-        $this->global = (new DocSubCategory())->setCode(100)->setDescription('Global')->setDocType($docType);
-        $this->ownOnly = (new DocSubCategory())->setCode(200)->setDescription('Own')->setDocType($docType)->setSubsidiary($this->own);
-        $this->otherOnly = (new DocSubCategory())->setCode(300)->setDescription('Other')->setDocType($docType)->setSubsidiary($this->other);
+        $this->global = (new DocSubCategory())->setCode(100)->setDescription('Global')->addDocType($docType);
+        $this->ownOnly = (new DocSubCategory())->setCode(200)->setDescription('Own')->addDocType($docType)->setSubsidiary($this->own);
+        $this->otherOnly = (new DocSubCategory())->setCode(300)->setDescription('Other')->addDocType($docType)->setSubsidiary($this->other);
         // Saved before sub categories were limited per subsidiary: belongs to the other one
-        $this->saved = (new DocSubCategory())->setCode(400)->setDescription('Saved')->setDocType($docType)->setSubsidiary($this->other);
-        $this->otherDocTypeOnly = (new DocSubCategory())->setCode(500)->setDescription('Other doc type')->setDocType($this->otherDocType);
+        $this->saved = (new DocSubCategory())->setCode(400)->setDescription('Saved')->addDocType($docType)->setSubsidiary($this->other);
+        $this->otherDocTypeOnly = (new DocSubCategory())->setCode(500)->setDescription('Other doc type')->addDocType($this->otherDocType);
 
         $this->entry = (new DocumentEntry())->setSubsidiary($this->own)->setMainCategory($mainCategory)->setReferenceCode('000')
             ->setDocType($docType)->setSubCategory($this->saved)->setDocNumber(1)->setTitle('Test document');
@@ -101,6 +101,18 @@ class DocumentEntryTypeTest extends WebTestCase
         $form->submit(['subsidiary' => (string) $this->own->getId(), 'docType' => (string) $this->otherDocType->getId()], false);
 
         $this->assertSame([$this->otherDocTypeOnly], array_values($this->offeredSubCategories($form)));
+    }
+
+    public function testSubCategoryOfSeveralDocTypesIsOfferedForEach(): void
+    {
+        $this->global->addDocType($this->otherDocType);
+        $this->em->flush();
+
+        $this->assertContains($this->global, $this->offeredSubCategories($this->form()));
+
+        $form = $this->form();
+        $form->submit(['subsidiary' => (string) $this->own->getId(), 'docType' => (string) $this->otherDocType->getId()], false);
+        $this->assertSame([$this->global, $this->otherDocTypeOnly], array_values($this->offeredSubCategories($form)));
     }
 
     public function testSavedSubCategoryOfAnotherDocTypeIsNotOffered(): void
