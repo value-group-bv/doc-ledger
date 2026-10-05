@@ -10,6 +10,7 @@ use App\Entity\DocumentEntry;
 use App\Entity\User;
 use App\Form\DocumentEntryType;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -116,6 +117,37 @@ class DocumentEntryTypeTest extends WebTestCase
         $this->assertResponseRedirects('/');
         $saved = $this->em->find(DocumentEntry::class, $this->entry->getId());
         $this->assertSame($this->otherOnly->getId(), $saved->getSubCategory()->getId());
+    }
+
+    #[DataProvider('requiredFields')]
+    public function testLiveFormSurvivesAnEmptiedRequiredField(string $field): void
+    {
+        $component = $this->createLiveComponent('DocumentEntryForm', ['entry' => $this->entry], static::getClient());
+
+        $html = (string) $component->set("document_entry.$field", '')->render();
+
+        $this->assertStringContainsString('Save changes', $html);
+    }
+
+    /** @return array<string, array{string}> */
+    public static function requiredFields(): array
+    {
+        $fields = ['subsidiary', 'mainCategory', 'docType', 'subCategory', 'docNumber', 'title'];
+
+        return array_combine($fields, array_map(fn($f) => [$f], $fields));
+    }
+
+    public function testSavingWithoutASubCategoryShowsAnError(): void
+    {
+        $client = static::getClient();
+        $crawler = $client->request('GET', "/ledger/{$this->entry->getId()}/edit");
+
+        $client->submit($crawler->selectButton('Save changes')->form(), ['document_entry[subCategory]' => '']);
+
+        $this->assertResponseStatusCodeSame(422);
+        $this->assertSelectorTextContains('form', 'This value should not be blank.');
+        $saved = $this->em->find(DocumentEntry::class, $this->entry->getId());
+        $this->assertSame($this->saved->getId(), $saved->getSubCategory()->getId());
     }
 
     private function form(): FormInterface

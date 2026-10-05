@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 1.4.2
+
+- FIX: Editing an entry could crash with an error when a required field (e.g. sub category) became empty.
+
 ## Version 1.4.1 (05 October 2026)
 
 - The sub category list when editing an entry now only shows sub categories for the selected subsidiary, and updates when you change it.
