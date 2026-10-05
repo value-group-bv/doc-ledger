@@ -6,6 +6,18 @@
 
 ] %}
 
+{% if app_version == 'dev' %}
+{# Local (dev) builds: orange navbar to tell them apart from the live site side by side; kept out of app.css so live never loads it #}
+<style>
+    .nav-gradient.nav-gradient-dev {
+        background: linear-gradient(to right, #7c2d12 0%, #9a3412 75%, #c2410c 100%);
+    }
+    .dark .nav-gradient.nav-gradient-dev {
+        background: linear-gradient(to right, #431407 0%, #431407 75%, #7c2d12 100%);
+    }
+</style>
+{% endif %}
+
 <div class="mb-8 min-h-full" data-controller="header">
     <nav class="border-border border-b nav-gradient {{ app_version == 'dev' ? 'nav-gradient-dev' }}">
         <div class="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">

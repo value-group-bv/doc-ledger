@@ -138,13 +138,6 @@
     :is(.dark) .nav-gradient {
         background: linear-gradient(to right, #09090b 0%, #09090b 75%, #1a1a1a 100%);
     }
-    /* Local (dev) builds: orange instead, to tell them apart from the live site side by side */
-    .nav-gradient.nav-gradient-dev {
-        background: linear-gradient(to right, #7c2d12 0%, #9a3412 75%, #c2410c 100%);
-    }
-    :is(.dark) .nav-gradient.nav-gradient-dev {
-        background: linear-gradient(to right, #431407 0%, #431407 75%, #7c2d12 100%);
-    }
 
 }
 
