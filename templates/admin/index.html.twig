@@ -234,21 +234,35 @@
                         <table class="mb-4 w-full text-sm">
                             <thead>
                                 <tr class="border-border border-b text-muted-foreground text-xs">
-                                    <th class="pb-2 text-left">Subsidiary</th>
-                                    <th class="pb-2 text-left">Main cat.</th>
-                                    <th class="pb-2 text-left">Type</th>
                                     <th class="pb-2 text-left">Code</th>
                                     <th class="pb-2 text-left">Description</th>
+                                    <th class="pb-2 text-left">Doc types</th>
+                                    <th class="pb-2 text-left">Subsidiary</th>
+                                    <th class="pb-2 text-left">Main cat.</th>
+                                    <th class="pb-2 text-right">Docs</th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-border">
                                 {% for sc in subCategories %}
+                                {% set usage = subCategoryUsage[sc.id] ?? 0 %}
                                 {% if sc.id == editSubcatId %}
                                 <tr id="subcat-{{ sc.id }}" class="target:animate-row-flash scroll-mt-24">
                                     <td class="py-1">
                                         <form id="subcat-edit-{{ sc.id }}" data-turbo="false" method="post"
                                             action="{{ path('admin_subcat_update', {id: sc.id}) }}"></form>
+                                        <twig:Input name="code" type="number" min="0" max="999" value="{{ sc.code }}"
+                                            form="subcat-edit-{{ sc.id }}"
+                                            class="px-2 py-0 rounded w-20 h-8 font-mono" />
+                                    </td>
+                                    <td class="py-1">
+                                        <twig:Input name="description" value="{{ sc.description }}"
+                                            form="subcat-edit-{{ sc.id }}" class="px-2 py-0 rounded h-8" />
+                                    </td>
+                                    <td class="py-1">
+                                        {% include 'admin/_doc_type_chips.html.twig' with {selected: sc.docTypes, formId: 'subcat-edit-' ~ sc.id, size: 'sm'} %}
+                                    </td>
+                                    <td class="py-1">
                                         <twig:Select name="subsidiaryId" form="subcat-edit-{{ sc.id }}"
                                             class="px-2 py-0 rounded w-auto h-8">
                                             <option value="0">All</option>
@@ -268,19 +282,8 @@
                                             {% endfor %}
                                         </twig:Select>
                                     </td>
-                                    <td class="py-1">
-                                        {% include 'admin/_doc_type_chips.html.twig' with {selected: sc.docTypes, formId: 'subcat-edit-' ~ sc.id, size: 'sm'} %}
-                                    </td>
-                                    <td class="py-1">
-                                        <twig:Input name="code" type="number" min="0" max="999" value="{{ sc.code }}"
-                                            form="subcat-edit-{{ sc.id }}"
-                                            class="px-2 py-0 rounded w-24 h-8 font-mono" />
-                                    </td>
-                                    <td class="py-1">
-                                        <twig:Input name="description" value="{{ sc.description }}"
-                                            form="subcat-edit-{{ sc.id }}" class="px-2 py-0 rounded h-8" />
-                                    </td>
-                                    <td class="py-1 text-right whitespace-nowrap">
+                                    <td class="py-1 text-muted-foreground text-right tabular-nums">{{ usage ?: '' }}</td>
+                                    <td class="py-1 pl-3 text-right whitespace-nowrap">
                                         <button type="submit" form="subcat-edit-{{ sc.id }}"
                                             class="mr-3 text-primary text-xs hover:underline">Save</button>
                                         <a href="{{ path('admin_index', {_fragment: 'subcat-' ~ sc.id}) }}"
@@ -289,10 +292,8 @@
                                 </tr>
                                 {% else %}
                                 <tr id="subcat-{{ sc.id }}" class="target:animate-row-flash scroll-mt-24">
-                                    <td class="py-2 font-mono text-muted-foreground">{{ sc.subsidiary ?
-                                        sc.subsidiary.code : 'All' }}</td>
-                                    <td class="py-2 font-mono text-muted-foreground">{{ sc.mainCategory ?
-                                        sc.mainCategory.code : 'All' }}</td>
+                                    <td class="py-2 font-mono font-semibold">{{ sc.formattedCode }}</td>
+                                    <td class="py-2">{{ sc.description }}</td>
                                     <td class="py-2">
                                         <div class="flex flex-wrap gap-1">
                                             {% for dt in sc.docTypes %}
@@ -300,28 +301,37 @@
                                             {% endfor %}
                                         </div>
                                     </td>
-                                    <td class="py-2 font-mono font-semibold">{{ sc.formattedCode }}</td>
-                                    <td class="py-2">{{ sc.description }}</td>
-                                    <td class="py-2 text-right whitespace-nowrap">
+                                    {# Only a restriction stands out; "All" is the usual case #}
+                                    <td class="py-2 font-mono {{ sc.subsidiary ? 'font-semibold' : 'text-muted-foreground' }}">{{ sc.subsidiary ? sc.subsidiary.code : 'All' }}</td>
+                                    <td class="py-2 font-mono {{ sc.mainCategory ? 'font-semibold' : 'text-muted-foreground' }}">{{ sc.mainCategory ? sc.mainCategory.code : 'All' }}</td>
+                                    <td class="py-2 text-muted-foreground text-right tabular-nums">{{ usage ?: '' }}</td>
+                                    <td class="py-2 pl-3 text-right whitespace-nowrap">
                                         <a href="{{ path('admin_index', {editSubcat: sc.id, _fragment: 'subcat-' ~ sc.id}) }}"
-                                            class="mr-3 text-xs hover:underline">Edit</a>
+                                            class="text-xs hover:underline">Edit</a>
+                                        {% if not usage %}
                                         <form method="post" action="{{ path('admin_subcat_delete', {id: sc.id}) }}"
                                             data-turbo-confirm="Delete sub category {{ sc.formattedCode }}?"
-                                            class="inline">
+                                            class="inline ml-3">
                                             <button type="submit"
                                                 class="text-destructive text-xs hover:underline">Delete</button>
                                         </form>
+                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% endif %}
                                 {% else %}<tr>
-                                    <td colspan="6" class="py-3 text-muted-foreground text-center">None yet.</td>
+                                    <td colspan="7" class="py-3 text-muted-foreground text-center">None yet.</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                    <form method="post" action="{{ path('admin_subcat_new') }}" class="flex flex-wrap gap-2">
+                    <form method="post" action="{{ path('admin_subcat_new') }}" class="flex flex-wrap items-center gap-2">
+                        <twig:Input name="code" type="number" min="0" max="999" placeholder="Code" required
+                            class="w-24 h-9 font-mono" />
+                        <twig:Input name="description" placeholder="Description" required
+                            class="flex-1 w-auto min-w-48 h-9" />
+                        {% include 'admin/_doc_type_chips.html.twig' with {selected: []} %}
                         <twig:Select name="subsidiaryId" class="w-auto h-9">
                             <option value="0">All subsidiaries</option>
                             {% for s in subsidiaries %}
@@ -334,11 +344,6 @@
                             <option value="{{ mc.id }}">{{ mc.code }} - {{ mc.description }}</option>
                             {% endfor %}
                         </twig:Select>
-                        {% include 'admin/_doc_type_chips.html.twig' with {selected: []} %}
-                        <twig:Input name="code" type="number" min="0" max="999" placeholder="Code (0–999)" required
-                            class="w-36 h-9" />
-                        <twig:Input name="description" placeholder="Description" required
-                            class="flex-1 w-auto min-w-48 h-9" />
                         <button type="submit"
                             class="inline-flex items-center bg-primary hover:bg-primary/90 px-3 rounded-md h-9 text-primary-foreground text-sm transition-colors">Add</button>
                     </form>

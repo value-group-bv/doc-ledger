@@ -54,6 +54,7 @@ class AdminController extends AbstractController
         FeasibilityCodeRepository $feasibilityCodes,
         DocTitleWordRepository $titleWords,
         ReservedFeasibilityCodeRepository $reservedCodes,
+        DocumentEntryRepository $documentEntries,
     ): Response {
         $editFeasibilityCodeId = (int) $request->query->get('editFeasibilityCode', 0);
         $fcTotalPages = max(1, (int) ceil($feasibilityCodes->count([]) / self::FC_PAGE_SIZE));
@@ -68,6 +69,7 @@ class AdminController extends AbstractController
             'mainCategories' => $mainCats->findBy([], ['code' => 'ASC']),
             'docTypes' => $docTypes->findBy([], ['sortOrder' => 'ASC']),
             'subCategories' => $subCats->findAllForAdmin(),
+            'subCategoryUsage' => $documentEntries->countBySubCategory(),
             'users' => $users->findBy([], ['createdAt' => 'DESC']),
             'feasibilityCodes' => $feasibilityCodes->findPage($fcPage, self::FC_PAGE_SIZE),
             'fcPage' => $fcPage,

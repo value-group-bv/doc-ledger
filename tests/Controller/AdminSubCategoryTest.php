@@ -107,6 +107,12 @@ class AdminSubCategoryTest extends WebTestCase
         }
         $this->em->flush();
 
+        // The list shows the usage and offers no Delete for it
+        $row = $this->client->request('GET', '/admin')->filter("#subcat-{$subCategory->getId()}");
+        self::assertSame('ZZA ZZB', trim(preg_replace('/\s+/', ' ', $row->filter('td')->eq(2)->text())));
+        self::assertSame('1', trim($row->filter('td')->eq(5)->text()));
+        self::assertCount(0, $row->filter('form[action$="/delete"]'));
+
         $this->client->request('POST', "/admin/subcat/{$subCategory->getId()}/update", [
             'code' => '951', 'description' => 'In use', 'docTypeIds' => [$this->typeA->getId()],
         ]);

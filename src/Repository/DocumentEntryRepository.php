@@ -118,6 +118,18 @@ class DocumentEntryRepository extends ServiceEntityRepository
         return $conflicts;
     }
 
+    /** @return array<int, int> Number of documents per sub category id; unused ones are left out */
+    public function countBySubCategory(): array
+    {
+        $rows = $this->createQueryBuilder('e')
+            ->select('IDENTITY(e.subCategory) AS id', 'COUNT(e.id) AS n')
+            ->groupBy('e.subCategory')
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_column(array_map(fn(array $r) => ['id' => (int) $r['id'], 'n' => (int) $r['n']], $rows), 'n', 'id');
+    }
+
     /**
      * Returns the highest docNumber used for a given docType + subCategory code, or null if none exist.
      * Matches on the code so sub categories sharing one don't get the same number suggested.
