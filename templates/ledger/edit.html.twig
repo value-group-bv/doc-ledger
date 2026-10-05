@@ -21,56 +21,7 @@
     <twig:Card>
         <twig:Card:Content class="p-6">
 
-        {{ form_start(form, {attr: {class: 'space-y-5'}}) }}
-
-        <div class="gap-4 grid grid-cols-2">
-            {{ form_row(form.subsidiary) }}
-            {{ form_row(form.mainCategory) }}
-        </div>
-        <div class="gap-4 grid grid-cols-2">
-            {{ form_row(form.docType) }}
-            {{ form_row(form.subCategory) }}
-        </div>
-        {{ form_row(form.docNumber) }}
-        <div class="gap-2 grid">
-            {{ form_label(form.alternateMainCategories) }}
-            <div class="flex flex-wrap gap-x-4 gap-y-2">
-                {% for choice in form.alternateMainCategories %}
-                {# The default main category is always allowed, so it isn't offered as an alternate #}
-                {% if choice.vars.value != form.mainCategory.vars.value %}
-                <label class="flex items-center gap-2 text-sm cursor-pointer">
-                    {{ form_widget(choice) }}
-                    {{ choice.vars.label }}
-                </label>
-                {% else %}
-                {% do choice.setRendered() %}
-                {% endif %}
-                {% endfor %}
-            </div>
-            <p class="text-muted-foreground text-xs">For documents that carry over to another main category, e.g. from feasibility to installation once a project is signed. Only possible for sub categories that apply to all main categories.</p>
-            {{ form_errors(form.alternateMainCategories) }}
-        </div>
-        <div class="gap-2 grid">
-            {{ form_label(form.title) }}
-            {{ form_widget(form.title) }}
-            <p class="text-muted-foreground text-xs">Only alphanumeric characters (A-Z, a-z, 0-9) and spaces are allowed, max. 48 characters</p>
-            {{ form_errors(form.title) }}
-        </div>
-        {{ form_row(form.comments) }}
-
-        <div class="flex gap-3 pt-2">
-            <button type="submit"
-                class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 px-6 rounded-md h-10 font-medium text-primary-foreground text-sm transition-colors">
-                <twig:ux:icon name="material-symbols:save-outline" class="size-4" />
-                Save changes
-            </button>
-            <a href="{{ path('ledger_index') }}"
-                class="inline-flex items-center hover:bg-muted px-4 border border-border rounded-md h-10 text-sm transition-colors">
-                Cancel
-            </a>
-        </div>
-
-        {{ form_end(form) }}
+        <twig:DocumentEntryForm :entry="entry" :form="form" />
 
         {# Delete section #}
         <div class="mt-10 pt-6 border-border border-t">

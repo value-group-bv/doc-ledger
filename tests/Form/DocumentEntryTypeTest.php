@@ -7,23 +7,58 @@ use App\Entity\DocSubCategory;
 use App\Entity\DocSubsidiary;
 use App\Entity\DocType;
 use App\Entity\DocumentEntry;
+use App\Entity\User;
 use App\Form\DocumentEntryType;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\UX\LiveComponent\Test\InteractsWithLiveComponents;
 
 /**
  * Runs inside a transaction that is rolled back afterwards, so the fixtures never reach the database.
  */
-class DocumentEntryTypeTest extends KernelTestCase
+class DocumentEntryTypeTest extends WebTestCase
 {
+    use InteractsWithLiveComponents;
+
     private EntityManagerInterface $em;
+    private DocSubsidiary $own;
+    private DocSubsidiary $other;
+    private DocSubCategory $global;
+    private DocSubCategory $ownOnly;
+    private DocSubCategory $otherOnly;
+    private DocSubCategory $saved;
+    private DocumentEntry $entry;
 
     protected function setUp(): void
     {
-        self::bootKernel();
+        static::createClient()->disableReboot();
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
         $this->em->getConnection()->beginTransaction();
+
+        $this->own = (new DocSubsidiary())->setCode('ZT')->setDescription('Test subsidiary');
+        $this->other = (new DocSubsidiary())->setCode('ZU')->setDescription('Other subsidiary');
+        $docType = (new DocType())->setCode('TST')->setDescription('Test type');
+        $taken = array_map(fn(DocMainCategory $mc) => $mc->getCode(), $this->em->getRepository(DocMainCategory::class)->findAll());
+        $mainCategory = (new DocMainCategory())->setCode((string) array_values(array_diff(range(0, 9), $taken))[0])->setDescription('Test');
+
+        $this->global = (new DocSubCategory())->setCode(100)->setDescription('Global')->setDocType($docType);
+        $this->ownOnly = (new DocSubCategory())->setCode(200)->setDescription('Own')->setDocType($docType)->setSubsidiary($this->own);
+        $this->otherOnly = (new DocSubCategory())->setCode(300)->setDescription('Other')->setDocType($docType)->setSubsidiary($this->other);
+        // Saved before sub categories were limited per subsidiary: belongs to the other one
+        $this->saved = (new DocSubCategory())->setCode(400)->setDescription('Saved')->setDocType($docType)->setSubsidiary($this->other);
+
+        $this->entry = (new DocumentEntry())->setSubsidiary($this->own)->setMainCategory($mainCategory)->setReferenceCode('000')
+            ->setDocType($docType)->setSubCategory($this->saved)->setDocNumber(1)->setTitle('Test document');
+
+        $admin = (new User())->setEmail('entry-form-test@example.com')->setRoles(['ROLE_ADMIN']);
+
+        foreach ([$this->own, $this->other, $docType, $mainCategory, $this->global, $this->ownOnly, $this->otherOnly, $this->saved, $this->entry, $admin] as $entity) {
+            $this->em->persist($entity);
+        }
+        $this->em->flush();
+        static::getClient()->loginUser($admin);
     }
 
     protected function tearDown(): void
@@ -34,31 +69,63 @@ class DocumentEntryTypeTest extends KernelTestCase
 
     public function testSubCategoriesAreLimitedToTheEntrysSubsidiary(): void
     {
-        $own = (new DocSubsidiary())->setCode('ZT')->setDescription('Test subsidiary');
-        $other = (new DocSubsidiary())->setCode('ZU')->setDescription('Other subsidiary');
-        $docType = (new DocType())->setCode('TST')->setDescription('Test type');
-        $taken = array_map(fn(DocMainCategory $mc) => $mc->getCode(), $this->em->getRepository(DocMainCategory::class)->findAll());
-        $mainCategory = (new DocMainCategory())->setCode((string) array_values(array_diff(range(0, 9), $taken))[0])->setDescription('Test');
+        $offered = $this->offeredSubCategories($this->form());
 
-        $global = (new DocSubCategory())->setCode(100)->setDescription('Global')->setDocType($docType);
-        $ownOnly = (new DocSubCategory())->setCode(200)->setDescription('Own')->setDocType($docType)->setSubsidiary($own);
-        $otherOnly = (new DocSubCategory())->setCode(300)->setDescription('Other')->setDocType($docType)->setSubsidiary($other);
-        $current = (new DocSubCategory())->setCode(400)->setDescription('Current')->setDocType($docType)->setSubsidiary($other);
+        $this->assertContains($this->global, $offered);
+        $this->assertContains($this->ownOnly, $offered);
+        $this->assertContains($this->saved, $offered, 'The saved sub category stays selectable');
+        $this->assertNotContains($this->otherOnly, $offered);
+    }
 
-        $entry = (new DocumentEntry())->setSubsidiary($own)->setMainCategory($mainCategory)->setReferenceCode('000')
-            ->setDocType($docType)->setSubCategory($current)->setDocNumber(1)->setTitle('Test document');
+    public function testSubCategoriesFollowTheSubmittedSubsidiary(): void
+    {
+        $form = $this->form();
+        $form->submit(['subsidiary' => (string) $this->other->getId()], false);
 
-        foreach ([$own, $other, $docType, $mainCategory, $global, $ownOnly, $otherOnly, $current, $entry] as $entity) {
-            $this->em->persist($entity);
-        }
-        $this->em->flush();
+        $offered = $this->offeredSubCategories($form);
 
-        $form = static::getContainer()->get(FormFactoryInterface::class)->create(DocumentEntryType::class, $entry);
-        $offered = array_map(fn($choice) => $choice->data, $form->get('subCategory')->createView()->vars['choices']);
+        $this->assertContains($this->global, $offered);
+        $this->assertContains($this->otherOnly, $offered);
+        $this->assertNotContains($this->ownOnly, $offered);
+    }
 
-        $this->assertContains($global, $offered);
-        $this->assertContains($ownOnly, $offered);
-        $this->assertContains($current, $offered, 'The current sub category stays selectable');
-        $this->assertNotContains($otherOnly, $offered);
+    public function testLiveFormUpdatesSubCategoriesWhenTheSubsidiaryChanges(): void
+    {
+        $component = $this->createLiveComponent('DocumentEntryForm', ['entry' => $this->entry], static::getClient());
+        $this->assertStringContainsString('200 - Own', (string) $component->render());
+
+        $html = (string) $component->set('document_entry.subsidiary', (string) $this->other->getId())->render();
+
+        $this->assertStringContainsString('300 - Other', $html);
+        $this->assertStringNotContainsString('200 - Own', $html);
+    }
+
+    public function testEditPageSavesASubCategoryOfTheNewSubsidiary(): void
+    {
+        $client = static::getClient();
+        $crawler = $client->request('GET', "/ledger/{$this->entry->getId()}/edit");
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('[data-controller~="live"] form');
+
+        // The browser would have the re-rendered options; the test client only knows the initial ones
+        $client->submit($crawler->selectButton('Save changes')->form()->disableValidation(), [
+            'document_entry[subsidiary]' => (string) $this->other->getId(),
+            'document_entry[subCategory]' => (string) $this->otherOnly->getId(),
+        ]);
+
+        $this->assertResponseRedirects('/');
+        $saved = $this->em->find(DocumentEntry::class, $this->entry->getId());
+        $this->assertSame($this->otherOnly->getId(), $saved->getSubCategory()->getId());
+    }
+
+    private function form(): FormInterface
+    {
+        return static::getContainer()->get(FormFactoryInterface::class)->create(DocumentEntryType::class, $this->entry, ['csrf_protection' => false]);
+    }
+
+    /** @return DocSubCategory[] */
+    private function offeredSubCategories(FormInterface $form): array
+    {
+        return array_map(fn($choice) => $choice->data, $form->get('subCategory')->createView()->vars['choices']);
     }
 }
