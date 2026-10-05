@@ -73,7 +73,8 @@
 {%- endblock %}
 
 {%- block form_row -%}
-    <div class="gap-2 grid">
+    {# content-start: next to a taller field (e.g. one showing an error) the label and input stay put #}
+    <div class="content-start gap-2 grid">
         {{- form_label(form) -}}
         {{- form_widget(form) -}}
         {{- form_errors(form) -}}
