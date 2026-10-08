@@ -1,5 +1,10 @@
 # Release Notes
 
+## Version 1.5.1 (07 October 2026)
+
+- The guide now states that titles must be written in British English.
+- FIX: Main categories are now sorted by number in the ledger filter and the entry form.
+
 ## Version 1.5.0 (05 October 2026)
 
 - Sub categories can now be assigned to multiple document types.
