@@ -50,6 +50,7 @@ class DocumentEntryType extends AbstractType
             ->add('mainCategory', EntityType::class, [
                 'class'        => DocMainCategory::class,
                 'choice_label' => fn(DocMainCategory $mc) => "{$mc->getCode()} - {$mc->getDescription()}",
+                'query_builder' => fn(EntityRepository $r) => $r->createQueryBuilder('mc')->orderBy('mc.code', 'ASC'),
                 'placeholder'  => 'select',
                 'setter'       => $unlessEmpty('setMainCategory'),
                 'constraints'  => [new NotBlank()],

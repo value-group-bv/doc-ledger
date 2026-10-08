@@ -94,7 +94,7 @@ class LedgerTable
     /** @return DocMainCategory[] */
     public function getMainCategories(): array
     {
-        return $this->mainCategories->findAll();
+        return $this->mainCategories->findBy([], ['code' => 'ASC']);
     }
 
     #[LiveAction]
