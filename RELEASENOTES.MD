@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 1.6.1 (12 October 2026)
+
+- FIX: The loading bar no longer keeps running after exporting to XLSX.
+
 ## Version 1.6.0 (12 October 2026)
 
 - The guide now states that titles must be written in British English.
