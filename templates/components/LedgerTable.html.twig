@@ -83,7 +83,7 @@
             {{ totalCount }} {{ totalCount == 1 ? 'entry' : 'entries' }}
             {% if search or subsidiaryFilter or docTypeFilter or mainCategoryFilter %} matching filters{% endif %}
         </p>
-        <a href="{{ path('ledger_export') }}"
+        <a href="{{ path('ledger_export') }}" data-turbo="false"
             class="not-sm:hidden inline-flex items-center gap-1 ml-auto text-muted-foreground hover:text-foreground text-xs transition-colors">
             <twig:ux:icon name="material-symbols:download" class="size-3" />
             Export to XLSX

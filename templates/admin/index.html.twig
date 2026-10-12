@@ -409,7 +409,7 @@
                             <twig:Card:Title>Feasibility Codes</twig:Card:Title>
                             <twig:Card:Description>Requested via SharePoint, newest first</twig:Card:Description>
                         </div>
-                        <a href="{{ path('admin_feasibility_codes_export') }}"
+                        <a href="{{ path('admin_feasibility_codes_export') }}" data-turbo="false"
                             class="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground text-xs transition-colors shrink-0">
                             <twig:ux:icon name="material-symbols:download" class="size-3" />
                             Export to XLSX
