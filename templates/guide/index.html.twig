@@ -5,130 +5,76 @@
 
 {% block body %}
 
-<div class="flex justify-between items-center mb-6">
+{# Document ID components: chip in the anatomy row, legend label, and dark-mode-aware colours #}
+{% set segments = [
+    {code: 'VG', legend: 'VG', color: 'bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300',
+        name: 'Subsidiary', text: 'Two-letter code identifying the responsible entity within the Value Group.'},
+    {code: '0', legend: '0', color: 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300',
+        name: 'Main category', text: 'Single digit indicating the project type.'},
+    {code: 'AAB', legend: 'AAB', color: 'bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300',
+        name: 'Reference code', text: 'Alphabetic for studies; numeric for signed projects; fixed abbreviations for product lines.'},
+    {code: 'REP', legend: 'REP', color: 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300',
+        name: 'Document type', text: 'Short three-letter abbreviation for the type of document.'},
+    {code: '000', legend: '000', color: 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300',
+        name: 'Sub category', text: 'Three-digit code identifying the technical or functional discipline.'},
+    {code: '000', legend: '000', color: 'bg-violet-100 dark:bg-violet-950 text-violet-700 dark:text-violet-300',
+        name: 'Document number', text: 'Three-digit number unique within the combination of the other components.'},
+    {code: '0A', legend: '0A', color: 'bg-pink-100 dark:bg-pink-950 text-pink-700 dark:text-pink-300',
+        name: 'Revision', text: 'Interim drafts use an alphanumeric suffix; released versions use a numeric suffix.'},
+    {code: 'Title', legend: 'Abc', color: 'bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200',
+        name: 'Title', text: 'Textual description of the document.'},
+] %}
+
+<div class="flex flex-wrap justify-between items-end gap-x-6 gap-y-3 mb-6">
     <div>
         <h1 class="font-heading font-bold text-foreground text-3xl">Guide</h1>
         <p class="mt-1 text-muted-foreground">Using the numbering system</p>
     </div>
+    <nav class="flex flex-wrap gap-x-4 gap-y-1 text-muted-foreground text-sm">
+        {% for id, label in {anatomy: 'Anatomy', conventions: 'Conventions', examples: 'Examples', 'dos-and-donts': "Do's and Don'ts", 'using-the-ledger': 'Using the Ledger'} %}
+        <a href="#{{ id }}" class="hover:text-foreground hover:underline underline-offset-2">{{ label }}</a>
+        {% endfor %}
+    </nav>
 </div>
 
 <div class="gap-8 grid grid-cols-1 xl:grid-cols-2">
 
-    {# ── Intro ─────────────────────────────────────────────────────── #}
-    <twig:Card>
-        <twig:Card:Header>
-            <twig:Card:Title>Intro</twig:Card:Title>
-            <!-- <twig:Card:Description>Subtitle</twig:Card:Description> -->
-        </twig:Card:Header>
-        <twig:Card:Content class="space-y-4 text-sm">
-            <p>Value Ledger is the central register for document identification across the Value Group. It provides a
-                structured and consistent naming system that ensures every document can be uniquely identified,
-                traced,
-                and managed throughout its lifecycle. Before creating a new document, users should verify that the
-                intended identifier is available. Usage of the naming system should follow the conventions described
-                in this guide.</p>
-
-            <p>A document identifier follows the structure:</p><code
-                class="block bg-muted px-3 py-2 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">VG0-AAB-REP-000-000-0A Title</code>
-
-            <p>Where each section conveys specific information, such as the responsible subsidiary, category, project or
-                product reference, document type, discipline, unique document number, and revision status.
-                By adhering to this convention, all stakeholders can quickly identify, locate, and understand documents
-                regardless of their origin or intended audience.</p>
-
-            <p>This guide explains the structure, rules, conventions, and best practices required to maintain a clean
-                and reliable document register using Value Ledger.</p>
-        </twig:Card:Content>
-    </twig:Card>
-
     {# ── Anatomy ─────────────────────────────────────────────────────── #}
-    <twig:Card>
+    <twig:Card id="anatomy" class="xl:col-span-2 scroll-mt-4">
         <twig:Card:Header>
             <twig:Card:Title>Anatomy</twig:Card:Title>
             <twig:Card:Description>How the ID is structured</twig:Card:Description>
         </twig:Card:Header>
         <twig:Card:Content class="space-y-6 text-sm">
 
+            <p>Value Ledger is the central register for document identifiers across the Value Group. Every document
+                gets a unique identifier with this structure:</p>
+
             <div class="flex flex-wrap items-center gap-x-1 gap-y-2">
-                <span class="bg-neutral-200 px-3 py-1.5 rounded font-mono font-bold text-neutral-700 text-sm">VG</span>
-                <span class="bg-red-100 px-3 py-1.5 rounded font-mono font-bold text-red-700 text-sm">0</span>
-                <span class="px-0.5 font-bold text-muted-foreground">-</span>
-                <span class="bg-orange-100 px-3 py-1.5 rounded font-mono font-bold text-orange-700 text-sm">AAB</span>
-                <span class="px-0.5 font-bold text-muted-foreground">-</span>
-                <span class="bg-blue-100 px-3 py-1.5 rounded font-mono font-bold text-blue-700 text-sm">REP</span>
-                <span class="px-0.5 font-bold text-muted-foreground">-</span>
-                <span class="bg-emerald-100 px-3 py-1.5 rounded font-mono font-bold text-emerald-700 text-sm">000</span>
-                <span class="px-0.5 font-bold text-muted-foreground">-</span>
-                <span class="bg-violet-100 px-3 py-1.5 rounded font-mono font-bold text-violet-700 text-sm">000</span>
-                <span class="px-0.5 font-bold text-muted-foreground">-</span>
-                <span class="bg-pink-100 px-3 py-1.5 rounded font-mono font-bold text-pink-700 text-sm">0A</span>
-                <span class="px-0.5 font-bold text-muted-foreground"> </span>
-                <span class="bg-gray-100 px-3 py-1.5 rounded font-mono font-bold text-gray-800 text-sm">Title</span>
+                {% for s in segments %}
+                {% if not loop.first %}<span class="px-0.5 font-bold text-muted-foreground">{{ loop.last ? ' ' : '-' }}</span>{% endif %}
+                <span class="{{ s.color }} px-3 py-1.5 rounded font-mono font-bold text-sm">{{ s.code }}</span>
+                {% endfor %}
             </div>
 
             <twig:Separator />
 
-            <dl class="space-y-3">
+            {# Two columns on wide screens, filled top to bottom so the order matches the ID #}
+            <dl class="gap-x-8 gap-y-3 grid grid-cols-1 xl:grid-cols-2 xl:grid-rows-4 xl:grid-flow-col">
+                {% for s in segments %}
                 <div class="flex items-baseline gap-3">
-                    <dt
-                        class="bg-neutral-200 px-1.5 py-0.5 rounded w-10 font-mono font-bold text-neutral-700 text-xs text-center shrink-0">
-                        VG</dt>
-                    <dd><strong>Subsidiary</strong> - Two-letter code identifying the responsible entity within the
-                        Value Group.</dd>
+                    <dt class="{{ s.color }} px-1.5 py-0.5 rounded w-10 font-mono font-bold text-xs text-center shrink-0">
+                        {{ s.legend }}</dt>
+                    <dd><strong>{{ s.name }}</strong> - {{ s.text }}</dd>
                 </div>
-                <div class="flex items-baseline gap-3">
-                    <dt
-                        class="bg-red-100 px-1.5 py-0.5 rounded w-10 font-mono font-bold text-red-700 text-xs text-center shrink-0">
-                        0</dt>
-                    <dd><strong>Main category</strong> - Single digit indicating the project type.</dd>
-                </div>
-                <div class="flex items-baseline gap-3">
-                    <dt
-                        class="bg-orange-100 px-1.5 py-0.5 rounded w-10 font-mono font-bold text-orange-700 text-xs text-center shrink-0">
-                        AAB</dt>
-                    <dd><strong>Reference code</strong> - Alphabetic for studies; numeric for signed
-                        projects; fixed abbreviations for product lines.</dd>
-                </div>
-                <div class="flex items-baseline gap-3">
-                    <dt
-                        class="bg-blue-100 px-1.5 py-0.5 rounded w-10 font-mono font-bold text-blue-700 text-xs text-center shrink-0">
-                        REP</dt>
-                    <dd><strong>Document type</strong> - Short three-letter abbreviation for the type of document.</dd>
-                </div>
-                <div class="flex items-baseline gap-3">
-                    <dt
-                        class="bg-emerald-100 px-1.5 py-0.5 rounded w-10 font-mono font-bold text-emerald-700 text-xs text-center shrink-0">
-                        000</dt>
-                    <dd><strong>Sub category</strong> - Three-digit code identifying the technical or functional
-                        discipline.</dd>
-                </div>
-                <div class="flex items-baseline gap-3">
-                    <dt
-                        class="bg-violet-100 px-1.5 py-0.5 rounded w-10 font-mono font-bold text-violet-700 text-xs text-center shrink-0">
-                        000</dt>
-                    <dd><strong>Document number</strong> - Three-digit number unique within the combination of the other
-                        components.</dd>
-                </div>
-                <div class="flex items-baseline gap-3">
-                    <dt
-                        class="bg-pink-100 px-1.5 py-0.5 rounded w-10 font-mono font-bold text-pink-700 text-xs text-center shrink-0">
-                        0A</dt>
-                    <dd><strong>Revision</strong> - Interim drafts use an alphanumeric suffix; released
-                        versions use a numeric suffix.</dd>
-                </div>
-                <div class="flex items-baseline gap-3">
-                    <dt
-                        class="bg-gray-100 px-1.5 py-0.5 rounded w-10 font-mono font-bold text-gray-800 text-xs text-center shrink-0">
-                        Abc</dt>
-                    <dd><strong>Title</strong> - Textual description of the document.</dd>
-                </div>
+                {% endfor %}
             </dl>
 
         </twig:Card:Content>
     </twig:Card>
 
     {# ── Conventions ─────────────────────────────────────────────────────── #}
-    <twig:Card class="xl:col-span-2">
+    <twig:Card id="conventions" class="xl:col-span-2 scroll-mt-4">
         <twig:Card:Header>
             <twig:Card:Title>Conventions</twig:Card:Title>
             <twig:Card:Description>Rules and constraints for each component of the document identifier
@@ -181,7 +127,7 @@
                     </li>
                     <li class="flex gap-2">
                         <span class="text-muted-foreground shrink-0">→</span>
-                        <span><strong>Studies</strong>: three-letter sequential alphabetic code (AAA-ZZZ). Next available code is automatically assigned by filling in any of the available forms on SharePoint (i.e. <a href="https://valuemaritime.sharepoint.com/sites/Engineering_new/SalesDocs/Lists/Feasibility%20Request/AllItems.aspx" class="text-primary dark:text-cyan-500 underline underline-offset-2" target="_blank">Maritime Feasibility Study Request</a>).</span>
+                        <span><strong>Studies</strong>: three-letter sequential alphabetic code (AAA-ZZZ). Next available code is automatically assigned by filling in any of the available forms on SharePoint (e.g. <a href="https://valuemaritime.sharepoint.com/sites/Engineering_new/SalesDocs/Lists/Feasibility%20Request/AllItems.aspx" class="text-primary dark:text-cyan-500 underline underline-offset-2" target="_blank">Maritime Feasibility Study Request</a>).</span>
                     </li>
                     <li class="flex gap-2">
                         <span class="text-muted-foreground shrink-0">→</span>
@@ -205,37 +151,22 @@
                 <ul class="space-y-2.5 pl-1">
                     <li class="flex gap-2">
                         <span class="text-muted-foreground shrink-0">→</span>
-                        <span><strong>Interim</strong>: alphanumeric suffix starting at <code
-                                class="bg-muted px-1.5 py-0.5 rounded font-mono font-bold text-neutral-700 dark:text-gray-300 text-xs">0A</code>,
+                        <span><strong>Interim</strong>: alphanumeric suffix starting at <twig:CodeChip size="inline">0A</twig:CodeChip>,
                             incrementing the letter for each subsequent draft.</span>
                     </li>
                     <li class="flex gap-2">
                         <span class="text-muted-foreground shrink-0">→</span>
-                        <span><strong>Released</strong>: numeric suffix starting at <code
-                                class="bg-muted px-1.5 py-0.5 rounded font-mono font-bold text-neutral-700 dark:text-gray-300 text-xs">00</code>,
+                        <span><strong>Released</strong>: numeric suffix starting at <twig:CodeChip size="inline">00</twig:CodeChip>,
                             incrementing for each subsequent formal reissue.</span>
                     </li>
                 </ul>
 
                 <div class="flex flex-wrap items-center gap-1.5 text-xs">
                     <span class="mr-1 text-muted-foreground">Example sequence:</span>
-                    <code
-                        class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">0A</code>
-                    <span class="font-bold text-muted-foreground">→</span>
-                    <code
-                        class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">0B</code>
-                    <span class="font-bold text-muted-foreground">→</span>
-                    <code
-                        class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">0C</code>
-                    <span class="font-bold text-muted-foreground">→</span>
-                    <code
-                        class="bg-emerald-100 dark:bg-emerald-900 px-2 py-1 rounded font-mono font-bold text-emerald-700 dark:text-emerald-300">00</code>
-                    <span class="font-bold text-muted-foreground">→</span>
-                    <code
-                        class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">1A</code>
-                    <span class="font-bold text-muted-foreground">→</span>
-                    <code
-                        class="bg-emerald-100 dark:bg-emerald-900 px-2 py-1 rounded font-mono font-bold text-emerald-700 dark:text-emerald-300">01</code>
+                    {% for rev in ['0A', '0B', '0C', '00', '1A', '01'] %}
+                    {% if not loop.first %}<span class="font-bold text-muted-foreground">→</span>{% endif %}
+                    <twig:CodeChip variant="{{ rev matches '/^\\d+$/' ? 'success' : 'muted' }}">{{ rev }}</twig:CodeChip>
+                    {% endfor %}
                 </div>
 
                 <div
@@ -254,7 +185,7 @@
                     <li class="flex gap-2">
                         <span class="text-muted-foreground shrink-0">→</span>
                         <span><strong>Language</strong>: titles are always written in <strong>British English</strong>,
-                            e.g. "Organisation" rather than "Organization".</span>
+                            e.g. <twig:CodeChip size="inline">Organisation</twig:CodeChip> rather than <twig:CodeChip size="inline">Organization</twig:CodeChip>.</span>
                     </li>
                     <li class="flex gap-2">
                         <span class="text-muted-foreground shrink-0">→</span>
@@ -270,24 +201,20 @@
                                 code from the title using a hyphen or any other character.</span>
                         </div>
                         <div class="flex items-center gap-1.5 pl-5 text-xs">
-                            <code
-                                class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">VG0-AAB-REP-000-000-0A</code>
+                            <twig:CodeChip>VG0-AAB-REP-000-000-0A</twig:CodeChip>
                             <span
                                 class="inline-flex items-center gap-1 bg-emerald-100 dark:bg-emerald-900 px-1.5 py-1 border border-emerald-200 dark:border-emerald-800 rounded font-sans text-emerald-700 dark:text-emerald-300">
                                 <twig:ux:icon name="material-symbols:space-bar" class="size-3.5" />
                                 space
                             </span>
-                            <code
-                                class="bg-muted px-2 py-1 rounded font-mono font-bold text-neutral-700 dark:text-gray-300">Title</code>
+                            <twig:CodeChip>Title</twig:CodeChip>
                         </div>
                     </li>
                     <li class="flex gap-2">
                         <span class="text-muted-foreground shrink-0">→</span>
-                        <span><strong>Casing</strong>: the title utilises <code
-                                class="bg-muted px-1.5 py-0.5 rounded font-mono font-bold text-neutral-700 dark:text-gray-300 text-xs">Title Case</code>.
+                        <span><strong>Casing</strong>: the title utilises <twig:CodeChip size="inline">Title Case</twig:CodeChip>.
                             Each word should start with a capital letter, except for certain short words (like "and",
-                            "or", "the") unless they are the first or last word of the title. Abbreviations can be fully capitalised, e.g. <code
-                                class="bg-muted px-1.5 py-0.5 rounded font-mono font-bold text-neutral-700 dark:text-gray-300 text-xs">pid → PID</code>.</span>
+                            "or", "the") unless they are the first or last word of the title. Abbreviations can be fully capitalised, e.g. <twig:CodeChip size="inline">pid → PID</twig:CodeChip>.</span>
                     </li>
                 </ul>
 
@@ -302,7 +229,7 @@
     </twig:Card>
 
     {# ── Examples ─────────────────────────────────────────────────────── #}
-    <twig:Card class="xl:col-span-2">
+    <twig:Card id="examples" class="xl:col-span-2 scroll-mt-4">
         <twig:Card:Header>
             <twig:Card:Title>Examples</twig:Card:Title>
             <twig:Card:Description>Correct and incorrect identifiers</twig:Card:Description>
@@ -310,16 +237,14 @@
         <twig:Card:Content class="space-y-5 text-sm">
 
             <div class="space-y-2">
-                <p class="font-semibold text-emerald-700">Correct</p>
+                <p class="font-semibold text-emerald-700 dark:text-emerald-400">Correct</p>
                 <ul class="space-y-2">
+                    {% for id in ['VM1-AAB-REP-100-001-0A Site Survey', 'VC5-045-DWG-320-003-01 Piping Layout'] %}
                     <li class="flex items-center gap-2">
                         <span class="font-bold text-emerald-600 shrink-0">✓</span>
-                        <code class="bg-emerald-100 dark:bg-emerald-900 px-2 py-1 rounded font-mono font-bold text-emerald-700 dark:text-emerald-300 text-xs">VG0-AAB-REP-000-000-0A Site Survey</code>
+                        <twig:CodeChip variant="success">{{ id }}</twig:CodeChip>
                     </li>
-                    <li class="flex items-center gap-2">
-                        <span class="font-bold text-emerald-600 shrink-0">✓</span>
-                        <code class="bg-emerald-100 dark:bg-emerald-900 px-2 py-1 rounded font-mono font-bold text-emerald-700 dark:text-emerald-300 text-xs">VC1-045-DWG-020-003-01 Piping Layout</code>
-                    </li>
+                    {% endfor %}
                 </ul>
             </div>
 
@@ -328,31 +253,19 @@
             <div class="space-y-2">
                 <p class="font-semibold text-destructive">Incorrect</p>
                 <ul class="space-y-2">
+                    {% for id, reason in {
+                        'VM1–AAB–REP–100–001–0A Site Survey': 'en dash used instead of hyphen-minus',
+                        'VM1-AAB-REP-100-001-0A-Site Survey': 'hyphen used between code and title instead of a space',
+                        'vm1-aab-rep-100-001-0a Site Survey': 'code must be fully capitalised',
+                        'VM1-AB-REP-100-001-0A Site Survey': 'reference code for a study must be three letters',
+                        'VM1-AAB-REP-100-001-0A P&ID System': 'title contains characters other than letters, digits and spaces',
+                    } %}
                     <li class="flex items-center gap-2">
                         <span class="font-bold text-destructive shrink-0">✗</span>
-                        <code class="bg-red-100 dark:bg-red-900 px-2 py-1 rounded font-mono font-bold text-red-700 dark:text-red-300 text-xs">VG0–AAB–REP–000–000–0A Site Survey</code>
-                        <span class="text-muted-foreground">en dash used instead of hyphen-minus</span>
+                        <twig:CodeChip variant="danger">{{ id }}</twig:CodeChip>
+                        <span class="text-muted-foreground">{{ reason }}</span>
                     </li>
-                    <li class="flex items-center gap-2">
-                        <span class="font-bold text-destructive shrink-0">✗</span>
-                        <code class="bg-red-100 dark:bg-red-900 px-2 py-1 rounded font-mono font-bold text-red-700 dark:text-red-300 text-xs">VG0-AAB-REP-000-000-0A-Site Survey</code>
-                        <span class="text-muted-foreground">hyphen used between code and title instead of a space</span>
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <span class="font-bold text-destructive shrink-0">✗</span>
-                        <code class="bg-red-100 dark:bg-red-900 px-2 py-1 rounded font-mono font-bold text-red-700 dark:text-red-300 text-xs">vg0-aab-rep-000-000-0a Site Survey</code>
-                        <span class="text-muted-foreground">code must be fully capitalised</span>
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <span class="font-bold text-destructive shrink-0">✗</span>
-                        <code class="bg-red-100 dark:bg-red-900 px-2 py-1 rounded font-mono font-bold text-red-700 dark:text-red-300 text-xs">VG0-AB-REP-000-000-0A Site Survey</code>
-                        <span class="text-muted-foreground">reference code for a study must be three letters</span>
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <span class="font-bold text-destructive shrink-0">✗</span>
-                        <code class="bg-red-100 dark:bg-red-900 px-2 py-1 rounded font-mono font-bold text-red-700 dark:text-red-300 text-xs">VG0-AAB-REP-000-000-0A P&ID System</code>
-                        <span class="text-muted-foreground">title contains characters other than letters, digits and spaces</span>
-                    </li>
+                    {% endfor %}
                 </ul>
             </div>
 
@@ -361,7 +274,7 @@
 
 
     {# ── Do's and Don'ts ─────────────────────────────────────────────────────── #}
-    <twig:Card>
+    <twig:Card id="dos-and-donts" class="scroll-mt-4">
         <twig:Card:Header>
             <twig:Card:Title>Do's and Don'ts</twig:Card:Title>
             <twig:Card:Description>Short recap</twig:Card:Description>
@@ -370,7 +283,7 @@
             <div class="gap-6 grid grid-cols-1 sm:grid-cols-2">
 
                 <div class="space-y-2.5">
-                    <p class="font-semibold text-emerald-700">Do</p>
+                    <p class="font-semibold text-emerald-700 dark:text-emerald-400">Do</p>
                     <ul class="space-y-2.5">
                         <li class="flex gap-2">
                             <span class="font-bold text-emerald-600 shrink-0">✓</span>
@@ -396,7 +309,7 @@
                         </li>
                         <li class="flex gap-2">
                             <span class="font-bold text-emerald-600 shrink-0">✓</span>
-                            Add keywords or tags ledger entries to improve searchability.
+                            Add keywords to ledger entries to improve searchability.
                         </li>
                     </ul>
                 </div>
@@ -415,10 +328,6 @@
                         </li>
                         <li class="flex gap-2">
                             <span class="font-bold text-destructive shrink-0">✗</span>
-                            Don't mix alphabetic and numeric reference codes within the same main category.
-                        </li>
-                        <li class="flex gap-2">
-                            <span class="font-bold text-destructive shrink-0">✗</span>
                             Don't create document identifiers outside of Value Ledger. Even for one-offs.
                         </li>
                         <li class="flex gap-2">
@@ -433,15 +342,14 @@
     </twig:Card>
 
     {# ── Ledger ─────────────────────────────────────────────────────── #}
-    <twig:Card>
+    <twig:Card id="using-the-ledger" class="scroll-mt-4">
         <twig:Card:Header>
             <twig:Card:Title>Using the Ledger</twig:Card:Title>
-            <!-- <twig:Card:Description>Subtitle</twig:Card:Description> -->
         </twig:Card:Header>
         <twig:Card:Content class="space-y-6 text-sm">
             <div class="space-y-4">
                 <div>
-                    <h3 class="mb-2 font-semibold text-foreground">How to Add Entries</h3>
+                    <h3 class="mb-2 font-semibold text-foreground">How to add entries</h3>
                     <p class="">Click the <strong>"New Entry"</strong> button to create a new document identifier. Fill
                         in each required field: subsidiary code, main category, reference code, document type, sub
                         category, and title. Also fill in search keywords to improve searchability for other
@@ -451,7 +359,7 @@
                 </div>
 
                 <div>
-                    <h3 class="mb-2 font-semibold text-foreground">How to Edit Entries</h3>
+                    <h3 class="mb-2 font-semibold text-foreground">How to edit entries</h3>
                     <p class="">Locate the entry in the ledger and click the
                         <twig:ux:icon name="material-symbols:edit-outline" class="inline" /> (edit) button. You can
                         update the title and other metadata. Always review changes before saving to ensure compliance
@@ -460,14 +368,14 @@
                 </div>
 
                 <div>
-                    <h3 class="mb-2 font-semibold text-foreground">How to Search</h3>
+                    <h3 class="mb-2 font-semibold text-foreground">How to search</h3>
                     <p class="">Use the search bar at the top of the ledger page to filter entries by document ID
                         components, title, or keywords. Search is case-insensitive and supports partial matches. You can
                         also use filters.</p>
                 </div>
 
                 <div>
-                    <h3 class="mb-2 font-semibold text-foreground">User vs Admin Rights</h3>
+                    <h3 class="mb-2 font-semibold text-foreground">User vs admin rights</h3>
                     <p class=""><strong>Users</strong> can only view entries. <strong>Admins</strong> can create, edit,
                         and delete entries.</p>
                 </div>
@@ -475,9 +383,9 @@
                 <div>
                     <h3 class="mb-2 font-semibold text-foreground">Tips and tricks</h3>
                     <ul class="space-y-1 list-disc list-inside">
-                        <li>You can resort the table by clicking on the column headers.</li>
+                        <li>You can sort the table by clicking on the column headers.</li>
                         <li>You can easily copy the document ID by clicking on it!</li>
-                        <li>You can export entries as a XLSX file for easy sharing and analysis.</li>
+                        <li>You can export entries as an XLSX file for easy sharing and analysis.</li>
                     </ul>
                 </div>
             </div>

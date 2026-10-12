@@ -1,0 +1,25 @@
+{# @prop variant 'muted'|'success'|'danger' The colour. Defaults to `muted` #}
+{# @prop size 'inline'|'default'|'block' Inline within running text, a standalone chip, or a full-width block. Defaults to `default` #}
+{# @block content The code text #}
+{%- props variant = 'muted', size = 'default' -%}
+{%- set style = html_cva(
+    base: 'rounded font-mono font-bold',
+    variants: {
+        variant: {
+            muted: 'bg-muted text-neutral-700 dark:text-gray-300',
+            success: 'bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300',
+            danger: 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300',
+        },
+        size: {
+            inline: 'px-1.5 py-0.5 text-xs',
+            default: 'px-2 py-1 text-xs',
+            block: 'block px-3 py-2',
+        },
+    },
+) -%}
+<code
+    class="{{ style.apply({variant: variant, size: size}, attributes.render('class'))|tailwind_merge }}"
+    {{ attributes }}
+>
+    {%- block content %}{% endblock -%}
+</code>
