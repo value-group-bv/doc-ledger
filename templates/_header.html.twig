@@ -6,20 +6,9 @@
 
 ] %}
 
-{% if app_version == 'dev' %}
-{# Local (dev) builds: orange navbar to tell them apart from the live site side by side; kept out of app.css so live never loads it #}
-<style>
-    .nav-gradient.nav-gradient-dev {
-        background: linear-gradient(to right, #9b3513 0%, #b33a12 75%, #db4408 100%);
-    }
-    .dark .nav-gradient.nav-gradient-dev {
-        background: linear-gradient(to right, #431407 0%, #431407 75%, #7c2d12 100%);
-    }
-</style>
-{% endif %}
-
 <div class="mb-8 min-h-full" data-controller="header">
-    <nav class="border-border border-b nav-gradient {{ app_version == 'dev' ? 'nav-gradient-dev' }}">
+    <nav
+        class="border-border border-b {{ app_version == 'dev' ? 'bg-orange-700 dark:bg-orange-950' : 'nav-gradient' }}">
         <div class="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
             <div class="flex justify-between items-center gap-6 h-[67px]">
                 <!-- Logo -->
@@ -116,7 +105,8 @@
         </div>
 
         <!-- Mobile Menu -->
-        <div id="mobile-menu" data-header-target="menu" class="hidden md:hidden border-border border-t nav-gradient {{ app_version == 'dev' ? 'nav-gradient-dev' }}">
+        <div id="mobile-menu" data-header-target="menu"
+            class="hidden md:hidden border-border border-t {{ app_version == 'dev' ? 'bg-orange-700 dark:bg-orange-950' : 'nav-gradient' }}">
             <div class="space-y-1 px-4 pt-2 pb-3">
                 {% for menu in menus %}
                 {% if (menu.route != 'admin_index' or is_granted('ROLE_ADMIN')) and (menu.route != 'logs_index' or

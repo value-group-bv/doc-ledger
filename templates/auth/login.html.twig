@@ -6,12 +6,13 @@
 {% block body %}
 
 <div class="flex justify-center items-center min-h-screen">
-    <twig:Card class="shadow-xl/30 px-5 rounded-2xl w-[366px]">
+    <twig:Card class="shadow-xl/30 px-5 rounded-2xl w-[366px] {{ app_version == 'dev' ? 'border-3 border-orange-500' }}">
         {% include 'auth/_card_header.html.twig' %}
         <twig:Card:Content>
 
             {% for message in app.flashes('error') %}
-            <div class="flex items-center gap-2 bg-destructive/5 mb-4 px-3 py-2 border border-destructive/25 rounded-lg text-destructive text-sm">
+            <div
+                class="flex items-center gap-2 bg-destructive/5 mb-4 px-3 py-2 border border-destructive/25 rounded-lg text-destructive text-sm">
                 <twig:ux:icon name="material-symbols:error-outline" class="size-4 shrink-0" />
                 <span>{{ message }}</span>
             </div>
