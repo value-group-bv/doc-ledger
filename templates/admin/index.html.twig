@@ -423,8 +423,8 @@
                                 <tr class="border-border border-b text-muted-foreground text-xs">
                                     <th class="pb-2 text-left">Code</th>
                                     <th class="pb-2 text-left">Title</th>
-                                    <th class="hidden sm:table-cell pb-2 text-left">Requestor</th>
                                     <th class="pb-2 text-left">Subsidiary</th>
+                                    <th class="hidden sm:table-cell pb-2 text-left">Requestor</th>
                                     <th class="hidden sm:table-cell pb-2 text-left">Created</th>
                                     <th></th>
                                 </tr>
@@ -443,9 +443,9 @@
                                         <twig:Input name="title" value="{{ fc.title }}" form="fc-edit-{{ fc.id }}"
                                             class="px-2 py-0 rounded h-8" />
                                     </td>
-                                    <td class="hidden sm:table-cell py-1">{{ fc.requestor }}</td>
                                     <td class="py-1 font-mono text-muted-foreground">{{ fc.subsidiary.code }}</td>
-                                    <td class="py-1 text-muted-foreground text-xs">{{ fc.createdAt|date('d M Y H:i') }}
+                                    <td class="hidden sm:table-cell py-1">{{ fc.requestor }}</td>
+                                    <td class="hidden sm:table-cell py-1 text-muted-foreground text-xs">{{ fc.createdAt|date('d M Y H:i') }}
                                     </td>
                                     <td class="py-1 text-right whitespace-nowrap">
                                         <button type="submit" form="fc-edit-{{ fc.id }}"
@@ -458,8 +458,8 @@
                                 <tr id="fc-{{ fc.id }}" class="target:animate-row-flash scroll-mt-24">
                                     <td class="py-2 font-mono font-semibold">{{ fc.code }}</td>
                                     <td class="py-2">{{ fc.title }}</td>
-                                    <td class="hidden sm:table-cell py-2">{{ fc.requestor }}</td>
                                     <td class="py-2 font-mono text-muted-foreground">{{ fc.subsidiary.code }}</td>
+                                    <td class="hidden sm:table-cell py-2">{{ fc.requestor }}</td>
                                     <td class="hidden sm:table-cell py-2 text-muted-foreground text-xs">{{
                                         fc.createdAt|date('d M Y H:i') }}</td>
                                     <td class="py-2 text-right whitespace-nowrap">
