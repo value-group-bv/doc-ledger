@@ -220,10 +220,10 @@
                             title="Click to copy title">{{ entry.title }}</button>
                     </td>
                     <td class="hidden sm:table-cell px-4 py-3 text-muted-foreground text-xs">
-                        {{ entry.subsidiary.code }}
+                        <span title="{{ entry.subsidiary.description }}">{{ entry.subsidiary.code }}</span>
                     </td>
                     <td class="hidden sm:table-cell px-4 py-3">
-                        <twig:Badge style="{{ doc_type_badge_style(entry.docType.code) }}">{{ entry.docType.code }}
+                        <twig:Badge style="{{ doc_type_badge_style(entry.docType.code) }}" title="{{ entry.docType.description }}">{{ entry.docType.code }}
                         </twig:Badge>
                     </td>
                     <td class="hidden sm:table-cell px-4 py-3 text-muted-foreground text-xs">
