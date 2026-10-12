@@ -1,9 +1,12 @@
 # Release Notes
 
-## Version 1.5.1 (07 October 2026)
+## Version 1.6.0 (12 October 2026)
 
 - The guide now states that titles must be written in British English.
+- The guide has a more compact layout with quick links to each section, reads better in dark mode, and its examples have been corrected.
 - FIX: Main categories are now sorted by number in the ledger filter and the entry form.
+- The feasibility code list on the `Admin` page now shows the subsidiary before the requestor.
+- Hover over a subsidiary or document type in the ledger to see its full name.
 
 ## Version 1.5.0 (05 October 2026)
 
